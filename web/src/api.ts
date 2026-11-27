@@ -1,4 +1,5 @@
 const BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'https://chanceclub-api.onrender.com/api/v1';
+export const HEALTH_URL = BASE.replace(/\/api\/v1\/?$/, '') + '/up';
 
 const TOKEN_KEY = 'cc.token';
 const USER_KEY = 'cc.user';

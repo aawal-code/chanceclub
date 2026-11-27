@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type WordleGame } from '../api';
 import type { Strings } from '../i18n';
 import { Btn, Card, Spinner, useToast } from '../components/ui';
@@ -6,6 +6,7 @@ import { Keyboard, WordleBoard, keyStatesFrom } from './Wordle';
 
 export default function WordleSolo({ t, onBack }: { t: Strings; onBack: () => void }) {
   const toast = useToast();
+  const wordsRef = useRef<Set<string> | null>(null);
   const [game, setGame] = useState<WordleGame | null>(null);
   const [current, setCurrent] = useState('');
   const [shake, setShake] = useState(false);
@@ -27,12 +28,21 @@ export default function WordleSolo({ t, onBack }: { t: Strings; onBack: () => vo
   }, [t.error, toast]);
 
   useEffect(() => { start(); }, [start]);
+  useEffect(() => {
+    import('./wordlist').then((mod) => { wordsRef.current = mod.WORDSET; }).catch(() => { /* server still validates */ });
+  }, []);
 
   const submit = useCallback(async () => {
     if (!game || game.done || busy) return;
     if (current.length !== 5) {
       setShake(true);
       window.setTimeout(() => setShake(false), 420);
+      return;
+    }
+    if (wordsRef.current && !wordsRef.current.has(current.toLowerCase())) {
+      setShake(true);
+      window.setTimeout(() => setShake(false), 420);
+      toast(t.notInDict);
       return;
     }
     setBusy(true);

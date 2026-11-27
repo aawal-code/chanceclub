@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, ApiError, getGuestName, getSavedUser, getToken, onSlowRequest, setGuestName, setSavedUser, setToken, type Party } from './api';
+import { api, ApiError, getGuestName, getSavedUser, getToken, HEALTH_URL, onSlowRequest, setGuestName, setSavedUser, setToken, type Party } from './api';
 import { strings, type Locale } from './i18n';
 import { Brand, DieLogo } from './components/brand';
 import { Btn, Card, Field, Spinner, ToastProvider, useToast } from './components/ui';
@@ -74,6 +74,7 @@ export default function App() {
   const [route, setRoute] = useState<Route>(() => parseHash());
   const [identity, setIdentity] = useState<Identity>(null);
   const [booting, setBooting] = useState(true);
+  const [wakePct, setWakePct] = useState(0);
   const [parties, setParties] = useState<Party[]>([]);
   const [activeParty, setActiveParty] = useState<Party | null>(null);
   const [guestName, setGuestNameState] = useState(() => getGuestName());
@@ -104,6 +105,22 @@ export default function App() {
   /* ---- boot: restore session ---- */
   useEffect(() => {
     (async () => {
+      /* Wake gate: never let the app boot into a sleeping server. Poll /up and show real progress. */
+      const isUp = async (): Promise<boolean> => {
+        try { const r = await fetch(HEALTH_URL, { cache: 'no-store' }); return r.ok; } catch { return false; }
+      };
+      if (!(await isUp())) {
+        const startedAt = Date.now();
+        await new Promise<void>((resolve) => {
+          const timer = window.setInterval(async () => {
+            const elapsed = (Date.now() - startedAt) / 1000;
+            const pct = elapsed < 3 ? 10 + elapsed * 8 : Math.min(95, 34 + 61 * (1 - Math.exp(-(elapsed - 3) / 25)));
+            setWakePct(Math.round(pct));
+            if (await isUp()) { window.clearInterval(timer); setWakePct(100); resolve(); }
+            else if (elapsed > 180) { window.clearInterval(timer); resolve(); }
+          }, 1500);
+        });
+      }
       const params = new URLSearchParams(window.location.search);
       const legacyJoin = params.get('join');
       if (legacyJoin) {
@@ -314,8 +331,13 @@ export default function App() {
     if (booting) {
       return (
         <div className="auth-shell">
-          <div className="row gap-10 center" style={{ color: 'var(--muted)' }}>
-            <Spinner /> {t.loading}
+          <div className="stack gap-12 center" style={{ color: 'var(--muted)', maxWidth: 320, width: '100%' }}>
+            <div className="row gap-10 center"><Spinner /> {wakePct > 0 ? t.waking : t.loading}</div>
+            {wakePct > 0 ? (
+              <div className="wake-bar" role="progressbar" aria-valuenow={wakePct} aria-valuemin={0} aria-valuemax={100}>
+                <div className="wake-bar-fill" style={{ width: `${wakePct}%` }} />
+              </div>
+            ) : null}
           </div>
         </div>
       );
