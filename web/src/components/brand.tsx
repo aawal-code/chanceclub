@@ -186,7 +186,7 @@ export function Glyph({ name, size = 22 }: GlyphProps) {
       return <svg {...common} className="flip-rtl"><path d="M4 12h15M13 6l6 6-6 6" /></svg>;
     case 'trophy':
       return <svg {...common}><path d="M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5" /><path d="M12 14v4M8.5 20.5h7M9.5 18h5" /></svg>;
-    case 'medal': return <svg {...common}><path d="M8 3l4 6 4-6" opacity="0.6" /><circle cx="12" cy="15" r="6" /></svg>;
+    case 'medal': return <svg {...common}><path d="M8.5 2.5l2.6 7M15.5 2.5l-2.6 7" /><circle cx="12" cy="15.5" r="5.5" /></svg>;
     case 'crown': return <svg {...common}><path d="M3.5 8l4.5 4 4-7 4 7 4.5-4-1.8 10.5H5.3z" /></svg>;
     case 'bulb': return <svg {...common}><path d="M9 18h6M10 21h4" /><path d="M12 3.5a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.2 1.1 2.2h5c0-1 .4-1.6 1.1-2.2A6 6 0 0 0 12 3.5z" /></svg>;
     case 'stats': return <svg {...common}><path d="M5 20V11M12 20V4M19 20v-6" /></svg>;
