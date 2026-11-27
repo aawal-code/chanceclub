@@ -5,6 +5,7 @@ import { Glyph } from '../components/brand';
 import { Btn, Card, Field, useToast, LagPill } from '../components/ui';
 import { Wheel, angleFor } from '../games/Wheel';
 import { BracketView } from '../games/Bracket';
+const DrawGame = React.lazy(() => import('../games/DrawGame'));
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 
 const AWARD_GAMES = ['categories', 'whoami', 'charades'];
@@ -27,6 +28,14 @@ export default function GameScreen({
   const game = round?.game || party.game || 'dice';
   const isMyTurn = !!round && round.turn_player_id === party.self_player_id;
   const turnName = round ? party.members.find((member) => member.id === round.turn_player_id)?.name : undefined;
+
+  if (game === 'draw') {
+    return (
+      <React.Suspense fallback={<p className="caption">{t.loading}</p>}>
+        <DrawGame t={t} locale={locale} party={party} onLeave={onLeave} onBack={onBack} />
+      </React.Suspense>
+    );
+  }
 
   return (
     <div className="stage fade-up">

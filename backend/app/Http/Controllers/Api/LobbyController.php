@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LobbyController extends Controller
 {
-    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket'];
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw'];
 
     private const PROMPTS = [
         'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],
@@ -23,7 +23,7 @@ class LobbyController extends Controller
         'wyr' => ['Explore space or the deep ocean?', 'Always sing instead of speaking or dance everywhere?', 'Live without music or without movies?', 'Have a rewind button or a pause button for life?'],
         'likely' => ['Who is most likely to become a famous chef?', 'Who would survive longest on a desert island?', 'Who is most likely to laugh at the wrong moment?', 'Who would plan the best surprise party?'],
         'yesno' => ['Ask chance to decide!'], 'dice' => ['Ready to roll?'], 'coin' => ['Flip the coin'],
-        'bracket' => ['Who takes the crown?'], 'wheel' => ['Who will chance pick?'], 'number' => ['Pick a number from 1 to 100'],
+        'bracket' => ['Who takes the crown?'], 'draw' => ['Draw it, guess it!'], 'wheel' => ['Who will chance pick?'], 'number' => ['Pick a number from 1 to 100'],
         'wordle' => ['Guess the five-letter word'],
     ];
 
@@ -41,7 +41,7 @@ class LobbyController extends Controller
         'wyr' => ['استكشاف الفضاء أم أعماق المحيط؟', 'الغناء دائماً أم الرقص في كل مكان؟', 'العيش بلا موسيقى أم بلا أفلام؟', 'زر لإعادة الوقت أم لإيقافه؟'],
         'likely' => ['من الأكثر احتمالاً أن يصبح طاهياً مشهوراً؟', 'من سيصمد أكثر في جزيرة مهجورة؟', 'من سيضحك في وقت غير مناسب؟', 'من سينظم أفضل حفلة مفاجأة؟'],
         'yesno' => ['اسأل الحظ ليقرر!'], 'dice' => ['ارمِ النرد'], 'coin' => ['اقلب العملة'],
-        'bracket' => ['من سيحمل التاج؟'], 'wheel' => ['من سيختاره الحظ؟'], 'number' => ['اختر رقماً من 1 إلى 100'],
+        'bracket' => ['من سيحمل التاج؟'], 'draw' => ['ارسم وخمّن!'], 'wheel' => ['من سيختاره الحظ؟'], 'number' => ['اختر رقماً من 1 إلى 100'],
         'wordle' => ['خمّن الكلمة'],
     ];
 
@@ -60,7 +60,7 @@ class LobbyController extends Controller
         'wyr' => ['Weltraum oder Tiefsee erkunden?', 'Immer singen statt sprechen oder überall tanzen?', 'Ohne Musik oder ohne Filme leben?', 'Eine Rückspultaste oder eine Pausentaste fürs Leben?'],
         'likely' => ['Wer wird am ehesten ein berühmter Koch?', 'Wer überlebt am längsten auf einer einsamen Insel?', 'Wer lacht am ehesten im falschen Moment?', 'Wer plant die beste Überraschungsparty?'],
         'yesno' => ['Lass den Zufall entscheiden!'], 'dice' => ['Bereit zu würfeln?'], 'coin' => ['Münze werfen'],
-        'bracket' => ['Wer holt sich die Krone?'], 'wheel' => ['Wen wählt der Zufall?'], 'number' => ['Wähle eine Zahl von 1 bis 100'],
+        'bracket' => ['Wer holt sich die Krone?'], 'draw' => ['Zeichnen und raten!'], 'wheel' => ['Wen wählt der Zufall?'], 'number' => ['Wähle eine Zahl von 1 bis 100'],
         'wordle' => ['Errate das fünfstellige Wort'],
     ];
 

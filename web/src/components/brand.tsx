@@ -74,6 +74,13 @@ export function Glyph({ name, size = 22 }: GlyphProps) {
           <path d="M12 3.5v17M3.5 12h17M6 6l12 12M18 6L6 18" opacity="0.45" />
         </svg>
       );
+    case 'draw':
+      return (
+        <svg {...common}>
+          <path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1z" />
+          <path d="M14 7l3 3" opacity="0.55" />
+        </svg>
+      );
     case 'bracket':
       return (
         <svg {...common}>

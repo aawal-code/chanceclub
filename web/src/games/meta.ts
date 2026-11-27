@@ -14,6 +14,7 @@ export const GAMES: GameMeta[] = [
   { id: 'number', modes: ['solo', 'party'] },
   { id: 'yesno', modes: ['solo', 'party'] },
   { id: 'bracket', modes: ['solo', 'party'] },
+  { id: 'draw', modes: ['party'] },
   { id: 'trivia', modes: ['party'] },
   { id: 'wyr', modes: ['party'] },
   { id: 'likely', modes: ['party'] },
