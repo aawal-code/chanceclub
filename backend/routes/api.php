@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\LobbyController;
 use App\Http\Controllers\Api\WordleController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/v1/up', fn () => response()->json(['up' => true]));
+
 Route::prefix('v1')->group(function () {
     Route::middleware('throttle:30,1')->group(function () {
         Route::post('/register', [ChanceClubController::class, 'register']);
