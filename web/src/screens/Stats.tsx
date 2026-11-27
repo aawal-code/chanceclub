@@ -82,7 +82,8 @@ export default function Stats({ t, partyCode, hasIdentity }: { t: Strings; party
           )}
           <Card pad="lg" className="stack gap-12">
             {board.rows.map((r) => (
-              <div key={r.player_key} className="row gap-10 center">
+              <div key={r.player_key} className="row gap-10 center rank-row">
+                <span className="rank-bar bar-grow" aria-hidden style={{ width: `${Math.max(4, Math.round((r.wins / Math.max(1, board.rows[0]?.wins || 1)) * 100))}%` }} />
                 <span className="mono" style={{ width: 28, fontSize: 16 }}>{r.wins > 0 ? medal(r.rank) : '·'}</span>
                 <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{r.name}{r.player_key === board.me ? ` · ${t.youLabel}` : ''}</span>
                 <span className="caption mono">{r.games}×</span>

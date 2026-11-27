@@ -29,3 +29,9 @@ export const partyGames = GAMES.filter((game) => game.modes.includes('party'));
 export function gameById(id: string): GameMeta | undefined {
   return GAMES.find((game) => game.id === id);
 }
+
+export const GAME_GROUPS: { key: 'gWords' | 'gFun' | 'gChance'; ids: string[] }[] = [
+  { key: 'gWords', ids: ['wordle', 'draw', 'categories', 'charades', 'whoami'] },
+  { key: 'gFun', ids: ['trivia', 'wyr', 'likely'] },
+  { key: 'gChance', ids: ['dice', 'coin', 'wheel', 'number', 'yesno', 'bracket'] },
+];

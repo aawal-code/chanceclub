@@ -776,3 +776,8 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .medal.m2 { color: var(--ink); } .medal.m2 svg circle { fill: currentColor; fill-opacity: .45; }
 .medal.m3 { color: var(--muted); } .medal.m3 svg circle { fill: currentColor; fill-opacity: .25; }
 .crown, .trophy-drop { color: var(--ink); display: inline-grid; place-items: center; }
+
+.rank-row { position: relative; padding: 6px 8px; border-radius: 10px; overflow: hidden; }
+.rank-row > *:not(.rank-bar) { position: relative; }
+.rank-bar { position: absolute; inset-block: 0; inset-inline-start: 0; background: var(--surface-2); border-radius: 10px; z-index: 0; }
+[dir='rtl'] .bar-grow { transform-origin: right; }

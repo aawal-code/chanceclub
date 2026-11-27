@@ -1,3 +1,4 @@
+import { GAME_GROUPS } from '../games/meta';
 import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
 import TournamentCard from './TournamentCard';
@@ -130,8 +131,11 @@ export default function PartyScreen({
               <div className="section-head">
                 <h2 className="h2">{t.chooseGame}</h2>
               </div>
+              {GAME_GROUPS.map((grp) => (
+                <div key={grp.key} className="stack gap-8">
+                  <p className="caption" style={{ fontWeight: 700 }}>{t[grp.key]}</p>
               <div className="game-grid">
-                {GAMES.map((game) => (
+                {GAMES.filter((g) => grp.ids.includes(g)).map((game) => (
                   <button
                     key={game}
                     className="game-card"
@@ -145,6 +149,8 @@ export default function PartyScreen({
                   </button>
                 ))}
               </div>
+                </div>
+              ))}
               {picked === 'bracket' && <SetupForm t={t} setup={bSetup} onChange={setBSetup} hint={t.bracketPartyHint} />}
               {picked === 'wheel' && (
                 <div className="stack gap-10">

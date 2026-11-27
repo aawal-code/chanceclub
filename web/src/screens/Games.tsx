@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Strings } from '../i18n';
 import { Glyph } from '../components/brand';
-import { soloGames, partyGames } from '../games/meta';
+import { soloGames, partyGames, GAME_GROUPS } from '../games/meta';
 
 export default function Games({ t, onOpen, onParty }: { t: Strings; onOpen: (id: string) => void; onParty: () => void }) {
   return (
@@ -39,8 +39,11 @@ export default function Games({ t, onOpen, onParty }: { t: Strings; onOpen: (id:
           </div>
           <button className="nav-link" onClick={onParty}>{t.startParty}<Glyph name="arrow" size={16} /></button>
         </div>
+        {GAME_GROUPS.map((grp) => (
+          <div key={grp.key} className="stack gap-8" style={{ marginBottom: 16 }}>
+            <p className="caption" style={{ fontWeight: 700 }}>{t[grp.key]}</p>
         <div className="game-grid stagger">
-          {partyGames.map((game) => (
+          {partyGames.filter((g) => grp.ids.includes(g.id)).map((game) => (
             <button key={`p-${game.id}`} className="game-card" onClick={() => onOpen(game.id)}>
               <span className="badge">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
               <span className="glyph"><Glyph name={game.id} /></span>
@@ -49,6 +52,8 @@ export default function Games({ t, onOpen, onParty }: { t: Strings; onOpen: (id:
             </button>
           ))}
         </div>
+          </div>
+        ))}
       </section>
     </div>
   );
