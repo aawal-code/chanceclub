@@ -1,3 +1,4 @@
+import { Glyph } from '../components/brand';
 import CountUp from '../components/CountUp';
 import { motionOn } from '../motion';
 import { friendlyError } from '../friendly';
@@ -34,7 +35,7 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
       <p className="caption">{t.tStandings}</p>
       {tour.standings.map((s, i) => (
         <div key={s.player_key} className="row gap-10 center">
-          <span className="mono" style={{ width: 24 }}>{s.points > 0 ? (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1) : '·'}</span>
+          <span className="mono" style={{ width: 24 }}>{s.points > 0 ? (i < 3 ? <span className={`medal m${i + 1}`}><Glyph name="medal" size={20} /></span> : i + 1) : '·'}</span>
           <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{s.name}</span>
           <span className="mono" style={{ fontWeight: 800 }}><CountUp to={s.points} /> {t.tPoints}</span>
         </div>
@@ -45,7 +46,7 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
   if (tour && tour.status === 'done') {
     return (
       <Card pad="lg" className="stack gap-12" style={{ position: 'relative', overflow: 'hidden' }}>
-        <div className="row gap-12 center"><span className="trophy-drop" style={{ fontSize: 34 }}>🏆</span>{motionOn() && <span className="confetti" aria-hidden>{Array.from({ length: 22 }, (_, i) => <i key={i} style={{ left: `${(i * 37) % 100}%`, animationDelay: `${(i % 7) * 0.08}s`, background: ["#f43f5e","#facc15","#22c55e","#38bdf8","#a78bfa"][i % 5] }} />)}</span>}
+        <div className="row gap-12 center"><span className="trophy-drop" ><Glyph name="trophy" size={38} /></span>{motionOn() && <span className="confetti" aria-hidden>{Array.from({ length: 22 }, (_, i) => <i key={i} style={{ left: `${(i * 37) % 100}%`, animationDelay: `${(i % 7) * 0.08}s`, background: ["var(--accent)","var(--ink)","var(--muted)","var(--accent)","var(--faint)"][i % 5] }} />)}</span>}
           <div className="grow"><div className="caption">{t.tChampion}</div><div className="h2">{tour.standings[0]?.name ?? ''}</div></div></div>
         {standings}
         {party.is_host && <Btn variant="ghost" onClick={() => run(() => api.tournamentCreate(party.code, pool, count))} disabled={busy}>{t.tNewOne}</Btn>}
@@ -64,8 +65,8 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
               <span className="mono caption" style={{ width: 22 }}>{tour.index + i + 1}</span>
               <span className="grow" style={{ fontWeight: i === 0 ? 800 : 600 }}>{gname(g)}</span>
               {party.is_host && <>
-                <Btn variant="ghost" size="sm" disabled={busy || i === 0} onClick={() => move(i, -1)} aria-label="up">↑</Btn>
-                <Btn variant="ghost" size="sm" disabled={busy || i === rest.length - 1} onClick={() => move(i, 1)} aria-label="down">↓</Btn>
+                <Btn variant="ghost" size="sm" disabled={busy || i === 0} onClick={() => move(i, -1)} aria-label="up"><Glyph name="up" size={16} /></Btn>
+                <Btn variant="ghost" size="sm" disabled={busy || i === rest.length - 1} onClick={() => move(i, 1)} aria-label="down"><Glyph name="down" size={16} /></Btn>
               </>}
             </div>
           ))}

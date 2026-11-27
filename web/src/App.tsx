@@ -4,6 +4,7 @@ import { api, ApiError, getGuestName, getSavedUser, getToken, HEALTH_URL, onSlow
 import { strings, type Locale, getStrings, DEFAULT_AR_DIALECT } from './i18n';
 import type { ArDialect } from './i18n';
 import { Brand, DieLogo } from './components/brand';
+import { Glyph } from './components/brand';
 import { Btn, Card, Field, Spinner, ToastProvider, useToast } from './components/ui';
 const Home = React.lazy(() => import('./screens/Home'));
 const PartyScreen = React.lazy(() => import('./screens/Party'));
@@ -37,7 +38,6 @@ export type Identity = { kind: 'user' | 'guest'; name: string } | null;
 
 export type ThemeName = 'ink' | 'paper' | 'midnight' | 'sand' | 'neon' | 'brutal' | 'terminal' | 'candy' | 'forest' | 'newsprint';
 const THEME_ORDER: ThemeName[] = ['ink', 'paper', 'midnight', 'sand', 'neon', 'brutal', 'terminal', 'candy', 'forest', 'newsprint'];
-const THEME_ICON: Record<ThemeName, string> = { ink: '◐', paper: '☀', midnight: '☾', sand: '◑', neon: '✦', brutal: '■', terminal: '>_', candy: '♥', forest: '❦', newsprint: '❡' };
 const THEME_KEY = 'cc.theme';
 
 function normalizeTheme(value: string | null): ThemeName {
@@ -533,7 +533,7 @@ export default function App() {
           ))}
         </nav>
         <div className="top-actions">
-          <button className="icon-btn" onClick={() => go({ name: 'settings' })} aria-label={t.settings} title={t.settings} data-active={route.name === 'settings'}>⚙</button>
+          <button className="icon-btn" onClick={() => go({ name: 'settings' })} aria-label={t.settings} title={t.settings} data-active={route.name === 'settings'}><Glyph name="gear" size={18} /></button>
           <button className="avatar" onClick={() => go({ name: 'profile' })} aria-label={t.profile}>
             {(identity?.name || 'A').charAt(0).toUpperCase()}
           </button>
@@ -553,7 +553,7 @@ export default function App() {
             data-active={route.name === item.id || (item.id === 'party' && route.name === 'game')}
             onClick={() => go({ name: item.id } as Route)}
           >
-            <span style={{ fontSize: 17, lineHeight: 1 }}>{iconFor(item.icon)}</span>
+            <span className="nav-ic">{iconFor(item.icon)}</span>
             {item.label}
           </button>
         ))}
@@ -563,14 +563,8 @@ export default function App() {
 }
 
 function iconFor(name: string) {
-  switch (name) {
-    case 'home': return '⌂';
-    case 'party': return '✦';
-    case 'games': return '◈';
-    case 'teams': return '❖';
-    case 'stats': return '❖';
-    default: return '●';
-  }
+  const map: Record<string, string> = { home: 'home', party: 'party', games: 'games', teams: 'stats', stats: 'stats', profile: 'profile' };
+  return <Glyph name={map[name] || 'dot'} size={22} />;
 }
 
 /* wrap the app in the toast provider at the module root */

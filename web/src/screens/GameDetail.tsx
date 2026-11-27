@@ -24,7 +24,7 @@ export default function GameDetail({
   return (
     <div className="stack gap-20 fade-up detail-wrap">
       <div className="row gap-10 center">
-        <Btn variant="ghost" size="sm" onClick={onBack}>← {t.games}</Btn>
+        <Btn variant="ghost" size="sm" onClick={onBack}><Glyph name="back" size={16} /> {t.games}</Btn>
       </div>
 
       <div className="detail">

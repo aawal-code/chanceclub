@@ -37,7 +37,7 @@ export default function Games({ t, onOpen, onParty }: { t: Strings; onOpen: (id:
             <h2 className="h2">{t.partyGames}</h2>
             <p className="section-sub">{t.partyHint}</p>
           </div>
-          <button className="nav-link" onClick={onParty}>{t.startParty} →</button>
+          <button className="nav-link" onClick={onParty}>{t.startParty}<Glyph name="arrow" size={16} /></button>
         </div>
         <div className="game-grid stagger">
           {partyGames.map((game) => (

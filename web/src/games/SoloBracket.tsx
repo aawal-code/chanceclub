@@ -21,7 +21,7 @@ export default function SoloBracket({ t, onBack }: { t: Strings; onBack: () => v
     <div className="stack gap-20 fade-up" style={{ maxWidth: 860, margin: '0 auto', width: '100%', minWidth: 0 }}>
       <div className="row between center wrap gap-10">
         <div className="row gap-10 center">
-          <Btn variant="ghost" size="sm" onClick={onBack}>← {t.back}</Btn>
+          <Btn variant="ghost" size="sm" onClick={onBack}><Glyph name="back" size={16} /> {t.back}</Btn>
           <span className="row gap-8 center"><Glyph name="bracket" size={18} /><span className="caption">{t.gameNames.bracket}</span></span>
         </div>
         <span className="caption">{t.solo}</span>

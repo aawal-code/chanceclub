@@ -763,3 +763,16 @@ body { transition: background-color .35s ease, color .35s ease; }
 .ready-pop { display: inline-block; animation: ready-pop .35s cubic-bezier(.3,1.6,.5,1) both; color: var(--ink); font-weight: 700; }
 @keyframes ready-pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: none; } }
 .tip-line { margin: 0 0 12px; padding: 10px 14px; border-radius: 12px; background: var(--surface-2); font-size: 14px; cursor: pointer; display: flex; gap: 8px; align-items: center; justify-content: space-between; min-height: 44px; }
+
+html { --icon-sw: 1.7; }
+html[data-theme='brutal'] { --icon-sw: 2.5; }
+html[data-theme='terminal'], html[data-theme='newsprint'] { --icon-sw: 1.4; }
+html[data-theme='neon'] { --icon-sw: 1.9; }
+svg { flex-shrink: 0; vertical-align: middle; }
+[dir='rtl'] .flip-rtl { transform: scaleX(-1); }
+.nav-ic { display: grid; place-items: center; height: 24px; }
+.medal { display: inline-grid; place-items: center; }
+.medal.m1 { color: var(--ink); } .medal.m1 svg circle { fill: currentColor; fill-opacity: .9; }
+.medal.m2 { color: var(--ink); } .medal.m2 svg circle { fill: currentColor; fill-opacity: .45; }
+.medal.m3 { color: var(--muted); } .medal.m3 svg circle { fill: currentColor; fill-opacity: .25; }
+.crown, .trophy-drop { color: var(--ink); display: inline-grid; place-items: center; }

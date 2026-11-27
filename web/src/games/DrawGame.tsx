@@ -1,3 +1,4 @@
+import { Glyph } from '../components/brand';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { WS_URL, getToken } from '../api';
 import type { Party } from '../api';
@@ -195,7 +196,7 @@ export default function DrawGame({ t, locale, party, onLeave, onBack }: {
   const header = (
     <div className="row between center wrap gap-10">
       <div className="row gap-10 center">
-        <Btn variant="ghost" size="sm" onClick={onBack}>← {t.lobby}</Btn>
+        <Btn variant="ghost" size="sm" onClick={onBack}><Glyph name="back" size={16} /> {t.lobby}</Btn>
         <span className="caption">{party.name} · {party.code}</span>
       </div>
       <div className="row gap-8 center">
@@ -365,8 +366,8 @@ export default function DrawGame({ t, locale, party, onLeave, onBack }: {
             <div key={p.id} className="dr-player" data-guessed={p.guessed} data-drawer={p.id === st.drawer}>
               <span className="avatar-chip" style={{ width: 28, height: 28, borderRadius: 8, fontSize: 12 }}>{p.name.charAt(0).toUpperCase()}</span>
               <span className="grow dr-pname">{p.name}{p.id === st.me ? ` · ${t.you}` : ''}</span>
-              {p.id === st.drawer && <span className="dr-tag">✎</span>}
-              {p.guessed && <span className="dr-tag ok">✓</span>}
+              {p.id === st.drawer && <span className="dr-tag"><Glyph name="pencil" size={14} /></span>}
+              {p.guessed && <span className="dr-tag ok"><Glyph name="check" size={14} /></span>}
               <span className="mono" style={{ fontWeight: 800 }}>{p.score}</span>
             </div>
           ))}

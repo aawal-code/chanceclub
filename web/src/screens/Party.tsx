@@ -97,7 +97,7 @@ export default function PartyScreen({
                       {member.is_host ? <span className="caption" style={{ marginLeft: 8 }}>· {t.host}</span> : null}
                       {member.id === activeParty.self_player_id ? <span className="caption" style={{ marginLeft: 8 }}>· {t.you}</span> : null}
                     </span>
-                    <span className="meta">{member.online ? t.connected : t.offline} · {member.ready ? <span className="ready-pop">✓ {t.ready}</span> : t.notReady} · <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} /></span>
+                    <span className="meta">{member.online ? t.connected : t.offline} · {member.ready ? <span className="ready-pop"><Glyph name="check" size={13} /> {t.ready}</span> : t.notReady} · <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} /></span>
                   </div>
                   <span className="dot" data-on={member.online} />
                   <span className="mono" style={{ fontWeight: 700 }}>{member.score}</span>
@@ -198,7 +198,7 @@ export default function PartyScreen({
           <h1 className="h1">{activeParty.name}</h1>
           <p className="body">{t.gameNames[activeParty.game || ''] || activeParty.game}</p>
           <div className="row gap-10 wrap">
-            <Btn onClick={onOpenGame}>{t.open} →</Btn>
+            <Btn onClick={onOpenGame}>{t.open}<Glyph name="arrow" size={16} /></Btn>
             <Btn variant="ghost" onClick={onLeave}>{t.leave}</Btn>
           </div>
         </Card>

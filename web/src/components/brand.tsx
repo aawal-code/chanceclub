@@ -49,7 +49,7 @@ type GlyphProps = { name: string; size?: number };
 
 /** Minimal monochrome glyphs, one per game. */
 export function Glyph({ name, size = 22 }: GlyphProps) {
-  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
+  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', style: { strokeWidth: 'var(--icon-sw, 1.7)' } as React.CSSProperties, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
   switch (name) {
     case 'dice':
       return (
@@ -183,7 +183,23 @@ export function Glyph({ name, size = 22 }: GlyphProps) {
     case 'check':
       return <svg {...common}><path d="M4.5 12.5l5 5 10-11" /></svg>;
     case 'arrow':
-      return <svg {...common}><path d="M4 12h15M13 6l6 6-6 6" /></svg>;
+      return <svg {...common} className="flip-rtl"><path d="M4 12h15M13 6l6 6-6 6" /></svg>;
+    case 'trophy':
+      return <svg {...common}><path d="M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M7 6H4v1.5A3.5 3.5 0 0 0 7.5 11M17 6h3v1.5a3.5 3.5 0 0 1-3.5 3.5" /><path d="M12 14v4M8.5 20.5h7M9.5 18h5" /></svg>;
+    case 'medal': return <svg {...common}><path d="M8 3l4 6 4-6" opacity="0.6" /><circle cx="12" cy="15" r="5.5" /></svg>;
+    case 'crown': return <svg {...common}><path d="M3.5 8l4.5 4 4-7 4 7 4.5-4-1.8 10.5H5.3z" /></svg>;
+    case 'bulb': return <svg {...common}><path d="M9 18h6M10 21h4" /><path d="M12 3.5a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.2 1.1 2.2h5c0-1 .4-1.6 1.1-2.2A6 6 0 0 0 12 3.5z" /></svg>;
+    case 'stats': return <svg {...common}><path d="M5 20V11M12 20V4M19 20v-6" /></svg>;
+    case 'gear': return <svg {...common}><circle cx="12" cy="12" r="3" /><path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" /></svg>;
+    case 'pencil': return <svg {...common}><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1z" /></svg>;
+    case 'up': return <svg {...common}><path d="M12 19V6M6 11l6-6 6 6" /></svg>;
+    case 'down': return <svg {...common}><path d="M12 5v13M6 13l6 6 6-6" /></svg>;
+    case 'close': return <svg {...common}><path d="M6 6l12 12M18 6L6 18" /></svg>;
+    case 'plus': return <svg {...common}><path d="M12 5v14M5 12h14" /></svg>;
+    case 'back': return <svg {...common} className="flip-rtl"><path d="M20 12H5M11 6l-6 6 6 6" /></svg>;
+    case 'dot': return <svg {...common}><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none" /></svg>;
+    case 'confetti': return <svg {...common}><path d="M4 20l5.5-12 7 7z" /></svg>;
+
     default:
       return <svg {...common}><circle cx="12" cy="12" r="8" /></svg>;
   }

@@ -42,7 +42,7 @@ export default function GameScreen({
     <div className="stage fade-up">
       <div className="row between center wrap gap-10">
         <div className="row gap-10 center">
-          <Btn variant="ghost" size="sm" onClick={party.is_host ? onFinish : onBack}>← {party.is_host ? t.endGame : t.lobby}</Btn>
+          <Btn variant="ghost" size="sm" onClick={party.is_host ? onFinish : onBack}><Glyph name="back" size={16} /> {party.is_host ? t.endGame : t.lobby}</Btn>
           <span className="caption">{party.name} · {party.code}</span>
         </div>
         <div className="row gap-8 center">
@@ -261,7 +261,7 @@ function AwardRound({ t, round, party, onAct }: { t: Strings; round: Round; part
                 disabled={scored.has(member.id)}
                 onClick={() => onAct({ type: 'point', target_player_id: Number(member.id) })}
               >
-                {member.name} {scored.has(member.id) ? '✓' : '+'}
+                {member.name} {scored.has(member.id) ? <Glyph name="check" size={14} /> : <Glyph name="plus" size={14} />}
               </Btn>
             ))}
           </div>

@@ -66,7 +66,7 @@ export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: 
     <div className="stack gap-20 fade-up" style={{ maxWidth: 720, margin: '0 auto' }}>
       <div className="row between center wrap gap-10">
         <div className="row gap-10 center">
-          <Btn variant="ghost" size="sm" onClick={onBack}>← {t.back}</Btn>
+          <Btn variant="ghost" size="sm" onClick={onBack}><Glyph name="back" size={16} /> {t.back}</Btn>
           <span className="row gap-8 center">
             <Glyph name={gameId} size={18} />
             <span className="caption">{t.gameNames[gameId]}</span>

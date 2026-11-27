@@ -1,3 +1,4 @@
+import { Glyph } from '../components/brand';
 import { friendlyError } from '../friendly';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type WordleGame } from '../api';
@@ -90,7 +91,7 @@ export default function WordleSolo({ t, onBack }: { t: Strings; onBack: () => vo
           <h1 className="h1">{t.wordle}</h1>
         </div>
         <div className="row gap-8">
-          <Btn variant="ghost" size="sm" onClick={onBack}>← {t.back}</Btn>
+          <Btn variant="ghost" size="sm" onClick={onBack}><Glyph name="back" size={16} /> {t.back}</Btn>
           <Btn variant="soft" size="sm" onClick={start} disabled={busy}>{t.newWord}</Btn>
         </div>
       </div>

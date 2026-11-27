@@ -33,7 +33,7 @@ export default function Home({
           <p className="lead">{t.heroLead}</p>
           {tipOpen && (
             <p className="tip-line" onClick={() => { setTipOpen(false); try { localStorage.setItem('cc.tip1', '1'); } catch { /* ignore */ } }}>
-              💡 {t.firstTip} <b>×</b>
+              <Glyph name="bulb" size={18} /> <span style={{ flex: 1 }}>{t.firstTip}</span> <Glyph name="close" size={16} />
             </p>
           )}
           <div className="hero-actions">
@@ -52,9 +52,9 @@ export default function Home({
             </div>
           )}
           <div className="hero-meta">
-            <span>● {t.hostedFree}</span>
-            <span>● {t.noAccount}</span>
-            <span>● {t.instant}</span>
+            <span><Glyph name="check" size={14} /> {t.hostedFree}</span>
+            <span><Glyph name="check" size={14} /> {t.noAccount}</span>
+            <span><Glyph name="check" size={14} /> {t.instant}</span>
           </div>
         </div>
         <div className="hero-art">
@@ -108,7 +108,7 @@ export default function Home({
             <h2 className="h1">{t.partyGames}</h2>
             <p className="section-sub">{t.partyHint}</p>
           </div>
-          <Btn variant="ghost" size="sm" onClick={onBrowse}>{t.allGames} →</Btn>
+          <Btn variant="ghost" size="sm" onClick={onBrowse}>{t.allGames}<Glyph name="arrow" size={16} /></Btn>
         </div>
         <div className="game-grid stagger">
           {partyGames.map((game) => (

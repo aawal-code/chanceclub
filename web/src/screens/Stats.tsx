@@ -1,3 +1,4 @@
+import { Glyph } from '../components/brand';
 import React, { useEffect, useState } from 'react';
 import { api, type Board, type HistoryRow } from '../api';
 import type { Strings } from '../i18n';
@@ -26,7 +27,7 @@ export default function Stats({ t, partyCode, hasIdentity }: { t: Strings; party
   }, [tab, days, game, partyCode, hasIdentity]);
 
   const gname = (id: string) => (t.gameNames as Record<string, string>)[id] || id;
-  const medal = (rank: number) => (rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : String(rank));
+  const medal = (rank: number) => (rank <= 3 ? <span className={`medal m${rank}`}><Glyph name="medal" size={20} /></span> : String(rank));
 
   return (
     <div className="stage fade-up">
@@ -55,7 +56,7 @@ export default function Stats({ t, partyCode, hasIdentity }: { t: Strings; party
             <Card pad="lg" className="stack gap-12">
               {hist.recent.map((r) => (
                 <div key={r.id + r.game} className="row gap-10 center">
-                  <span className="mono" style={{ width: 28, fontSize: 18 }}>{r.winner ? '🏆' : r.place ? `#${r.place}` : '·'}</span>
+                  <span className="mono" style={{ width: 28, fontSize: 18 }}>{r.winner ? <Glyph name="trophy" size={18} /> : r.place ? `#${r.place}` : '·'}</span>
                   <span className="grow">
                     <div style={{ fontWeight: 700, fontSize: 14 }}>{gname(r.game)}</div>
                     <div className="caption">{r.mode === 'solo' ? t.soloLabel : r.party} · {new Date(r.finished_at.replace(' ', 'T') + (r.finished_at.includes('Z') ? '' : 'Z')).toLocaleDateString()}</div>
@@ -74,7 +75,7 @@ export default function Stats({ t, partyCode, hasIdentity }: { t: Strings; party
         <>
           {board.most_winner && board.most_winner.wins > 0 && (
             <Card pad="lg" className="row gap-12 center">
-              <span style={{ fontSize: 34 }}>👑</span>
+              <span className="crown"><Glyph name="crown" size={34} /></span>
               <div className="grow"><div className="caption">{t.mostWinner}</div><div className="h2">{board.most_winner.name}</div></div>
               <div className="mono" style={{ fontWeight: 800, fontSize: 20 }}>{board.most_winner.wins}</div>
             </Card>
