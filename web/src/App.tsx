@@ -14,6 +14,7 @@ const GameDetail = React.lazy(() => import('./screens/GameDetail'));
 const SoloChance = React.lazy(() => import('./games/SoloChance'));
 const SoloBracket = React.lazy(() => import('./games/SoloBracket'));
 import { gameById } from './games/meta';
+import Stats from './screens/Stats';
 
 export type Route =
   | { name: 'home' }
@@ -21,6 +22,7 @@ export type Route =
   | { name: 'game' }
   | { name: 'games' }
   | { name: 'teams' }
+  | { name: 'stats' }
   | { name: 'profile' }
   | { name: 'wordle' }
   | { name: 'detail'; id: string }
@@ -54,6 +56,7 @@ function parseHash(): Route {
   if (head === 'games' && tail) return { name: 'detail', id: tail };
   if (head === 'games') return { name: 'games' };
   if (head === 'teams') return { name: 'teams' };
+  if (head === 'stats') return { name: 'stats' };
   if (head === 'profile') return { name: 'profile' };
   if (head === 'wordle') return { name: 'wordle' };
   if (head === 'play' && tail) return { name: 'solo', id: tail };
@@ -413,6 +416,8 @@ export default function App() {
         );
       case 'games':
         return <Games t={t} onOpen={(id) => go({ name: 'detail', id })} onParty={() => go({ name: 'party' })} />;
+      case 'stats':
+        return <Stats t={t} partyCode={activeParty?.code ?? null} hasIdentity={!!identity} />;
       case 'teams':
         return <Teams t={t} identity={identity} onSignIn={() => go({ name: 'profile' })} />;
       case 'profile':
@@ -479,7 +484,7 @@ export default function App() {
     { id: 'home', label: t.home, icon: 'home' },
     { id: 'party', label: t.party, icon: 'party' },
     { id: 'games', label: t.games, icon: 'games' },
-    { id: 'teams', label: t.teams, icon: 'teams' },
+    { id: 'stats', label: t.stats, icon: 'teams' },
     { id: 'profile', label: t.profile, icon: 'profile' },
   ];
 
@@ -548,6 +553,7 @@ function iconFor(name: string) {
     case 'party': return '✦';
     case 'games': return '◈';
     case 'teams': return '❖';
+    case 'stats': return '❖';
     default: return '●';
   }
 }

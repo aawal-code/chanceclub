@@ -197,6 +197,9 @@ export const api = {
   action: (code: string, body: Record<string, unknown>) =>
     request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/action`, 'POST', body),
   advance: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/advance`, 'POST'),
+  history: () => request<{ data: { games: number; wins: number; recent: HistoryRow[] } }>('/history'),
+  globalBoard: (game: string, days: number) => request<{ data: Board }>(`/leaderboard?days=${days}${game ? `&game=${game}` : ''}`),
+  partyBoard: (code: string, game: string, days: number) => request<{ data: Board }>(`/parties/${encodeURIComponent(code)}/leaderboard?days=${days}${game ? `&game=${game}` : ''}`),
   finish: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/finish`, 'POST'),
   heartbeat: (code: string, rttMs: number) =>
     request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/heartbeat`, 'POST', { rtt_ms: rttMs }),
@@ -207,3 +210,7 @@ export const api = {
   wordleShow: (id: string) => request<{ data: WordleGame }>(`/wordle/solo/${id}`),
   wordleGuess: (id: string, word: string) => request<{ data: WordleGame }>(`/wordle/solo/${id}/guess`, 'POST', { word }),
 };
+
+export type HistoryRow = { id: string; game: string; mode: string; party: string | null; score: number; place: number | null; winner: boolean; finished_at: string; rounds: number };
+export type BoardRow = { rank: number; player_key: string; name: string; games: number; wins: number; points: number };
+export type Board = { game: string | null; days: number; rows: BoardRow[]; me: string; mine?: BoardRow | null; most_winner: BoardRow | null };
