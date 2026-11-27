@@ -18,7 +18,7 @@ class ChanceClubController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'min:2', 'max:80'],
             'email' => ['required', 'email:rfc', 'max:190', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::min(10)->mixedCase()->numbers()],
+            'password' => ['required', 'string', Password::min(8)],
         ]);
 
         $user = User::create(['name' => trim($data['name']), 'email' => strtolower(trim($data['email'])), 'password' => Hash::make($data['password'])]);
@@ -46,8 +46,8 @@ class ChanceClubController extends Controller
     {
         $data = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'min:2', 'max:80'],
-            'preferred_language' => ['sometimes', 'in:en,ar'],
-            'theme' => ['sometimes', 'in:light,dark'],
+            'preferred_language' => ['sometimes', 'in:en,ar,de'],
+            'theme' => ['sometimes', 'in:ink,paper,midnight,sand,light,dark'],
         ]);
         $user = $this->user($request);
         $user->fill($data)->save();
