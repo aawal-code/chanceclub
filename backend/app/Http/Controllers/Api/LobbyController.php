@@ -1,0 +1,361 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+
+class LobbyController extends Controller
+{
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number'];
+
+    private const PROMPTS = [
+        'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],
+        'whoami' => ['A sleepy koala', 'The moon landing', 'A famous chef', 'A roller coaster', 'A detective', 'The last slice of pizza'],
+        'trivia' => ['Which planet has the most moons?', 'What is the largest desert on Earth?', 'How many hearts does an octopus have?', 'What is the smallest prime number?', 'Which country invented paper?'],
+        'charades' => ['Brushing your teeth', 'A cat seeing a cucumber', 'Winning an Olympic medal', 'A very slow elevator', 'Making the perfect sandwich'],
+        'wyr' => ['Explore space or the deep ocean?', 'Always sing instead of speaking or dance everywhere?', 'Live without music or without movies?', 'Have a rewind button or a pause button for life?'],
+        'likely' => ['Who is most likely to become a famous chef?', 'Who would survive longest on a desert island?', 'Who is most likely to laugh at the wrong moment?', 'Who would plan the best surprise party?'],
+        'yesno' => ['Ask chance to decide!'], 'dice' => ['Ready to roll?'], 'coin' => ['Flip the coin'],
+        'wheel' => ['Who will chance pick?'], 'number' => ['Pick a number from 1 to 100'],
+    ];
+
+    private const ANSWERS = [
+        'trivia' => ['Saturn', 'Antarctica', 'Three', 'Two', 'China'],
+        'whoami' => ['A sleepy koala', 'The moon landing', 'A famous chef', 'A roller coaster', 'A detective', 'The last slice of pizza'],
+        'charades' => ['Brushing your teeth', 'A cat seeing a cucumber', 'Winning an Olympic medal', 'A very slow elevator', 'Making the perfect sandwich'],
+    ];
+
+    private const PROMPTS_AR = [
+        'categories' => ['أشياء تجدها على الشاطئ', 'فواكه وخضروات', 'شخصيات أفلام', 'بلدان ومدن', 'أشياء لونها أحمر', 'رياضات وهوايات'],
+        'whoami' => ['كوالا نائمة', 'الهبوط على القمر', 'طاهٍ مشهور', 'أفعوانية', 'محقق', 'آخر قطعة بيتزا'],
+        'trivia' => ['ما الكوكب الذي يملك أكبر عدد من الأقمار؟', 'ما أكبر صحراء على الأرض؟', 'كم قلباً للأخطبوط؟', 'ما أصغر عدد أولي؟', 'أي بلد اخترع الورق؟'],
+        'charades' => ['تنظيف أسنانك', 'قطة رأت خياراً', 'الفوز بميدالية أولمبية', 'مصعد بطيء جداً', 'تحضير الشطيرة المثالية'],
+        'wyr' => ['استكشاف الفضاء أم أعماق المحيط؟', 'الغناء دائماً أم الرقص في كل مكان؟', 'العيش بلا موسيقى أم بلا أفلام؟', 'زر لإعادة الوقت أم لإيقافه؟'],
+        'likely' => ['من الأكثر احتمالاً أن يصبح طاهياً مشهوراً؟', 'من سيصمد أكثر في جزيرة مهجورة؟', 'من سيضحك في وقت غير مناسب؟', 'من سينظم أفضل حفلة مفاجأة؟'],
+        'yesno' => ['اسأل الحظ ليقرر!'], 'dice' => ['ارمِ النرد'], 'coin' => ['اقلب العملة'],
+        'wheel' => ['من سيختاره الحظ؟'], 'number' => ['اختر رقماً من 1 إلى 100'],
+    ];
+
+    private const ANSWERS_AR = [
+        'trivia' => ['زحل', 'القارة القطبية الجنوبية', 'ثلاثة', 'اثنان', 'الصين'],
+        'whoami' => ['كوالا نائمة', 'الهبوط على القمر', 'طاهٍ مشهور', 'أفعوانية', 'محقق', 'آخر قطعة بيتزا'],
+        'charades' => ['تنظيف أسنانك', 'قطة رأت خياراً', 'الفوز بميدالية أولمبية', 'مصعد بطيء جداً', 'تحضير الشطيرة المثالية'],
+    ];
+
+    public function index(Request $request): JsonResponse
+    {
+        $identity = $this->identity($request);
+        $query = DB::table('party_players');
+        if ($identity['kind'] === 'user') $query->where('user_id', $identity['id']);
+        else $query->where('guest_id', $identity['id']);
+        $ids = $query->pluck('party_id');
+        $parties = DB::table('parties')->whereIn('id', $ids)->whereIn('status', ['lobby', 'playing'])->orderByDesc('updated_at')->limit(50)->get();
+        return response()->json(['data' => $parties->map(fn ($party) => $this->partyView($party, $identity))->values()]);
+    }
+
+    public function create(Request $request): JsonResponse
+    {
+        $data = $request->validate(['name' => ['required', 'string', 'min:1', 'max:80']]);
+        $identity = $this->identity($request);
+        $party = DB::transaction(function () use ($data, $identity) {
+            $code = $this->uniqueCode();
+            $partyId = DB::table('parties')->insertGetId([
+                'owner_id' => $identity['kind'] === 'user' ? $identity['id'] : null,
+                'name' => trim($data['name']),
+                'invite_code' => $code,
+                'status' => 'lobby',
+                'round_number' => 0,
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+            $playerId = $this->insertPlayer($partyId, $identity, true);
+            DB::table('parties')->where('id', $partyId)->update(['host_player_id' => $playerId]);
+            return DB::table('parties')->find($partyId);
+        });
+        return response()->json(['data' => $this->partyView($party, $identity)], 201);
+    }
+
+    public function show(Request $request, string $code): JsonResponse
+    {
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $player = $this->player($party->id, $identity);
+        if (!$player) return response()->json(['message' => 'Party not found.'], 404);
+        DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
+        return response()->json(['data' => $this->partyView($party, $identity)]);
+    }
+
+    public function join(Request $request, string $code): JsonResponse
+    {
+        $identity = $this->identity($request);
+        $party = DB::table('parties')->where('invite_code', strtoupper($code))->first();
+        if (!$party || $party->status !== 'lobby') return response()->json(['message' => 'Lobby not found or already started.'], 404);
+        $joined = DB::transaction(function () use ($party, $identity) {
+            $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+            if (!$locked || $locked->status !== 'lobby') throw new HttpException(409, 'This lobby has already started.');
+            $existing = $this->player($locked->id, $identity);
+            if ($existing) {
+                DB::table('party_players')->where('id', $existing->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
+                return DB::table('parties')->find($locked->id);
+            }
+            if (DB::table('party_players')->where('party_id', $locked->id)->count() >= 20) throw new HttpException(409, 'This lobby is full.');
+            $this->insertPlayer($locked->id, $identity, false);
+            DB::table('parties')->where('id', $locked->id)->update(['updated_at' => now()]);
+            return DB::table('parties')->find($locked->id);
+        });
+        return response()->json(['data' => $this->partyView($joined, $identity), 'message' => 'Joined lobby.']);
+    }
+
+    public function ready(Request $request, string $code): JsonResponse
+    {
+        $data = $request->validate(['ready' => ['required', 'boolean']]);
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $player = $this->requireMember($party, $identity);
+        if ($party->status !== 'lobby') throw new HttpException(409, 'Readiness is locked after the game starts.');
+        DB::table('party_players')->where('id', $player->id)->update(['is_ready' => $data['ready'], 'last_seen_at' => now(), 'updated_at' => now()]);
+        DB::table('parties')->where('id', $party->id)->update(['updated_at' => now()]);
+        return response()->json(['data' => $this->partyView(DB::table('parties')->find($party->id), $identity)]);
+    }
+
+    public function start(Request $request, string $code): JsonResponse
+    {
+        $data = $request->validate(['game' => ['required', 'string', 'in:'.implode(',', self::GAMES)], 'locale' => ['sometimes', 'in:en,ar']]);
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $this->requireHost($party, $identity);
+        $result = DB::transaction(function () use ($party, $data, $identity) {
+            $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+            if ($locked->status !== 'lobby') throw new HttpException(409, 'The game has already started.');
+            $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
+            if ($players->count() < 2) throw new HttpException(409, 'At least two players are needed.');
+            if ($players->contains(fn ($player) => !$player->is_ready)) throw new HttpException(409, 'Everyone must be ready first.');
+            $number = (int) $locked->round_number + 1;
+            $game = $data['game'];
+            $locale = $data['locale'] ?? 'en';
+            $promptBank = $locale === 'ar' ? self::PROMPTS_AR : self::PROMPTS;
+            $answerBank = $locale === 'ar' ? self::ANSWERS_AR : self::ANSWERS;
+            $promptIndex = random_int(0, count($promptBank[$game]) - 1);
+            $prompt = $promptBank[$game][$promptIndex];
+            $answer = isset($answerBank[$game]) ? $answerBank[$game][$promptIndex] : null;
+            $turn = $players->first(fn ($player) => (int) $player->id === (int) $locked->host_player_id) ?? $players->first();
+            DB::table('party_rounds')->insert([
+                'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
+                'prompt' => $prompt, 'answer' => $answer, 'status' => 'active',
+                'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
+            ]);
+            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => null, 'updated_at' => now()]);
+            return DB::table('parties')->find($locked->id);
+        });
+        return response()->json(['data' => $this->partyView($result, $identity)]);
+    }
+
+    public function action(Request $request, string $code): JsonResponse
+    {
+        $data = $request->validate([
+            'type' => ['required', 'string', 'in:answer,vote,roll,point'],
+            'target_player_id' => ['nullable', 'integer', 'min:1'],
+            'value' => ['nullable', 'string', 'max:120'],
+            'count' => ['nullable', 'integer', 'in:1,2'],
+            'max' => ['nullable', 'integer', 'min:2', 'max:10000'],
+        ]);
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $player = $this->requireMember($party, $identity);
+        $responseParty = DB::transaction(function () use ($party, $player, $data, $identity) {
+            $round = DB::table('party_rounds')->where('party_id', $party->id)->orderByDesc('round_number')->lockForUpdate()->first();
+            if (!$round || $round->status !== 'active') throw new HttpException(409, 'This round is already resolved.');
+            $members = DB::table('party_players')->where('party_id', $party->id)->orderBy('id')->get();
+            if ($data['type'] === 'point') {
+                if (!in_array($round->game, ['categories', 'whoami', 'charades'], true)) throw new HttpException(422, 'Host-awarded points are not available for this game.');
+                if ((int) $party->host_player_id !== (int) $player->id) throw new HttpException(403, 'Only the host can award points.');
+                $target = $members->first(fn ($person) => (int) $person->id === (int) ($data['target_player_id'] ?? 0));
+                if (!$target) throw new HttpException(422, 'Choose a player in this lobby.');
+                if (DB::table('party_round_scores')->where('round_id', $round->id)->where('player_id', $target->id)->exists()) throw new HttpException(409, 'A point was already awarded to that player this round.');
+                DB::table('party_round_scores')->insert(['round_id' => $round->id, 'player_id' => $target->id, 'awarded_by' => $player->id, 'created_at' => now(), 'updated_at' => now()]);
+                DB::table('party_players')->where('id', $target->id)->increment('score');
+            } elseif ($data['type'] === 'roll') {
+                if (!in_array($round->game, ['dice', 'coin', 'yesno', 'number', 'wheel'], true)) throw new HttpException(422, 'This game does not use a random draw.');
+                if ((int) $round->turn_player_id !== (int) $player->id) throw new HttpException(403, 'It is not your turn.');
+                $outcome = match ($round->game) {
+                    'dice' => $this->rollDice((int) ($data['count'] ?? 2)),
+                    'coin' => ['result' => $round->locale === 'ar' ? (random_int(0, 1) ? 'وجه' : 'كتابة') : (random_int(0, 1) ? 'Heads' : 'Tails')],
+                    'yesno' => ['result' => $round->locale === 'ar' ? ['بالتأكيد نعم!', 'ليس هذه المرة.', 'الحظ يقول نعم.', 'اسأل لاحقاً.', 'لا بكل تأكيد.', 'الأمر محتمل.'][random_int(0, 5)] : ['Absolutely yes!', 'Not this time.', 'The odds say yes.', 'Ask again later.', 'A confident no.', 'It could go either way.'][random_int(0, 5)]],
+                    'number' => ['result' => (string) random_int(1, (int) ($data['max'] ?? 100))],
+                    'wheel' => ['result' => $members->random()->display_name],
+                };
+                DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
+            } else {
+                if (!in_array($round->game, ['trivia', 'wyr', 'likely'], true)) throw new HttpException(422, 'This game does not accept private submissions.');
+                $value = trim($data['value'] ?? '');
+                if ($value === '') throw ValidationException::withMessages(['value' => 'A response is required.']);
+                if ($data['type'] === 'vote' && !in_array($round->game, ['wyr', 'likely'], true)) throw new HttpException(422, 'Voting is not available in this game.');
+                if ($data['type'] === 'answer' && $round->game !== 'trivia') throw new HttpException(422, 'Answer submissions are only available for trivia.');
+                if (DB::table('party_submissions')->where('round_id', $round->id)->where('player_id', $player->id)->exists()) throw new HttpException(409, 'You already submitted for this round.');
+                DB::table('party_submissions')->insert(['round_id' => $round->id, 'player_id' => $player->id, 'payload' => json_encode(['value' => $value], JSON_THROW_ON_ERROR), 'created_at' => now(), 'updated_at' => now()]);
+                $submitted = DB::table('party_submissions')->where('round_id', $round->id)->whereIn('player_id', $members->pluck('id'))->count();
+                if ($submitted >= $members->count()) {
+                    if ($round->game === 'trivia') {
+                        foreach (DB::table('party_submissions')->where('round_id', $round->id)->get() as $submission) {
+                            $submittedValue = json_decode($submission->payload, true)['value'] ?? '';
+                            if ($this->normalized($submittedValue) === $this->normalized((string) $round->answer)) DB::table('party_players')->where('id', $submission->player_id)->increment('score');
+                        }
+                        $outcome = ['answer' => $round->answer];
+                    } else {
+                        $outcome = ['tally' => $this->tally($round->id)];
+                    }
+                    DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
+                }
+            }
+            DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
+            return DB::table('parties')->find($party->id);
+        });
+        return response()->json(['data' => $this->partyView($responseParty, $identity)]);
+    }
+
+    public function advance(Request $request, string $code): JsonResponse
+    {
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $this->requireHost($party, $identity);
+        $result = DB::transaction(function () use ($party, $identity) {
+            $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+            if ($locked->status !== 'playing' || !$locked->current_game) throw new HttpException(409, 'There is no active game.');
+            $number = (int) $locked->round_number + 1;
+            $game = $locked->current_game;
+            $previousRound = DB::table('party_rounds')->where('party_id', $locked->id)->orderByDesc('round_number')->first();
+            $locale = $previousRound?->locale ?? 'en';
+            $promptBank = $locale === 'ar' ? self::PROMPTS_AR : self::PROMPTS;
+            $answerBank = $locale === 'ar' ? self::ANSWERS_AR : self::ANSWERS;
+            $index = random_int(0, count($promptBank[$game]) - 1);
+            $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
+            $previousTurnIndex = $players->search(fn ($person) => (int) $person->id === (int) ($previousRound?->turn_player_id ?? 0));
+            $turn = $players->get($previousTurnIndex === false ? 0 : (($previousTurnIndex + 1) % $players->count()));
+            if (!$previousRound?->turn_player_id) $turn = $players->first(fn ($person) => (int) $person->id === (int) $locked->host_player_id) ?? $players->first();
+            DB::table('party_rounds')->insert([
+                'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
+                'prompt' => $promptBank[$game][$index], 'answer' => $answerBank[$game][$index] ?? null,
+                'status' => 'active', 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
+            ]);
+            DB::table('parties')->where('id', $locked->id)->update(['round_number' => $number, 'updated_at' => now()]);
+            return DB::table('parties')->find($locked->id);
+        });
+        return response()->json(['data' => $this->partyView($result, $identity)]);
+    }
+
+    private function identity(Request $request): array
+    {
+        return $request->attributes->get('cc.identity') ?? throw new HttpException(401, 'Unauthenticated.');
+    }
+
+    private function party(string $code): object
+    {
+        return DB::table('parties')->where('invite_code', strtoupper($code))->first() ?? throw new HttpException(404, 'Party not found.');
+    }
+
+    private function player(int $partyId, array $identity): ?object
+    {
+        return DB::table('party_players')->where('party_id', $partyId)
+            ->where($identity['kind'] === 'user' ? 'user_id' : 'guest_id', $identity['id'])->first();
+    }
+
+    private function requireMember(object $party, array $identity): object
+    {
+        return $this->player($party->id, $identity) ?? throw new HttpException(404, 'Party not found.');
+    }
+
+    private function requireHost(object $party, array $identity): void
+    {
+        $player = $this->requireMember($party, $identity);
+        if ((int) $party->host_player_id !== (int) $player->id) throw new HttpException(403, 'Only the host can control this lobby.');
+    }
+
+    private function insertPlayer(int $partyId, array $identity, bool $ready): int
+    {
+        return (int) DB::table('party_players')->insertGetId([
+            'party_id' => $partyId,
+            'user_id' => $identity['kind'] === 'user' ? $identity['id'] : null,
+            'guest_id' => $identity['kind'] === 'guest' ? $identity['id'] : null,
+            'display_name' => $identity['name'], 'is_ready' => $ready,
+            'last_seen_at' => now(), 'created_at' => now(), 'updated_at' => now(),
+        ]);
+    }
+
+    private function partyView(object $party, array $identity): array
+    {
+        $members = DB::table('party_players')->where('party_id', $party->id)->orderBy('id')->get();
+        $myPlayer = $members->first(fn ($person) => ($identity['kind'] === 'user' ? (int) $person->user_id : (int) $person->guest_id) === (int) $identity['id']);
+        if (!$myPlayer) throw new HttpException(404, 'Party not found.');
+        $round = DB::table('party_rounds')->where('party_id', $party->id)->orderByDesc('round_number')->first();
+        $submissions = $round ? DB::table('party_submissions')->where('round_id', $round->id)->get() : collect();
+        $ownSubmission = $round ? $submissions->firstWhere('player_id', $myPlayer->id) : null;
+        $roundScores = $round ? DB::table('party_round_scores')->where('round_id', $round->id)->pluck('player_id')->map(fn ($id) => (string) $id)->all() : [];
+        $outcome = $round?->outcome ? json_decode($round->outcome, true) : null;
+        $displayPrompt = $round?->prompt;
+        if ($round?->game === 'whoami') $displayPrompt = $round->locale === 'ar' ? 'من أنا؟' : 'Who am I?';
+        if ($round?->game === 'charades') $displayPrompt = $round->locale === 'ar' ? 'مثّلها!' : 'Act it out!';
+        $privateClue = null;
+        if ($round?->game === 'charades' && (int) $round->turn_player_id === (int) $myPlayer->id) $privateClue = $round->answer;
+        if ($round?->game === 'whoami' && (int) $round->turn_player_id !== (int) $myPlayer->id) $privateClue = $round->answer;
+        $roundView = $round ? [
+            'number' => (int) $round->round_number,
+            'game' => $round->game,
+            'prompt' => $displayPrompt,
+            'status' => $round->status,
+            'turn_player_id' => $round->turn_player_id ? (string) $round->turn_player_id : null,
+            'private_clue' => $privateClue,
+            'result' => $outcome,
+            'submitted' => (bool) $ownSubmission,
+            'submission_count' => $submissions->count(),
+            'scored_player_ids' => $roundScores,
+            'submission_status' => $members->map(fn ($person) => ['player_id' => (string) $person->id, 'submitted' => $submissions->contains('player_id', $person->id)])->values()->all(),
+        ] : null;
+        return [
+            'id' => (string) $party->id, 'name' => $party->name, 'code' => $party->invite_code,
+            'players' => $members->pluck('display_name')->all(),
+            'members' => $members->map(fn ($person) => [
+                'id' => (string) $person->id, 'name' => $person->display_name,
+                'ready' => (bool) $person->is_ready, 'score' => (int) $person->score,
+                'is_host' => (int) $person->id === (int) $party->host_player_id,
+                'online' => $person->last_seen_at && now()->diffInSeconds($person->last_seen_at) < 20,
+            ])->values()->all(),
+            'self_player_id' => $myPlayer ? (string) $myPlayer->id : null,
+            'is_host' => (int) $party->host_player_id === (int) $myPlayer->id,
+            'status' => $party->status, 'game' => $party->current_game,
+            'round' => $roundView, 'createdAt' => $party->created_at,
+        ];
+    }
+
+    private function uniqueCode(): string
+    {
+        do { $code = Str::upper(Str::random(8)); } while (DB::table('parties')->where('invite_code', $code)->exists());
+        return $code;
+    }
+
+    private function rollDice(int $count): array
+    {
+        $faces = array_map(fn () => random_int(1, 6), range(1, $count));
+        return ['faces' => $faces, 'result' => array_sum($faces)];
+    }
+
+    private function normalized(string $answer): string
+    {
+        return mb_strtolower(preg_replace('/\s+/u', ' ', trim($answer)) ?? trim($answer));
+    }
+
+    private function tally(int $roundId): array
+    {
+        $counts = [];
+        foreach (DB::table('party_submissions')->where('round_id', $roundId)->get() as $submission) {
+            $value = json_decode($submission->payload, true)['value'] ?? '';
+            $counts[$value] = ($counts[$value] ?? 0) + 1;
+        }
+        arsort($counts);
+        return $counts;
+    }
+}
