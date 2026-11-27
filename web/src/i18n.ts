@@ -339,7 +339,7 @@ const arEG: Partial<Strings> = {
   waiting: 'مستني المضيف', notReady: 'مش جاهز', offline: 'مش متصل',
   needTwo: 'محتاجين لاعبين اتنين على الأقل', everyoneReady: 'لازم الكل يبقى جاهز',
   chooseGame: 'اختار لعبة', createParty: 'اعمل جلسة', code: 'كود الدعوة', invite: 'كود الدعوة', copyLink: 'انسخ لينك الدعوة', copied: 'اتنسخ',
-  joinAction: 'ادخل', createAction: 'اعمل الجلسة', lobby: 'اللوبي', members: 'اللاعبين',
+  joinAction: 'ادخل', createAction: 'اعمل الجلسة', lobby: 'غرفة الانتظار', members: 'اللاعبين',
   waitingOthers: 'مستنيين الباقي…', roll: 'ارمي', rollAgain: 'ارمي تاني', playAgain: 'العب تاني', leave: 'اخرج', saved: 'اتحفظ',
   guestNote: 'تقدر تدخل كضيف على طول. اعمل حساب عشان تحفظ جلساتك على كل أجهزتك.',
   displayNameHint: 'ده الاسم اللي هيشوفه اللاعبين.', solved: 'حليتها!', outOfGuesses: 'خلصت المحاولات', notAWord: 'مش في القاموس', alreadyGuessed: 'جربتها قبل كده',
