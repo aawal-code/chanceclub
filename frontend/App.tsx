@@ -151,7 +151,9 @@ export default function App() {
   // A short polling interval keeps lobbies usable without a push/broadcast service; missed updates recover after reconnect.
   const activePartyCode = party?.code;
   useEffect(() => { if (!activePartyCode || (screen !== 'party' && screen !== 'game')) return; let cancelled = false; const refresh = () => { api(`/parties/${encodeURIComponent(activePartyCode)}`).then(res => { if (cancelled) return; const shared = res.data as Party; setParty(shared); mergeParty(shared); if (shared.status === 'playing' && shared.game && shared.round) { const selected = GAMES.find(item => item.id === shared.game); if (selected) { setGame(selected); setRound(shared.round.number); setRoundText(shared.round.prompt); if (screen === 'party' && openedGameCode !== shared.code) { setOpenedGameCode(shared.code); setScreen('game'); } } } else if (shared.status === 'lobby' && screen === 'game') { setGame(null); setScreen('party'); } }).catch(() => {}); }; refresh(); const timerId = setInterval(refresh, 2000); return () => { cancelled = true; clearInterval(timerId); }; }, [activePartyCode, screen, mergeParty, openedGameCode]);
-  const notify = (message: string) => { if (Platform.OS === 'web') window.alert(message); else Alert.alert('Chance Club', message); };
+  const [toast, setToast] = useState<string | null>(null);
+  const toastTimer = useRef<any>(null);
+  const notify = (message: string) => { setToast(message); if (toastTimer.current) clearTimeout(toastTimer.current); toastTimer.current = setTimeout(() => setToast(null), 4200); };
   const go = (next: Screen) => setScreen(next);
   const startGame = (selected: Game) => { setGame(selected); setRound(1); setShowAnswer(false); setScreen('game'); makePrompt(selected, 1); };
   const makePrompt = (selected: Game, nextRound: number) => { let prompt = ''; let answer = ''; roundRef.current=nextRound; switch(selected.id) {
@@ -250,6 +252,7 @@ export default function App() {
     <ScrollView style={styles.scroll} contentContainerStyle={[styles.page,{paddingHorizontal:width<600?16:width<1024?32:48,paddingTop:width<600?20:32,paddingBottom:desktop?48:24}]} keyboardShouldPersistTaps="handled">
       <View key={screen} nativeID="cc-screen" style={[styles.content,{maxWidth:desktop?1280:940}]}>{content()}<Text style={[styles.footer,{color:t.muted}]}>CHANCE CLUB  ·  PLAY MORE, SCROLL LESS</Text></View>
     </ScrollView>
+    {toast?<View pointerEvents="none" style={{position:'absolute',left:0,right:0,bottom:desktop?28:96,alignItems:'center',zIndex:999}}><View style={{maxWidth:460,backgroundColor:t.text,borderRadius:16,paddingHorizontal:18,paddingVertical:12}}><Text style={{color:t.bg,fontSize:14,fontWeight:'600',textAlign:'center'}}>{toast}</Text></View></View>:null}
     {!desktop&&<View style={[styles.nav,{backgroundColor:t.card,borderColor:t.line,flexDirection:rtl?'row-reverse':'row'}]}>{tab('home',s.home,'home-variant-outline')}{tab('party',s.party,'party-popper')}{tab('games',s.games,'gamepad-variant-outline')}{tab('teams',s.teams,'account-group-outline')}{tab('profile',s.profile,'account-circle-outline')}</View>}
   </View></AppTypography.Provider>;
 }
