@@ -480,3 +480,19 @@ html[data-theme='paper'] .form-error, html[data-theme='sand'] .form-error { colo
 .mini-name { font-size: 13.5px; font-weight: 700; color: var(--ink); }
 .mini-cat { font-size: 11px; color: var(--muted); }
 .mini-mode { font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); font-weight: 700; }
+
+.slow-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  background: var(--line);
+  color: inherit;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  z-index: 60;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+  max-width: 90vw;
+  text-align: center;
+}

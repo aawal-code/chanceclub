@@ -1,17 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, ApiError, getGuestName, getSavedUser, getToken, setGuestName, setSavedUser, setToken, type Party } from './api';
+import { api, ApiError, getGuestName, getSavedUser, getToken, onSlowRequest, setGuestName, setSavedUser, setToken, type Party } from './api';
 import { strings, type Locale } from './i18n';
 import { Brand, DieLogo } from './components/brand';
 import { Btn, Card, Field, Spinner, ToastProvider, useToast } from './components/ui';
-import Home from './screens/Home';
-import PartyScreen from './screens/Party';
-import GameScreen from './screens/Game';
-import Games from './screens/Games';
-import Teams from './screens/Teams';
-import Profile from './screens/Profile';
-import WordleSolo from './games/WordleSolo';
-import GameDetail from './screens/GameDetail';
-import SoloChance from './games/SoloChance';
+const Home = React.lazy(() => import('./screens/Home'));
+const PartyScreen = React.lazy(() => import('./screens/Party'));
+const GameScreen = React.lazy(() => import('./screens/Game'));
+const Games = React.lazy(() => import('./screens/Games'));
+const Teams = React.lazy(() => import('./screens/Teams'));
+const Profile = React.lazy(() => import('./screens/Profile'));
+const WordleSolo = React.lazy(() => import('./games/WordleSolo'));
+const GameDetail = React.lazy(() => import('./screens/GameDetail'));
+const SoloChance = React.lazy(() => import('./games/SoloChance'));
 import { gameById } from './games/meta';
 
 export type Route =
@@ -79,6 +79,8 @@ export default function App() {
   const [guestName, setGuestNameState] = useState(() => getGuestName());
   const [busy, setBusy] = useState(false);
   const pollRef = useRef<number | null>(null);
+  const [slowNet, setSlowNet] = useState(false);
+  useEffect(() => onSlowRequest(setSlowNet), []);
 
   const t = strings[locale];
   const toast = useToast();
@@ -175,10 +177,15 @@ export default function App() {
     if (!activeParty || !identity) return;
     const code = activeParty.code;
     let cancelled = false;
+    let ticks = 0;
     const tick = async () => {
       try {
+        const startedAt = performance.now();
         const result = await api.party(code);
         if (cancelled) return;
+        const rtt = Math.max(1, Math.round(performance.now() - startedAt));
+        ticks += 1;
+        if (ticks % 5 === 1) api.heartbeat(code, rtt).catch(() => { /* best effort */ });
         setActiveParty(result.data);
       } catch (error) {
         if (cancelled) return;
@@ -464,7 +471,8 @@ export default function App() {
       </header>
 
       <main className="page" key={route.name}>
-        {screen}
+        <React.Suspense fallback={<div className="auth-shell"><div className="row gap-10 center" style={{ color: 'var(--muted)' }}><Spinner /> {t.loading}</div></div>}>{screen}</React.Suspense>
+        {slowNet ? <div className="slow-banner">{t.waking}</div> : null}
       </main>
 
       <nav className="mobile-nav">

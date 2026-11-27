@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Glyph } from '../components/brand';
-import { Btn, Card, CopyButton, Field, useToast } from '../components/ui';
+import { Btn, Card, CopyButton, Field, useToast, LagPill } from '../components/ui';
 
 const GAMES = ['wordle', 'trivia', 'charades', 'whoami', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
 
@@ -77,7 +77,7 @@ export default function PartyScreen({
                       {member.is_host ? <span className="caption" style={{ marginLeft: 8 }}>· {t.host}</span> : null}
                       {member.id === activeParty.self_player_id ? <span className="caption" style={{ marginLeft: 8 }}>· {t.you}</span> : null}
                     </span>
-                    <span className="meta">{member.online ? t.connected : t.offline} · {member.ready ? t.ready : t.notReady}</span>
+                    <span className="meta">{member.online ? t.connected : t.offline} · {member.ready ? t.ready : t.notReady} · <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} /></span>
                   </div>
                   <span className="dot" data-on={member.online} />
                   <span className="mono" style={{ fontWeight: 700 }}>{member.score}</span>

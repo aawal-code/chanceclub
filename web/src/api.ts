@@ -11,6 +11,7 @@ export type Member = {
   score: number;
   is_host: boolean;
   online: boolean;
+  rtt: number | null;
 };
 
 export type Round = {
@@ -114,7 +115,33 @@ async function healGuest(): Promise<boolean> {
   }
 }
 
+/* Slow-request signal: any API call pending longer than ~3s means a cold start or a bad connection. */
+const slowListeners = new Set<(slow: boolean) => void>();
+let slowPending = 0;
+let slowOn = false;
+function emitSlow(value: boolean) {
+  if (slowOn === value) return;
+  slowOn = value;
+  slowListeners.forEach((fn) => fn(value));
+}
+export function onSlowRequest(fn: (slow: boolean) => void): () => void {
+  slowListeners.add(fn);
+  return () => { slowListeners.delete(fn); };
+}
+
 async function request<T>(path: string, method = 'GET', body?: unknown, retry = true): Promise<T> {
+  slowPending += 1;
+  const slowTimer = window.setTimeout(() => emitSlow(true), 3000);
+  try {
+    return await requestInner<T>(path, method, body, retry);
+  } finally {
+    window.clearTimeout(slowTimer);
+    slowPending -= 1;
+    if (slowPending <= 0) { slowPending = 0; emitSlow(false); }
+  }
+}
+
+async function requestInner<T>(path: string, method = 'GET', body?: unknown, retry = true): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -166,6 +193,8 @@ export const api = {
   action: (code: string, body: Record<string, unknown>) =>
     request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/action`, 'POST', body),
   advance: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/advance`, 'POST'),
+  heartbeat: (code: string, rttMs: number) =>
+    request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/heartbeat`, 'POST', { rtt_ms: rttMs }),
   teams: () => request<{ data: Team[] }>('/teams'),
   createTeam: (name: string) => request<{ data: Team }>('/teams', 'POST', { name }),
   joinTeam: (code: string) => request<{ data: Team }>(`/teams/${encodeURIComponent(code)}/join`, 'POST'),

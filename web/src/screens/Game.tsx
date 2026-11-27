@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Party, Round } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Glyph } from '../components/brand';
-import { Btn, Card, Field, useToast } from '../components/ui';
+import { Btn, Card, Field, useToast, LagPill } from '../components/ui';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 
 const AWARD_GAMES = ['categories', 'whoami', 'charades'];
@@ -85,6 +85,7 @@ export default function GameScreen({
                 <span className="caption mono" style={{ width: 18 }}>{index + 1}</span>
                 <span className="avatar-chip" style={{ width: 30, height: 30, borderRadius: 9, fontSize: 12 }}>{member.name.charAt(0).toUpperCase()}</span>
                 <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{member.name}{member.id === party.self_player_id ? ` · ${t.you}` : ''}</span>
+                <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} />
                 <span className="mono" style={{ fontWeight: 800 }}>{member.score}</span>
               </div>
             ))}

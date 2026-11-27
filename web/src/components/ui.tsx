@@ -164,3 +164,25 @@ export function useStableCallback<T extends (...args: any[]) => any>(fn: T) {
   useEffect(() => { ref.current = fn; }, [fn]);
   return useMemo(() => ((...args: Parameters<T>) => ref.current(...args)) as T, []);
 }
+
+export function LagPill({ rtt, online, labels }: {
+  rtt: number | null | undefined;
+  online: boolean;
+  labels: { none: string; slight: string; heavy: string; checking: string; offline: string };
+}) {
+  let color = '#868e96';
+  let text = labels.checking;
+  if (!online) { color = '#adb5bd'; text = labels.offline; }
+  else if (typeof rtt === 'number') {
+    if (rtt < 400) { color = '#2f9e44'; text = labels.none; }
+    else if (rtt < 900) { color = '#f08c00'; text = labels.slight; }
+    else { color = '#e03131'; text = labels.heavy; }
+  }
+  return (
+    <span className="row gap-4 center" style={{ fontSize: 11, color: 'var(--muted)', whiteSpace: 'nowrap', display: 'inline-flex' }}
+      title={typeof rtt === 'number' ? `${rtt} ms` : undefined}>
+      <span style={{ width: 8, height: 8, borderRadius: 99, background: color, display: 'inline-block' }} />
+      {text}
+    </span>
+  );
+}
