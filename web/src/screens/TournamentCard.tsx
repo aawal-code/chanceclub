@@ -31,7 +31,7 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
       <p className="caption">{t.tStandings}</p>
       {tour.standings.map((s, i) => (
         <div key={s.player_key} className="row gap-10 center">
-          <span className="mono" style={{ width: 24 }}>{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
+          <span className="mono" style={{ width: 24 }}>{s.points > 0 ? (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1) : '·'}</span>
           <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{s.name}</span>
           <span className="mono" style={{ fontWeight: 800 }}>{s.points} {t.tPoints}</span>
         </div>

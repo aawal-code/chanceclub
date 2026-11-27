@@ -4,18 +4,6 @@ import type { Locale, Strings } from '../i18n';
 import { Btn, Card, Field, Seg, useToast } from '../components/ui';
 import type { ThemeName } from '../App';
 
-const THEMES: { id: ThemeName; bg: string; surface: string; ink: string }[] = [
-  { id: 'ink', bg: '#0b0b0c', surface: '#1c1c21', ink: '#f6f6f3' },
-  { id: 'paper', bg: '#f3f2ee', surface: '#ffffff', ink: '#111110' },
-  { id: 'midnight', bg: '#070b16', surface: '#121b2f', ink: '#eef2ff' },
-  { id: 'sand', bg: '#efe7d8', surface: '#fbf6ec', ink: '#211b12' },
-  { id: 'neon', bg: '#0a0614', surface: '#ff2bd6', ink: '#00e5ff' },
-  { id: 'brutal', bg: '#ffe14d', surface: '#ff4fa3', ink: '#000000' },
-  { id: 'terminal', bg: '#020a04', surface: '#0b2c16', ink: '#3dff7a' },
-  { id: 'candy', bg: '#ffe6f2', surface: '#ff4f9f', ink: '#4a1d5c' },
-  { id: 'forest', bg: '#0e1c16', surface: '#e3b04b', ink: '#f3ead2' },
-  { id: 'newsprint', bg: '#e9e4d5', surface: '#c0271c', ink: '#141414' },
-];
 
 export default function Profile({
   t, locale, setLocale, theme, setTheme, identity, setIdentity, guestName, setGuestName, onSignOut,
@@ -45,11 +33,6 @@ export default function Profile({
   const displayName = identity?.name || guestName || '';
   const trimmedName = name.trim();
   const nameValid = trimmedName.length >= 2;
-
-  const themeLabels: Record<ThemeName, string> = useMemo(
-    () => ({ ink: t.themeInk, paper: t.themePaper, midnight: t.themeMidnight, sand: t.themeSand, neon: t.themeNeon, brutal: t.themeBrutal, terminal: t.themeTerminal, candy: t.themeCandy, forest: t.themeForest, newsprint: t.themeNewsprint }),
-    [t],
-  );
 
   const saveName = async () => {
     setError(null);
@@ -121,36 +104,6 @@ export default function Profile({
           </div>
           <p className="caption">{t.displayNameHint}</p>
         </div>
-      </Card>
-
-      <Card pad="lg" className="stack gap-16">
-        <h3 className="h3">{t.theme}</h3>
-        <div className="theme-grid">
-          {THEMES.map((option) => (
-            <button
-              key={option.id}
-              className="theme-swatch"
-              data-on={theme === option.id}
-              onClick={() => setTheme(option.id)}
-              aria-pressed={theme === option.id}
-            >
-              <span className="swatch-preview" style={{ background: option.bg }}>
-                <span className="swatch-chip" style={{ background: option.ink }} />
-                <span className="swatch-chip" style={{ background: option.surface }} />
-              </span>
-              <span className="swatch-name">{themeLabels[option.id]}</span>
-            </button>
-          ))}
-        </div>
-
-        <hr className="divider" />
-
-        <h3 className="h3">{t.language}</h3>
-        <Seg
-          value={locale}
-          options={[{ value: 'en' as Locale, label: 'English' }, { value: 'ar' as Locale, label: 'عربي' }, { value: 'de' as Locale, label: 'Deutsch' }]}
-          onChange={(value) => setLocale(value)}
-        />
       </Card>
 
       <Card pad="lg" className="stack gap-14">

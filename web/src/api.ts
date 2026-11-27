@@ -44,6 +44,9 @@ export type Party = {
   bracket?: { teams: { name: string; members: string[] }[]; rounds: { a: number | null; b: number | null; w: number | null }[][] } | null;
   wheel?: { entries: string[]; remaining: string[]; eliminate: boolean } | null;
   round: Round | null;
+  last_played?: string | null;
+  games_played?: number;
+  my_wins?: number;
   tournament?: Tournament | null;
   createdAt: string;
 };
@@ -205,6 +208,7 @@ export const api = {
   partyBoard: (code: string, game: string, days: number) => request<{ data: Board }>(`/parties/${encodeURIComponent(code)}/leaderboard?days=${days}${game ? `&game=${game}` : ''}`),
   tournamentCreate: (code: string, games: string[], count: number) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/tournament`, 'POST', { games, count }),
   tournamentAct: (code: string, action: 'next' | 'shuffle' | 'reorder' | 'cancel', body?: Record<string, unknown>) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/tournament/${action}`, 'POST', body),
+  leave: (code: string) => request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/leave`, 'POST'),
   finish: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/finish`, 'POST'),
   heartbeat: (code: string, rttMs: number) =>
     request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/heartbeat`, 'POST', { rtt_ms: rttMs }),

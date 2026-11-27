@@ -6,6 +6,12 @@ use Illuminate\Support\Facades\DB;
 
 class History
 {
+    /** Seconds since a stored timestamp (positive for the past). */
+    public static function age($ts): int
+    {
+        return $ts ? max(0, now()->getTimestamp() - \Illuminate\Support\Carbon::parse($ts)->getTimestamp()) : PHP_INT_MAX;
+    }
+
     public static function key(?int $userId, ?int $guestId): string
     {
         return $userId ? 'u'.$userId : 'g'.$guestId;
@@ -54,7 +60,7 @@ class History
         $players = DB::table('party_players')->where('party_id', $party->id)->get();
         $scores = [];
         foreach ($players as $p) {
-            $online = $p->last_seen_at && now()->diffInSeconds($p->last_seen_at) < 60;
+            $online = $p->last_seen_at && \App\Support\History::age($p->last_seen_at) < 60;
             $score = $scoreByPlayerId !== null ? (int) ($scoreByPlayerId[(string) $p->id] ?? 0) : (int) $p->score;
             if (!$online && $score <= 0 && (int) $p->id !== (int) $party->host_player_id) continue;
             $scores[] = ['user_id' => $p->user_id ? (int) $p->user_id : null, 'guest_id' => $p->guest_id ? (int) $p->guest_id : null, 'name' => $p->display_name, 'score' => $score];

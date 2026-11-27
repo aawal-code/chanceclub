@@ -29,6 +29,7 @@ const en = {
   needTwo: 'At least two players needed', everyoneReady: 'Everyone must be ready',
   stats: 'Ranks', myHistory: 'My games', partyRanks: 'This party', globalRanks: 'Global', winsLabel: 'wins', gamesLabel: 'games', noHistory: 'No games yet. Finish a game and it shows up here.', mostWinner: 'Most wins', d7: '7 days', d30: '30 days', dAll: 'All time', needParty: 'Join a party to see its ranks.', placeLabel: 'Place', soloLabel: 'Solo', youLabel: 'You',
   tournament: 'Tournament', tGames: 'Games in the pool', tCount: 'Number of games', tCreate: 'Create tournament', tShuffle: 'Shuffle', tStartNext: 'Start next game', tCancel: 'Cancel tournament', tStandings: 'Standings', tGameOf: 'Game', tChampion: 'Champion', tPoints: 'pts', tHint: 'Points per placement: 1st 10, 2nd 7, 3rd 5. Order is random each run; the host can move games.', tNewOne: 'New tournament', tRunning: 'Tournament running. Finish each game with End game to score it.',
+  settings: 'Settings', arabicStyle: 'Arabic style', dialectEg: 'Egyptian', dialectMsa: 'Standard (MSA)', leaveGroup: 'Leave group', lastPlayed: 'Last played', yourWins: 'your wins', noGamesYet: 'no games yet', settingsHint: 'Language and look. Saved on this device and on your account.', groupsTitle: 'Your groups',
   allGames: 'All games', round: 'Round', hostControls: 'Host controls', nextRound: 'Next round', endGame: 'End game',
   submit: 'Submit', submitted: 'Submitted', waitingOthers: 'Waiting for the others…',
   yourAnswer: 'Your answer', yourVote: 'Your vote', pickPlayer: 'Pick a player', award: 'Award point',
@@ -138,6 +139,7 @@ const ar: Strings = {
   needTwo: 'تحتاج لاعبين اثنين على الأقل', everyoneReady: 'الجميع يجب أن يكون جاهزاً',
   stats: 'الترتيب', myHistory: 'ألعابي', partyRanks: 'هذه الجلسة', globalRanks: 'عالمي', winsLabel: 'فوز', gamesLabel: 'لعبة', noHistory: 'لا توجد ألعاب بعد. أنهِ لعبة وستظهر هنا.', mostWinner: 'الأكثر فوزاً', d7: '٧ أيام', d30: '٣٠ يوماً', dAll: 'كل الوقت', needParty: 'انضم إلى جلسة لترى ترتيبها.', placeLabel: 'المركز', soloLabel: 'فردي', youLabel: 'أنت',
   tournament: 'بطولة', tGames: 'الألعاب المتاحة', tCount: 'عدد الألعاب', tCreate: 'ابدأ بطولة', tShuffle: 'اخلط', tStartNext: 'ابدأ اللعبة التالية', tCancel: 'إلغاء البطولة', tStandings: 'الترتيب', tGameOf: 'اللعبة', tChampion: 'البطل', tPoints: 'نقطة', tHint: 'نقاط حسب المركز: الأول ١٠ والثاني ٧ والثالث ٥. الترتيب عشوائي في كل مرة ويقدر المضيف يغيّره.', tNewOne: 'بطولة جديدة', tRunning: 'البطولة شغالة. أنهِ كل لعبة بزر إنهاء اللعبة عشان تتحسب.',
+  settings: 'الإعدادات', arabicStyle: 'اللهجة', dialectEg: 'مصري', dialectMsa: 'فصحى', leaveGroup: 'اترك المجموعة', lastPlayed: 'آخر لعب', yourWins: 'انتصاراتك', noGamesYet: 'لا ألعاب بعد', settingsHint: 'اللغة والمظهر. تُحفظ على هذا الجهاز وعلى حسابك.', groupsTitle: 'مجموعاتك',
   allGames: 'كل الألعاب', round: 'الجولة', hostControls: 'تحكم المضيف', nextRound: 'الجولة التالية', endGame: 'إنهاء اللعبة',
   submit: 'إرسال', submitted: 'تم الإرسال', waitingOthers: 'بانتظار الباقين…',
   yourAnswer: 'إجابتك', yourVote: 'تصويتك', pickPlayer: 'اختر لاعباً', award: 'امنح نقطة',
@@ -245,6 +247,7 @@ const de: Strings = {
   needTwo: 'Mindestens zwei Spieler nötig', everyoneReady: 'Alle müssen bereit sein',
   stats: 'Ranking', myHistory: 'Meine Spiele', partyRanks: 'Diese Runde', globalRanks: 'Global', winsLabel: 'Siege', gamesLabel: 'Spiele', noHistory: 'Noch keine Spiele. Beende ein Spiel, dann erscheint es hier.', mostWinner: 'Meiste Siege', d7: '7 Tage', d30: '30 Tage', dAll: 'Gesamt', needParty: 'Tritt einer Runde bei, um ihr Ranking zu sehen.', placeLabel: 'Platz', soloLabel: 'Solo', youLabel: 'Du',
   tournament: 'Turnier', tGames: 'Spiele im Pool', tCount: 'Anzahl Spiele', tCreate: 'Turnier erstellen', tShuffle: 'Mischen', tStartNext: 'Nächstes Spiel starten', tCancel: 'Turnier abbrechen', tStandings: 'Wertung', tGameOf: 'Spiel', tChampion: 'Champion', tPoints: 'Pkt.', tHint: 'Punkte pro Platz: 1. 10, 2. 7, 3. 5. Reihenfolge ist jedes Mal zufällig, der Host kann Spiele verschieben.', tNewOne: 'Neues Turnier', tRunning: 'Turnier läuft. Beende jedes Spiel mit Spiel beenden, damit es zählt.',
+  settings: 'Einstellungen', arabicStyle: 'Arabischer Stil', dialectEg: 'Ägyptisch', dialectMsa: 'Hocharabisch', leaveGroup: 'Gruppe verlassen', lastPlayed: 'Zuletzt gespielt', yourWins: 'deine Siege', noGamesYet: 'noch keine Spiele', settingsHint: 'Sprache und Aussehen. Gespeichert auf diesem Gerät und in deinem Konto.', groupsTitle: 'Deine Gruppen',
   allGames: 'Alle Spiele', round: 'Runde', hostControls: 'Host-Steuerung', nextRound: 'Nächste Runde', endGame: 'Spiel beenden',
   submit: 'Senden', submitted: 'Gesendet', waitingOthers: 'Warten auf die anderen…',
   yourAnswer: 'Deine Antwort', yourVote: 'Deine Stimme', pickPlayer: 'Spieler wählen', award: 'Punkt geben',
@@ -324,3 +327,45 @@ const de: Strings = {
 };
 
 export const strings: Record<Locale, Strings> = { en, ar, de };
+
+export type ArDialect = 'eg' | 'msa';
+
+/* Arabic dialect registry. `ar` above is Modern Standard Arabic and is the base every dialect falls back to.
+   A new dialect (for example Syrian) is a copy of the Egyptian block below with its own overrides plus one registry entry. */
+const arEG: Partial<Strings> = {
+  waiting: 'مستني المضيف', notReady: 'مش جاهز', offline: 'مش متصل',
+  needTwo: 'محتاجين لاعبين اتنين على الأقل', everyoneReady: 'لازم الكل يبقى جاهز',
+  chooseGame: 'اختار لعبة', createParty: 'اعمل جلسة', code: 'كود الدعوة', invite: 'كود الدعوة', copyLink: 'انسخ لينك الدعوة', copied: 'اتنسخ',
+  joinAction: 'ادخل', createAction: 'اعمل الجلسة', lobby: 'اللوبي', members: 'اللاعبين',
+  waitingOthers: 'مستنيين الباقي…', roll: 'ارمي', rollAgain: 'ارمي تاني', playAgain: 'العب تاني', leave: 'اخرج', saved: 'اتحفظ',
+  guestNote: 'تقدر تدخل كضيف على طول. اعمل حساب عشان تحفظ جلساتك على كل أجهزتك.',
+  displayNameHint: 'ده الاسم اللي هيشوفه اللاعبين.', solved: 'حليتها!', outOfGuesses: 'خلصت المحاولات', notAWord: 'مش في القاموس', alreadyGuessed: 'جربتها قبل كده',
+  waitingTurn: 'مستني دوره', roundComplete: 'الجولة خلصت', error: 'حصل خطأ',
+  lagNone: 'مفيش تأخير', lagSlight: 'تأخير بسيط', lagHeavy: 'تأخير كبير', lagChecking: 'بنفحص…',
+  waking: 'بنصحّي السيرفر، أول زيارة ممكن تاخد دقيقة.', heads: 'صورة',
+  wheelPartyHint: 'سطر لكل عنصر. سيبها فاضية عشان تستخدم أسماء اللاعبين.', bracketPartyHint: 'سيبها فاضية عشان تستخدم لاعبين الغرفة.',
+  drConnecting: 'بنتصل… السيرفر المجاني ممكن ياخد دقيقة يصحى.', drDown: 'الاتصال قطع. بنحاول تاني…', drWaitHost: 'مستنيين المضيف يبدأ…',
+  drGuessPh: 'اكتب تخمينك…', drClose: 'قريب أوي!', drNoSpoil: 'ماينفعش تكتب الكلمة.', drNeedTwo: 'لازم لاعبين متصلين عشان نبدأ.',
+  drLeft: 'الرسام خرج. هننقل للي بعده.', drNoOne: 'محدش خمّنها', drUndo: 'ارجع', drClear: 'امسح', drWatch: 'اتفرج على الرسمة وخمّن الكلمة.',
+  drSetupHint: 'لاعب بيرسم كلمة سرية والباقي بيتسابقوا يخمنوها. كل ما تخمّن أسرع تاخد نقط أكتر.',
+  loading: 'بيحمّل…', yesNo: ['أكيد آه!', 'الحظ بيقول آه.', 'اسأل تاني بعدين.', 'لأ طبعاً.'],
+  nextRound: 'الجولة الجاية', tStartNext: 'ابدأ اللعبة الجاية', tCancel: 'الغي البطولة',
+  tHint: 'النقط حسب المركز: الأول ١٠ والتاني ٧ والتالت ٥. الترتيب عشوائي كل مرة وتقدر تغيّره.',
+  tRunning: 'البطولة شغالة. خلّص كل لعبة بزرار إنهاء اللعبة عشان تتحسب.',
+  noHistory: 'مفيش ألعاب لسه. خلّص لعبة وهتظهر هنا.', needParty: 'ادخل جلسة عشان تشوف ترتيبها.', mostWinner: 'أكتر واحد فاز',
+  settingsHint: 'اللغة والمظهر. بيتحفظوا على الجهاز ده وعلى حسابك.', leaveGroup: 'سيب المجموعة',
+  gameNames: { ...ar.gameNames, wyr: 'تفضّل إيه', likely: 'مين الأكتر احتمالاً' },
+};
+
+export const arDialects: Record<ArDialect, { label: string; strings: Partial<Strings> }> = {
+  eg: { label: 'مصري', strings: arEG },
+  msa: { label: 'فصحى', strings: {} },
+};
+export const DEFAULT_AR_DIALECT: ArDialect = 'eg';
+
+export function getStrings(locale: Locale, dialect: ArDialect = DEFAULT_AR_DIALECT): Strings {
+  if (locale !== 'ar') return strings[locale];
+  const d = arDialects[dialect] ?? arDialects[DEFAULT_AR_DIALECT];
+  return { ...ar, ...d.strings } as Strings;
+}
+

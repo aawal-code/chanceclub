@@ -11,7 +11,7 @@ const GAMES = ['wordle', 'draw', 'bracket', 'trivia', 'charades', 'whoami', 'wyr
 
 export default function PartyScreen({
   t, locale, identity, guestName, setGuestName, parties, activeParty, busy, initialCode,
-  onCreate, onJoin, onOpen, onReady, onStart, onLeave, onOpenGame, onSignIn, onTournament,
+  onCreate, onJoin, onOpen, onReady, onStart, onLeave, onOpenGame, onSignIn, onTournament, onLeaveGroup,
 }: {
   t: Strings;
   locale: Locale;
@@ -31,6 +31,7 @@ export default function PartyScreen({
   onOpenGame: () => void;
   onSignIn: () => void;
   onTournament: (party: Party, started?: boolean) => void;
+  onLeaveGroup: (code: string) => void;
 }) {
   const toast = useToast();
   const [partyName, setPartyName] = useState('');
@@ -224,16 +225,25 @@ export default function PartyScreen({
 
       {parties.length > 0 && (
         <Card className="stack gap-8">
-          <h3 className="h3">{t.yourParties}</h3>
+          <h3 className="h3">{t.groupsTitle}</h3>
           {parties.map((party) => (
-            <button key={party.code} className="member" onClick={() => onOpen(party.code)} style={{ border: 0, background: 'none', textAlign: 'left', cursor: 'pointer' }}>
-              <span className="avatar-chip">{party.name.charAt(0).toUpperCase()}</span>
-              <div className="grow stack">
-                <span className="name">{party.name}</span>
-                <span className="meta">{party.code} · {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.players.length} {t.members.toLowerCase()}</span>
+            <div key={party.code} className="member" style={{ alignItems: 'flex-start' }}>
+              <button onClick={() => onOpen(party.code)} style={{ border: 0, background: 'none', textAlign: 'start', cursor: 'pointer', display: 'flex', gap: 12, flex: 1, minWidth: 0, color: 'inherit', padding: 0 }}>
+                <span className="avatar-chip">{party.name.charAt(0).toUpperCase()}</span>
+                <div className="grow stack" style={{ minWidth: 0 }}>
+                  <span className="name">{party.name}</span>
+                  <span className="meta">{party.members.map((m) => m.name).join(', ')}</span>
+                  <span className="meta">
+                    {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.games_played ? `${party.games_played}× · ${t.yourWins} ${party.my_wins ?? 0}` : t.noGamesYet}
+                    {party.last_played ? ` · ${t.lastPlayed} ${new Date(party.last_played.replace(' ', 'T') + 'Z').toLocaleDateString()}` : ''}
+                  </span>
+                </div>
+              </button>
+              <div className="stack gap-6" style={{ alignItems: 'flex-end' }}>
+                <Btn size="sm" onClick={() => onOpen(party.code)}>{t.open}</Btn>
+                <Btn size="sm" variant="ghost" onClick={() => { if (window.confirm(`${t.leaveGroup}: ${party.name}?`)) onLeaveGroup(party.code); }}>{t.leaveGroup}</Btn>
               </div>
-              <Glyph name="arrow" size={18} />
-            </button>
+            </div>
           ))}
         </Card>
       )}

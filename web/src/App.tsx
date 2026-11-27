@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, ApiError, getGuestName, getSavedUser, getToken, HEALTH_URL, onSlowRequest, setGuestName, setSavedUser, setToken, type Party } from './api';
-import { strings, type Locale } from './i18n';
+import { strings, type Locale, getStrings, DEFAULT_AR_DIALECT } from './i18n';
+import type { ArDialect } from './i18n';
 import { Brand, DieLogo } from './components/brand';
 import { Btn, Card, Field, Spinner, ToastProvider, useToast } from './components/ui';
 const Home = React.lazy(() => import('./screens/Home'));
@@ -15,6 +16,7 @@ const SoloChance = React.lazy(() => import('./games/SoloChance'));
 const SoloBracket = React.lazy(() => import('./games/SoloBracket'));
 import { gameById } from './games/meta';
 import Stats from './screens/Stats';
+import Settings from './screens/Settings';
 
 export type Route =
   | { name: 'home' }
@@ -23,6 +25,7 @@ export type Route =
   | { name: 'games' }
   | { name: 'teams' }
   | { name: 'stats' }
+  | { name: 'settings' }
   | { name: 'profile' }
   | { name: 'wordle' }
   | { name: 'detail'; id: string }
@@ -57,6 +60,7 @@ function parseHash(): Route {
   if (head === 'games') return { name: 'games' };
   if (head === 'teams') return { name: 'teams' };
   if (head === 'stats') return { name: 'stats' };
+  if (head === 'settings') return { name: 'settings' };
   if (head === 'profile') return { name: 'profile' };
   if (head === 'wordle') return { name: 'wordle' };
   if (head === 'play' && tail) return { name: 'solo', id: tail };
@@ -88,7 +92,9 @@ export default function App() {
   const [slowNet, setSlowNet] = useState(false);
   useEffect(() => onSlowRequest(setSlowNet), []);
 
-  const t = strings[locale];
+  const [dialect, setDialectState] = useState<ArDialect>(() => (localStorage.getItem('cc.ardialect') === 'msa' ? 'msa' : DEFAULT_AR_DIALECT));
+  const setDialect = useCallback((d: ArDialect) => { setDialectState(d); try { localStorage.setItem('cc.ardialect', d); } catch { /* ignore */ } }, []);
+  const t = useMemo(() => getStrings(locale, dialect), [locale, dialect]);
   const toast = useToast();
 
   /* ---- theme + locale side effects ---- */
@@ -99,6 +105,13 @@ export default function App() {
     localStorage.setItem(THEME_KEY, theme);
     localStorage.setItem(LOCALE_KEY, locale);
   }, [theme, locale]);
+
+  /* ---- keep account preferences in step with the device (accounts only) ---- */
+  useEffect(() => {
+    if (identity?.kind !== 'user') return;
+    const id = window.setTimeout(() => { api.updateMe({ preferred_language: locale, theme }).catch(() => { /* best effort */ }); }, 800);
+    return () => window.clearTimeout(id);
+  }, [identity?.kind, locale, theme]);
 
   /* ---- hash routing ---- */
   useEffect(() => {
@@ -340,6 +353,12 @@ export default function App() {
     }
   }, [activeParty, t.error, toast]);
 
+  const leaveGroup = useCallback(async (code: string) => {
+    try { await api.leave(code); } catch (error: any) { toast(error?.message || t.error); return; }
+    if (activeParty?.code === code) { setActiveParty(null); try { localStorage.removeItem(PARTY_KEY); } catch { /* ignore */ } }
+    refreshParties();
+  }, [activeParty?.code, refreshParties, t.error, toast]);
+
   const leaveParty = useCallback(() => {
     setActiveParty(null);
     try { localStorage.removeItem(PARTY_KEY); } catch { /* ignore */ }
@@ -393,6 +412,7 @@ export default function App() {
             onLeave={leaveParty}
             onOpenGame={() => go({ name: 'game' })}
             onSignIn={() => go({ name: 'profile' })}
+            onLeaveGroup={leaveGroup}
             onTournament={(p, started) => { setActiveParty(p); if (started) go({ name: 'game' }); }}
           />
         );
@@ -417,6 +437,8 @@ export default function App() {
         );
       case 'games':
         return <Games t={t} onOpen={(id) => go({ name: 'detail', id })} onParty={() => go({ name: 'party' })} />;
+      case 'settings':
+        return <Settings t={t} locale={locale} setLocale={setLocale} dialect={dialect} setDialect={setDialect} theme={theme} setTheme={setTheme} />;
       case 'stats':
         return <Stats t={t} partyCode={activeParty?.code ?? null} hasIdentity={!!identity} />;
       case 'teams':
@@ -479,7 +501,7 @@ export default function App() {
           />
         );
     }
-  }, [booting, route, t, locale, identity, guestName, parties, activeParty, busy, theme, createParty, joinParty, openParty, setReady, startGame, leaveParty, act, advance, finishParty, signOut]);
+  }, [booting, route, t, locale, identity, guestName, parties, activeParty, busy, theme, createParty, joinParty, openParty, setReady, startGame, leaveParty, act, advance, finishParty, leaveGroup, setDialect, dialect, signOut]);
 
   const navItems: { id: Route['name']; label: string; icon: string }[] = [
     { id: 'home', label: t.home, icon: 'home' },
@@ -506,21 +528,7 @@ export default function App() {
           ))}
         </nav>
         <div className="top-actions">
-          <button
-            className="icon-btn"
-            onClick={() => setLocale(locale === 'en' ? 'ar' : locale === 'ar' ? 'de' : 'en')}
-            aria-label={t.language}
-          >
-            {locale === 'en' ? 'عربي' : locale === 'ar' ? 'DE' : 'EN'}
-          </button>
-          <button
-            className="icon-btn"
-            onClick={() => setTheme(THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length])}
-            aria-label={t.theme}
-            title={t.theme}
-          >
-            {THEME_ICON[theme]}
-          </button>
+          <button className="icon-btn" onClick={() => go({ name: 'settings' })} aria-label={t.settings} title={t.settings} data-active={route.name === 'settings'}>⚙</button>
           <button className="avatar" onClick={() => go({ name: 'profile' })} aria-label={t.profile}>
             {(identity?.name || 'A').charAt(0).toUpperCase()}
           </button>

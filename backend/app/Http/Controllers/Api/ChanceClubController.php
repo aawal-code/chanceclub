@@ -54,7 +54,7 @@ class ChanceClubController extends Controller
         $data = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'min:2', 'max:80'],
             'preferred_language' => ['sometimes', 'in:en,ar,de'],
-            'theme' => ['sometimes', 'in:ink,paper,midnight,sand,light,dark'],
+            'theme' => ['sometimes', 'in:ink,paper,midnight,sand,neon,brutal,terminal,candy,forest,newsprint,light,dark'],
         ]);
 
         $user = $this->user($request);

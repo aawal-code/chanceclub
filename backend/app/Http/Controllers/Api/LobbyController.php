@@ -78,7 +78,15 @@ class LobbyController extends Controller
         else $query->where('guest_id', $identity['id']);
         $ids = $query->pluck('party_id');
         $parties = DB::table('parties')->whereIn('id', $ids)->whereIn('status', ['lobby', 'playing'])->orderByDesc('updated_at')->limit(50)->get();
-        return response()->json(['data' => $parties->map(fn ($party) => $this->partyView($party, $identity))->values()]);
+        $key = ($identity['kind'] === 'user' ? 'u' : 'g').$identity['id'];
+        $pids = $parties->pluck('id');
+        $stats = DB::table('matches')->whereIn('party_id', $pids)->groupBy('party_id')->selectRaw('party_id, max(finished_at) as last_played, count(*) as games')->get()->keyBy('party_id');
+        $wins = DB::table('match_results')->whereIn('party_id', $pids)->where('player_key', $key)->where('is_winner', true)->groupBy('party_id')->selectRaw('party_id, count(*) as wins')->get()->keyBy('party_id');
+        return response()->json(['data' => $parties->map(fn ($party) => $this->partyView($party, $identity) + [
+            'last_played' => $stats[$party->id]->last_played ?? null,
+            'games_played' => (int) ($stats[$party->id]->games ?? 0),
+            'my_wins' => (int) ($wins[$party->id]->wins ?? 0),
+        ])->values()]);
     }
 
     public function create(Request $request): JsonResponse
@@ -108,7 +116,7 @@ class LobbyController extends Controller
         $party = $this->party($code);
         $player = $this->player($party->id, $identity);
         if (!$player) return response()->json(['message' => 'Party not found.'], 404);
-        if (!$player->last_seen_at || now()->diffInSeconds($player->last_seen_at) >= 8) {
+        if (!$player->last_seen_at || \App\Support\History::age($player->last_seen_at) >= 8) {
             DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
         }
         return response()->json(['data' => $this->partyView($party, $identity)]);
@@ -184,7 +192,7 @@ class LobbyController extends Controller
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if ($locked->status !== 'lobby') throw new HttpException(409, 'The game has already started.');
             $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
-            $isOnline = fn ($p) => $p->last_seen_at && now()->diffInSeconds($p->last_seen_at) < 25;
+            $isOnline = fn ($p) => $p->last_seen_at && \App\Support\History::age($p->last_seen_at) < 25;
             $present = $players->filter(fn ($p) => $isOnline($p) || (int) $p->id === (int) $locked->host_player_id)->values();
             if ($present->count() < 2) throw new HttpException(409, 'At least two players are needed.');
             if (!$skipReady && $present->contains(fn ($player) => !$player->is_ready)) throw new HttpException(409, 'Everyone must be ready first.');
@@ -413,6 +421,31 @@ class LobbyController extends Controller
         return response()->json(['data' => $this->partyView(DB::table('parties')->find($party->id), $identity)]);
     }
 
+    public function leave(Request $request, string $code): JsonResponse
+    {
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $me = $this->requireMember($party, $identity);
+        DB::transaction(function () use ($party, $me) {
+            $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+            $others = DB::table('party_players')->where('party_id', $locked->id)->where('id', '!=', $me->id)->orderBy('id')->get();
+            if ($others->isEmpty()) {
+                DB::table('parties')->where('id', $locked->id)->update(['host_player_id' => null]);
+                DB::table('party_players')->where('party_id', $locked->id)->delete();
+                DB::table('parties')->where('id', $locked->id)->delete();
+                return;
+            }
+            if ((int) $locked->host_player_id === (int) $me->id) {
+                $next = $others->first(fn ($p) => $p->last_seen_at && \App\Support\History::age($p->last_seen_at) < 60) ?? $others->first();
+                DB::table('parties')->where('id', $locked->id)->update(['host_player_id' => $next->id, 'updated_at' => now()]);
+                DB::table('party_players')->where('id', $next->id)->update(['is_ready' => true]);
+            }
+            DB::table('party_players')->where('id', $me->id)->delete();
+            DB::table('parties')->where('id', $locked->id)->update(['updated_at' => now()]);
+        });
+        return response()->json(['ok' => true]);
+    }
+
     public function finish(Request $request, string $code): JsonResponse
     {
         $identity = $this->identity($request);
@@ -525,7 +558,7 @@ class LobbyController extends Controller
                 'id' => (string) $person->id, 'name' => $person->display_name,
                 'ready' => (bool) $person->is_ready, 'score' => (int) $person->score,
                 'is_host' => (int) $person->id === (int) $party->host_player_id,
-                'online' => $person->last_seen_at && now()->diffInSeconds($person->last_seen_at) < 20,
+                'online' => $person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 20,
                 'rtt' => $person->last_rtt_ms === null ? null : (int) $person->last_rtt_ms,
             ])->values()->all(),
             'self_player_id' => $myPlayer ? (string) $myPlayer->id : null,

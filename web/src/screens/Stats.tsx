@@ -34,7 +34,7 @@ export default function Stats({ t, partyCode, hasIdentity }: { t: Strings; party
       {tab !== 'mine' && (
         <div className="row gap-8 wrap">
           <Seg<string> value={String(days)} onChange={(v) => setDays(Number(v))} options={[{ value: '7', label: t.d7 }, { value: '30', label: t.d30 }, { value: '0', label: t.dAll }]} />
-          <select className="field" value={game} onChange={(e) => setGame(e.target.value)} aria-label={t.games} style={{ minHeight: 40 }}>
+          <select className="input" value={game} onChange={(e) => setGame(e.target.value)} aria-label={t.games} style={{ minHeight: 40 }}>
             {GAMES.map((g) => <option key={g} value={g}>{g ? gname(g) : t.allGames}</option>)}
           </select>
         </div>
@@ -72,7 +72,7 @@ export default function Stats({ t, partyCode, hasIdentity }: { t: Strings; party
         <Card pad="lg"><p className="body">{t.noHistory}</p></Card>
       ) : (
         <>
-          {board.most_winner && (
+          {board.most_winner && board.most_winner.wins > 0 && (
             <Card pad="lg" className="row gap-12 center">
               <span style={{ fontSize: 34 }}>👑</span>
               <div className="grow"><div className="caption">{t.mostWinner}</div><div className="h2">{board.most_winner.name}</div></div>
@@ -82,9 +82,9 @@ export default function Stats({ t, partyCode, hasIdentity }: { t: Strings; party
           <Card pad="lg" className="stack gap-12">
             {board.rows.map((r) => (
               <div key={r.player_key} className="row gap-10 center">
-                <span className="mono" style={{ width: 28, fontSize: 16 }}>{medal(r.rank)}</span>
+                <span className="mono" style={{ width: 28, fontSize: 16 }}>{r.wins > 0 ? medal(r.rank) : '·'}</span>
                 <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{r.name}{r.player_key === board.me ? ` · ${t.youLabel}` : ''}</span>
-                <span className="caption mono">{r.games} {t.gamesLabel}</span>
+                <span className="caption mono">{r.games}×</span>
                 <span className="mono" style={{ fontWeight: 800, minWidth: 28, textAlign: 'end' }}>{r.wins}</span>
               </div>
             ))}

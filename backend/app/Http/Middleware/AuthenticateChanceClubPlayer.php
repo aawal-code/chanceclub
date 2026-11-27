@@ -31,7 +31,9 @@ class AuthenticateChanceClubPlayer
 
         $guest = DB::table('guest_identities')->where('token_hash', $hash)->where('expires_at', '>', now())->first();
         if (!$guest) return response()->json(['message' => 'Unauthenticated.'], 401);
-        DB::table('guest_identities')->where('id', $guest->id)->update(['last_used_at' => now(), 'updated_at' => now()]);
+        if (!$guest->last_used_at || \App\Support\History::age($guest->last_used_at) >= 43200) {
+            DB::table('guest_identities')->where('id', $guest->id)->update(['last_used_at' => now(), 'expires_at' => now()->addDays(60), 'updated_at' => now()]);
+        }
         $request->attributes->set('cc.guest', $guest);
         $request->attributes->set('cc.identity', ['kind' => 'guest', 'id' => (int) $guest->id, 'name' => $guest->display_name]);
         return $next($request);
