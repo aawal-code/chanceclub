@@ -7,4 +7,4 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - run: curl -fsS -m 30 https://chanceclub-api.onrender.com/api/v1/up || true
+      - run: curl -fsS -m 30 https://chanceclub-api-eu.onrender.com/api/v1/up || true
