@@ -59,6 +59,8 @@ class History
             if (!$online && $score <= 0 && (int) $p->id !== (int) $party->host_player_id) continue;
             $scores[] = ['user_id' => $p->user_id ? (int) $p->user_id : null, 'guest_id' => $p->guest_id ? (int) $p->guest_id : null, 'name' => $p->display_name, 'score' => $score];
         }
-        return self::record('party', $game ?: $party->current_game ?: $last->game, $party, (int) $last->round_number, $seq, $rounds, $scores);
+        $matchId = self::record('party', $game ?: $party->current_game ?: $last->game, $party, (int) $last->round_number, $seq, $rounds, $scores);
+        if ($matchId) Tournament::award($party->id, $matchId);
+        return $matchId;
     }
 }

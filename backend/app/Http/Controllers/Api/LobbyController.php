@@ -174,14 +174,20 @@ class LobbyController extends Controller
         $identity = $this->identity($request);
         $party = $this->party($code);
         $this->requireHost($party, $identity);
-        $result = DB::transaction(function () use ($party, $data, $identity) {
+        if (DB::table('tournaments')->where('party_id', $party->id)->where('status', 'active')->exists()) throw new HttpException(409, 'A tournament is running. Continue it or cancel it first.');
+        return $this->launch($party, $data, $identity, false);
+    }
+
+    private function launch(object $party, array $data, array $identity, bool $skipReady): JsonResponse
+    {
+        $result = DB::transaction(function () use ($party, $data, $identity, $skipReady) {
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if ($locked->status !== 'lobby') throw new HttpException(409, 'The game has already started.');
             $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
             $isOnline = fn ($p) => $p->last_seen_at && now()->diffInSeconds($p->last_seen_at) < 25;
             $present = $players->filter(fn ($p) => $isOnline($p) || (int) $p->id === (int) $locked->host_player_id)->values();
             if ($present->count() < 2) throw new HttpException(409, 'At least two players are needed.');
-            if ($present->contains(fn ($player) => !$player->is_ready)) throw new HttpException(409, 'Everyone must be ready first.');
+            if (!$skipReady && $present->contains(fn ($player) => !$player->is_ready)) throw new HttpException(409, 'Everyone must be ready first.');
             $players = $present;
             $number = (int) $locked->round_number + 1;
             $game = $data['game'];
@@ -355,6 +361,58 @@ class LobbyController extends Controller
         return response()->json(['data' => $this->partyView($result, $identity)]);
     }
 
+    public function tournamentCreate(Request $request, string $code): JsonResponse
+    {
+        $data = $request->validate(['games' => ['required', 'array', 'min:1', 'max:6'], 'games.*' => ['string', 'in:'.implode(',', \App\Support\Tournament::GAMES)], 'count' => ['required', 'integer', 'min:2', 'max:10']]);
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $this->requireHost($party, $identity);
+        $result = DB::transaction(function () use ($party, $data) {
+            $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+            if ($locked->status !== 'lobby') throw new HttpException(409, 'Finish the current game first.');
+            DB::table('tournaments')->where('party_id', $locked->id)->where('status', 'active')->update(['status' => 'canceled', 'updated_at' => now()]);
+            $pool = array_values(array_unique($data['games']));
+            $lineup = [];
+            while (count($lineup) < $data['count']) { $bag = $pool; shuffle($bag); $lineup = array_merge($lineup, $bag); }
+            $lineup = array_slice($lineup, 0, $data['count']);
+            shuffle($lineup);
+            DB::table('tournaments')->insert(['party_id' => $locked->id, 'status' => 'active', 'total_games' => $data['count'], 'current_index' => 0, 'lineup' => json_encode($lineup), 'points' => json_encode((object) []), 'created_at' => now(), 'updated_at' => now()]);
+            return DB::table('parties')->find($locked->id);
+        });
+        return response()->json(['data' => $this->partyView($result, $identity)], 201);
+    }
+
+    public function tournamentAction(Request $request, string $code, string $action): JsonResponse
+    {
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $this->requireHost($party, $identity);
+        $tour = DB::table('tournaments')->where('party_id', $party->id)->where('status', 'active')->orderByDesc('id')->first();
+        if (!$tour) throw new HttpException(404, 'No active tournament.');
+        $lineup = json_decode($tour->lineup, true) ?: [];
+        $idx = (int) $tour->current_index;
+        if ($action === 'cancel') {
+            DB::table('tournaments')->where('id', $tour->id)->update(['status' => 'canceled', 'updated_at' => now()]);
+        } elseif ($action === 'shuffle') {
+            $rest = array_slice($lineup, $idx); shuffle($rest);
+            DB::table('tournaments')->where('id', $tour->id)->update(['lineup' => json_encode(array_merge(array_slice($lineup, 0, $idx), $rest)), 'updated_at' => now()]);
+        } elseif ($action === 'reorder') {
+            $data = $request->validate(['lineup' => ['required', 'array', 'max:10'], 'lineup.*' => ['string']]);
+            $rest = array_slice($lineup, $idx); $new = array_values($data['lineup']);
+            sort($rest); $check = $new; sort($check);
+            if ($rest !== $check) throw new HttpException(422, 'The lineup must keep the same games.');
+            DB::table('tournaments')->where('id', $tour->id)->update(['lineup' => json_encode(array_merge(array_slice($lineup, 0, $idx), $new)), 'updated_at' => now()]);
+        } elseif ($action === 'next') {
+            $data = $request->validate(['locale' => ['sometimes', 'in:en,ar,de']]);
+            if ($party->status !== 'lobby') throw new HttpException(409, 'A game is already running.');
+            if ($idx >= count($lineup)) throw new HttpException(409, 'The tournament is finished.');
+            return $this->launch($party, ['game' => $lineup[$idx], 'locale' => $data['locale'] ?? 'en'], $identity, true);
+        } else {
+            throw new HttpException(404, 'Unknown action.');
+        }
+        return response()->json(['data' => $this->partyView(DB::table('parties')->find($party->id), $identity)]);
+    }
+
     public function finish(Request $request, string $code): JsonResponse
     {
         $identity = $this->identity($request);
@@ -475,6 +533,7 @@ class LobbyController extends Controller
             'status' => $party->status, 'game' => $party->current_game,
             'wheel' => $wheel,
             'bracket' => $bracketView,
+            'tournament' => \App\Support\Tournament::view($party->id),
             'round' => $roundView, 'createdAt' => $party->created_at,
         ];
     }

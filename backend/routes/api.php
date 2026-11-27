@@ -55,6 +55,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/leaderboard', [HistoryController::class, 'global']);
         Route::get('/parties/{code}/leaderboard', [HistoryController::class, 'party']);
         Route::get('/parties/{code}/history', [HistoryController::class, 'partyHistory']);
+        Route::post('/parties/{code}/tournament', [LobbyController::class, 'tournamentCreate']);
+        Route::post('/parties/{code}/tournament/{action}', [LobbyController::class, 'tournamentAction'])->whereIn('action', ['next', 'shuffle', 'reorder', 'cancel']);
         Route::post('/parties/{code}/finish', [LobbyController::class, 'finish']);
         Route::post('/wordle/solo', [WordleController::class, 'start']);
         Route::get('/wordle/solo/{id}', [WordleController::class, 'show']);
