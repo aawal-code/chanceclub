@@ -14,7 +14,6 @@ WORKDIR /var/www/html
 COPY . .
 COPY --from=vendor /app/vendor ./vendor
 RUN mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache storage/logs bootstrap/cache \
- && \
  && chown -R www-data:www-data storage bootstrap/cache
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
