@@ -3,10 +3,10 @@ import type { Party } from '../api';
 import type { Strings } from '../i18n';
 import { Glyph } from '../components/brand';
 import { Btn, Card } from '../components/ui';
-import type { GameMeta } from '../games/meta';
+import { GAMES, type GameMeta } from '../games/meta';
 
 export default function GameDetail({
-  t, gameId, meta, parties, onBack, onSolo, onParty,
+  t, gameId, meta, parties, onBack, onSolo, onParty, onPick,
 }: {
   t: Strings;
   gameId: string;
@@ -15,12 +15,14 @@ export default function GameDetail({
   onBack: () => void;
   onSolo: () => void;
   onParty: () => void;
+  onPick: (id: string) => void;
 }) {
   const canSolo = meta.modes.includes('solo');
   const openParties = parties.filter((party) => party.status === 'lobby');
+  const others = GAMES.filter((game) => game.id !== gameId).slice(0, 5);
 
   return (
-    <div className="stack gap-20 fade-up">
+    <div className="stack gap-20 fade-up detail-wrap">
       <div className="row gap-10 center">
         <Btn variant="ghost" size="sm" onClick={onBack}>← {t.games}</Btn>
       </div>
@@ -61,6 +63,20 @@ export default function GameDetail({
                 ))}
               </div>
             )}
+          </Card>
+
+          <Card className="stack gap-8">
+            <span className="caption">{t.allGames}</span>
+            {others.map((game) => (
+              <button key={game.id} className="mini-row" onClick={() => onPick(game.id)}>
+                <span className="mini-glyph"><Glyph name={game.id} size={16} /></span>
+                <span className="grow stack">
+                  <span className="mini-name">{t.gameNames[game.id]}</span>
+                  <span className="mini-cat">{t.gameCats[game.id]}</span>
+                </span>
+                <span className="mini-mode">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
+              </button>
+            ))}
           </Card>
         </div>
       </div>

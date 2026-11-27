@@ -14,7 +14,7 @@ Route::prefix('v1')->group(function () {
     });
 
     // Session + teams answer for guests too: no screen may require an account.
-    Route::middleware(['cc.player', 'throttle:120,1'])->group(function () {
+    Route::middleware(['cc.player', 'throttle:cc-player'])->group(function () {
         Route::get('/me', [ChanceClubController::class, 'me']);
         Route::patch('/me', [ChanceClubController::class, 'updateMe']);
         Route::post('/logout', [ChanceClubController::class, 'logout']);
@@ -23,7 +23,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/teams/{code}/join', [ChanceClubController::class, 'joinTeam']);
     });
 
-    Route::middleware(['cc.player', 'throttle:60,1'])->group(function () {
+    Route::middleware(['cc.player', 'throttle:cc-player'])->group(function () {
         Route::get('/guest/me', [GuestIdentityController::class, 'me']);
         Route::post('/guest/logout', [GuestIdentityController::class, 'logout']);
         Route::get('/parties', [LobbyController::class, 'index']);

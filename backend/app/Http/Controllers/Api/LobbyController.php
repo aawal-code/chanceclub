@@ -51,6 +51,25 @@ class LobbyController extends Controller
         'charades' => ['تنظيف أسنانك', 'قطة رأت خياراً', 'الفوز بميدالية أولمبية', 'مصعد بطيء جداً', 'تحضير الشطيرة المثالية'],
     ];
 
+
+    private const PROMPTS_DE = [
+        'categories' => ['Dinge, die man am Strand findet', 'Obst und Gemüse', 'Filmfiguren', 'Länder und Städte', 'Dinge, die rot sind', 'Sport und Hobbys'],
+        'whoami' => ['Ein schlafender Koala', 'Die Mondlandung', 'Eine berühmte Köchin', 'Eine Achterbahn', 'Ein Detektiv', 'Das letzte Stück Pizza'],
+        'trivia' => ['Welcher Planet hat die meisten Monde?', 'Was ist die größte Wüste der Erde?', 'Wie viele Herzen hat ein Oktopus?', 'Was ist die kleinste Primzahl?', 'Welches Land hat das Papier erfunden?'],
+        'charades' => ['Zähne putzen', 'Eine Katze sieht eine Gurke', 'Eine olympische Medaille gewinnen', 'Ein sehr langsamer Aufzug', 'Das perfekte Sandwich machen'],
+        'wyr' => ['Weltraum oder Tiefsee erkunden?', 'Immer singen statt sprechen oder überall tanzen?', 'Ohne Musik oder ohne Filme leben?', 'Eine Rückspultaste oder eine Pausentaste fürs Leben?'],
+        'likely' => ['Wer wird am ehesten ein berühmter Koch?', 'Wer überlebt am längsten auf einer einsamen Insel?', 'Wer lacht am ehesten im falschen Moment?', 'Wer plant die beste Überraschungsparty?'],
+        'yesno' => ['Lass den Zufall entscheiden!'], 'dice' => ['Bereit zu würfeln?'], 'coin' => ['Münze werfen'],
+        'wheel' => ['Wen wählt der Zufall?'], 'number' => ['Wähle eine Zahl von 1 bis 100'],
+        'wordle' => ['Errate das fünfstellige Wort'],
+    ];
+
+    private const ANSWERS_DE = [
+        'trivia' => ['Saturn', 'Antarktis', 'Drei', 'Zwei', 'China'],
+        'whoami' => ['Ein schlafender Koala', 'Die Mondlandung', 'Eine berühmte Köchin', 'Eine Achterbahn', 'Ein Detektiv', 'Das letzte Stück Pizza'],
+        'charades' => ['Zähne putzen', 'Eine Katze sieht eine Gurke', 'Eine olympische Medaille gewinnen', 'Ein sehr langsamer Aufzug', 'Das perfekte Sandwich machen'],
+    ];
+
     public function index(Request $request): JsonResponse
     {
         $identity = $this->identity($request);
@@ -128,7 +147,7 @@ class LobbyController extends Controller
 
     public function start(Request $request, string $code): JsonResponse
     {
-        $data = $request->validate(['game' => ['required', 'string', 'in:'.implode(',', self::GAMES)], 'locale' => ['sometimes', 'in:en,ar']]);
+        $data = $request->validate(['game' => ['required', 'string', 'in:'.implode(',', self::GAMES)], 'locale' => ['sometimes', 'in:en,ar,de']]);
         $identity = $this->identity($request);
         $party = $this->party($code);
         $this->requireHost($party, $identity);
@@ -143,6 +162,7 @@ class LobbyController extends Controller
             $locale = $data['locale'] ?? 'en';
             $promptBank = $locale === 'ar' ? self::PROMPTS_AR : self::PROMPTS;
             $answerBank = $locale === 'ar' ? self::ANSWERS_AR : self::ANSWERS;
+            if ($locale === 'de') { $promptBank = self::PROMPTS_DE; $answerBank = self::ANSWERS_DE; }
             $promptIndex = random_int(0, count($promptBank[$game]) - 1);
             $prompt = $promptBank[$game][$promptIndex];
             $answer = isset($answerBank[$game]) ? $answerBank[$game][$promptIndex] : null;
@@ -271,6 +291,7 @@ class LobbyController extends Controller
             $locale = $previousRound?->locale ?? 'en';
             $promptBank = $locale === 'ar' ? self::PROMPTS_AR : self::PROMPTS;
             $answerBank = $locale === 'ar' ? self::ANSWERS_AR : self::ANSWERS;
+            if ($locale === 'de') { $promptBank = self::PROMPTS_DE; $answerBank = self::ANSWERS_DE; }
             $index = random_int(0, count($promptBank[$game]) - 1);
             $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
             $previousTurnIndex = $players->search(fn ($person) => (int) $person->id === (int) ($previousRound?->turn_player_id ?? 0));

@@ -41,6 +41,7 @@ function normalizeLocale(value: string | null): Locale {
   return value === 'ar' || value === 'de' ? value : 'en';
 }
 const LOCALE_KEY = 'cc.locale';
+const PARTY_KEY = 'cc.party';
 
 function parseHash(): Route {
   const hash = window.location.hash.replace(/^#\/?/, '');
@@ -119,6 +120,19 @@ export default function App() {
           setIdentity(null);
         }
       }
+      // A reload or a deep link must not drop the lobby you are in.
+      const savedParty = (() => { try { return localStorage.getItem(PARTY_KEY); } catch { return null; } })();
+      const wanted = route.name === 'party' && route.code ? route.code : route.name === 'game' ? savedParty : null;
+      if (wanted && getToken()) {
+        try {
+          const party = await api.party(wanted);
+          setActiveParty(party.data);
+          if (route.name === 'game' && party.data.status === 'lobby') go({ name: 'party', code: party.data.code });
+        } catch {
+          try { localStorage.removeItem(PARTY_KEY); } catch { /* ignore */ }
+          if (route.name === 'game') go({ name: 'home' });
+        }
+      }
       setBooting(false);
     })();
   }, []);
@@ -148,6 +162,12 @@ export default function App() {
     setIdentity(next);
     return next;
   }, [identity, guestName, t.guestName]);
+
+  /* ---- remember the lobby across reloads ---- */
+  useEffect(() => {
+    if (!activeParty?.code) return;
+    try { localStorage.setItem(PARTY_KEY, activeParty.code); } catch { /* ignore */ }
+  }, [activeParty?.code]);
 
   /* ---- polling the active party ---- */
   useEffect(() => {
@@ -268,6 +288,7 @@ export default function App() {
 
   const leaveParty = useCallback(() => {
     setActiveParty(null);
+    try { localStorage.removeItem(PARTY_KEY); } catch { /* ignore */ }
     go({ name: 'home' });
     refreshParties();
   }, [refreshParties]);
@@ -366,6 +387,7 @@ export default function App() {
             onBack={() => go({ name: 'games' })}
             onSolo={() => go({ name: 'solo', id: meta.id })}
             onParty={() => go({ name: 'party' })}
+            onPick={(id) => go({ name: 'detail', id })}
           />
         );
       }
