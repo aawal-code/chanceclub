@@ -393,6 +393,7 @@ export default function App() {
             onLeave={leaveParty}
             onOpenGame={() => go({ name: 'game' })}
             onSignIn={() => go({ name: 'profile' })}
+            onTournament={(p, started) => { setActiveParty(p); if (started) go({ name: 'game' }); }}
           />
         );
       case 'game':

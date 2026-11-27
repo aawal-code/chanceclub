@@ -44,8 +44,11 @@ export type Party = {
   bracket?: { teams: { name: string; members: string[] }[]; rounds: { a: number | null; b: number | null; w: number | null }[][] } | null;
   wheel?: { entries: string[]; remaining: string[]; eliminate: boolean } | null;
   round: Round | null;
+  tournament?: Tournament | null;
   createdAt: string;
 };
+
+export type Tournament = { id: string; status: 'active' | 'done'; total: number; index: number; lineup: string[]; next: string | null; standings: { player_key: string; name: string; points: number; wins: number }[] };
 
 export type Team = { id: string; name: string; code: string; members?: { id: string; name: string }[] };
 
@@ -200,6 +203,8 @@ export const api = {
   history: () => request<{ data: { games: number; wins: number; recent: HistoryRow[] } }>('/history'),
   globalBoard: (game: string, days: number) => request<{ data: Board }>(`/leaderboard?days=${days}${game ? `&game=${game}` : ''}`),
   partyBoard: (code: string, game: string, days: number) => request<{ data: Board }>(`/parties/${encodeURIComponent(code)}/leaderboard?days=${days}${game ? `&game=${game}` : ''}`),
+  tournamentCreate: (code: string, games: string[], count: number) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/tournament`, 'POST', { games, count }),
+  tournamentAct: (code: string, action: 'next' | 'shuffle' | 'reorder' | 'cancel', body?: Record<string, unknown>) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/tournament/${action}`, 'POST', body),
   finish: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/finish`, 'POST'),
   heartbeat: (code: string, rttMs: number) =>
     request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/heartbeat`, 'POST', { rtt_ms: rttMs }),

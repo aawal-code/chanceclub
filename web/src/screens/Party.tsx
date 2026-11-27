@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
+import TournamentCard from './TournamentCard';
 import type { Locale, Strings } from '../i18n';
 import { Glyph } from '../components/brand';
 import { SetupForm, buildTeams, defaultSetup } from '../games/Bracket';
@@ -10,7 +11,7 @@ const GAMES = ['wordle', 'draw', 'bracket', 'trivia', 'charades', 'whoami', 'wyr
 
 export default function PartyScreen({
   t, locale, identity, guestName, setGuestName, parties, activeParty, busy, initialCode,
-  onCreate, onJoin, onOpen, onReady, onStart, onLeave, onOpenGame, onSignIn,
+  onCreate, onJoin, onOpen, onReady, onStart, onLeave, onOpenGame, onSignIn, onTournament,
 }: {
   t: Strings;
   locale: Locale;
@@ -29,6 +30,7 @@ export default function PartyScreen({
   onLeave: () => void;
   onOpenGame: () => void;
   onSignIn: () => void;
+  onTournament: (party: Party, started?: boolean) => void;
 }) {
   const toast = useToast();
   const [partyName, setPartyName] = useState('');
@@ -96,7 +98,7 @@ export default function PartyScreen({
                 {me?.ready ? t.notReady : t.ready}
               </Btn>
               <Btn variant="ghost" onClick={onLeave}>{t.leave}</Btn>
-              {activeParty.is_host && (
+              {activeParty.is_host && !(activeParty.tournament && activeParty.tournament.status === 'active') && (
                 <Btn disabled={!canStart || busy} onClick={() => onStart(picked, picked === 'bracket' ? { teams: buildTeams(bSetup, activeParty.members.map((x) => x.name)) } : picked === 'wheel' ? { entries: wheelText.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 24), eliminate: wheelMode === 'remove' } : undefined)}>
                   {t.startGame}
                 </Btn>
@@ -109,7 +111,9 @@ export default function PartyScreen({
             )}
           </Card>
 
-          {activeParty.is_host && (
+          <TournamentCard t={t} locale={locale} party={activeParty} onParty={onTournament} />
+
+          {activeParty.is_host && !(activeParty.tournament && activeParty.tournament.status === 'active') && (
             <Card pad="lg" className="stack gap-12">
               <div className="section-head">
                 <h2 className="h2">{t.chooseGame}</h2>
