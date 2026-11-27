@@ -7,14 +7,14 @@ use App\Http\Controllers\Api\WordleController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/v1/up', function () {
-    \$t0 = microtime(true);
+    $t0 = microtime(true);
     try {
         \Illuminate\Support\Facades\DB::select('select 1');
-        \$db = (int) round((microtime(true) - \$t0) * 1000);
-    } catch (\Throwable \$e) {
-        \$db = -1;
+        $db = (int) round((microtime(true) - $t0) * 1000);
+    } catch (\Throwable $e) {
+        $db = -1;
     }
-    return response()->json(['up' => true, 'db_ms' => \$db]);
+    return response()->json(['up' => true, 'db_ms' => $db]);
 });
 
 Route::prefix('v1')->group(function () {
