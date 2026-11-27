@@ -477,10 +477,10 @@ class LobbyController extends Controller
         shuffle($seeds);
         $size = 2;
         while ($size < count($seeds)) $size *= 2;
-        $slots = array_pad($seeds, $size, null);
+        $half = intdiv($size, 2);
         $rounds = [];
         $matches = [];
-        for ($i = 0; $i < $size; $i += 2) $matches[] = ['a' => $slots[$i], 'b' => $slots[$i + 1], 'w' => null];
+        for ($i = 0; $i < $half; $i++) $matches[] = ['a' => $seeds[$i], 'b' => $seeds[$half + $i] ?? null, 'w' => null];
         $rounds[] = $matches;
         while (count($matches) > 1) {
             $matches = array_map(fn () => ['a' => null, 'b' => null, 'w' => null], range(1, intdiv(count($matches), 2)));

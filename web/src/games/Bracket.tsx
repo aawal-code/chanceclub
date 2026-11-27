@@ -53,9 +53,9 @@ export function makeBracket(teams: BTeam[]): BracketState {
   const seeds = shuffle(teams.map((_, i) => i));
   let size = 2;
   while (size < seeds.length) size *= 2;
-  const slots: (number | null)[] = [...seeds, ...Array(size - seeds.length).fill(null)];
+  const half = size / 2;
   let matches: BMatch[] = [];
-  for (let i = 0; i < size; i += 2) matches.push({ a: slots[i], b: slots[i + 1], w: null });
+  for (let i = 0; i < half; i++) matches.push({ a: seeds[i], b: seeds[half + i] ?? null, w: null });
   const rounds = [matches];
   while (matches.length > 1) {
     matches = Array.from({ length: matches.length / 2 }, () => ({ a: null, b: null, w: null }));
