@@ -1,3 +1,5 @@
+import { motionOn } from '../motion';
+import { friendlyError } from '../friendly';
 import React, { useState } from 'react';
 import { api, type Party } from '../api';
 import type { Locale, Strings } from '../i18n';
@@ -15,7 +17,7 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
 
   const run = async (fn: () => Promise<{ data: Party }>, started = false) => {
     setBusy(true);
-    try { const r = await fn(); onParty(r.data, started); } catch (e: any) { toast(e?.message || t.error); } finally { setBusy(false); }
+    try { const r = await fn(); onParty(r.data, started); } catch (e: any) { toast(friendlyError(e, t)); } finally { setBusy(false); }
   };
   const move = (i: number, d: number) => {
     if (!tour) return;
@@ -41,8 +43,8 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
 
   if (tour && tour.status === 'done') {
     return (
-      <Card pad="lg" className="stack gap-12">
-        <div className="row gap-12 center"><span style={{ fontSize: 34 }}>🏆</span>
+      <Card pad="lg" className="stack gap-12" style={{ position: 'relative', overflow: 'hidden' }}>
+        <div className="row gap-12 center"><span className="trophy-drop" style={{ fontSize: 34 }}>🏆</span>{motionOn() && <span className="confetti" aria-hidden>{Array.from({ length: 22 }, (_, i) => <i key={i} style={{ left: `${(i * 37) % 100}%`, animationDelay: `${(i % 7) * 0.08}s`, background: ["#f43f5e","#facc15","#22c55e","#38bdf8","#a78bfa"][i % 5] }} />)}</span>}
           <div className="grow"><div className="caption">{t.tChampion}</div><div className="h2">{tour.standings[0]?.name ?? ''}</div></div></div>
         {standings}
         {party.is_host && <Btn variant="ghost" onClick={() => run(() => api.tournamentCreate(party.code, pool, count))} disabled={busy}>{t.tNewOne}</Btn>}

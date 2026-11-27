@@ -1,3 +1,4 @@
+import { friendlyError } from './friendly';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { api, ApiError, getGuestName, getSavedUser, getToken, HEALTH_URL, onSlowRequest, setGuestName, setSavedUser, setToken, type Party } from './api';
 import { strings, type Locale, getStrings, DEFAULT_AR_DIALECT } from './i18n';
@@ -16,6 +17,7 @@ const SoloChance = React.lazy(() => import('./games/SoloChance'));
 const SoloBracket = React.lazy(() => import('./games/SoloBracket'));
 import { gameById } from './games/meta';
 import Stats from './screens/Stats';
+import { applyMotion, getMotion } from './motion';
 import Settings from './screens/Settings';
 
 export type Route =
@@ -89,7 +91,10 @@ export default function App() {
   const [guestName, setGuestNameState] = useState(() => getGuestName());
   const [busy, setBusy] = useState(false);
   const pollRef = useRef<number | null>(null);
+  useEffect(() => { applyMotion(getMotion()); }, []);
   const [slowNet, setSlowNet] = useState(false);
+  const [offline, setOffline] = useState(typeof navigator !== 'undefined' && navigator.onLine === false);
+  useEffect(() => { const on = () => setOffline(false), off = () => setOffline(true); window.addEventListener('online', on); window.addEventListener('offline', off); return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); }; }, []);
   useEffect(() => onSlowRequest(setSlowNet), []);
 
   const [dialect, setDialectState] = useState<ArDialect>(() => (localStorage.getItem('cc.ardialect') === 'msa' ? 'msa' : DEFAULT_AR_DIALECT));
@@ -203,8 +208,8 @@ export default function App() {
   /* ---- ensure an identity exists before any lobby action ---- */
   const ensureIdentity = useCallback(async (): Promise<Identity> => {
     if (identity) return identity;
-    const name = (guestName || '').trim();
-    if (name.length < 2) throw new ApiError(t.guestName, 422);
+    let name = (guestName || '').trim();
+    if (name.length < 2) name = `${t.playerWord}-${Math.floor(1000 + Math.random() * 9000)}`;
     const result = await api.guest(name);
     setToken(result.token);
     setGuestName(result.guest.name);
@@ -263,7 +268,7 @@ export default function App() {
       go({ name: 'party', code: result.data.code });
       refreshParties();
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }
@@ -278,7 +283,7 @@ export default function App() {
       go({ name: 'party', code: result.data.code });
       refreshParties();
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }
@@ -292,7 +297,7 @@ export default function App() {
       setActiveParty(result.data);
       go({ name: 'party', code });
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }
@@ -304,7 +309,7 @@ export default function App() {
       const result = await api.action(activeParty.code, body);
       setActiveParty(result.data);
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     }
   }, [activeParty, t.error, toast]);
 
@@ -314,7 +319,7 @@ export default function App() {
       const result = await api.ready(activeParty.code, ready);
       setActiveParty(result.data);
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     }
   }, [activeParty, t.error, toast]);
 
@@ -326,7 +331,7 @@ export default function App() {
       setActiveParty(result.data);
       go({ name: 'game' });
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }
@@ -338,7 +343,7 @@ export default function App() {
       const result = await api.advance(activeParty.code);
       setActiveParty(result.data);
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     }
   }, [activeParty, t.error, toast]);
 
@@ -349,12 +354,12 @@ export default function App() {
       setActiveParty(result.data);
       go({ name: 'party', code: result.data.code });
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     }
   }, [activeParty, t.error, toast]);
 
   const leaveGroup = useCallback(async (code: string) => {
-    try { await api.leave(code); } catch (error: any) { toast(error?.message || t.error); return; }
+    try { await api.leave(code); } catch (error: any) { toast(friendlyError(error, t)); return; }
     if (activeParty?.code === code) { setActiveParty(null); try { localStorage.removeItem(PARTY_KEY); } catch { /* ignore */ } }
     refreshParties();
   }, [activeParty?.code, refreshParties, t.error, toast]);
@@ -537,6 +542,7 @@ export default function App() {
 
       <main className="page" key={route.name}>
         <React.Suspense fallback={<div className="auth-shell"><div className="row gap-10 center" style={{ color: 'var(--muted)' }}><Spinner /> {t.loading}</div></div>}>{screen}</React.Suspense>
+        {offline ? <div className="offline-banner" role="alert"><span>{t.offlineBanner}</span><Btn size="sm" variant="soft" onClick={() => window.location.reload()}>{t.retry}</Btn></div> : null}
         {slowNet ? <div className="slow-banner">{t.waking}</div> : null}
       </main>
 

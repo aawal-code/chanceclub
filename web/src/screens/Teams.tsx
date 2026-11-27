@@ -1,3 +1,4 @@
+import { friendlyError } from '../friendly';
 import React, { useEffect, useState } from 'react';
 import { api, type Team } from '../api';
 import type { Strings } from '../i18n';
@@ -23,7 +24,7 @@ export default function Teams({ t, identity, onSignIn }: { t: Strings; identity:
       setName('');
       toast(t.saved);
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }
@@ -37,7 +38,7 @@ export default function Teams({ t, identity, onSignIn }: { t: Strings; identity:
       setCode('');
       toast(t.saved);
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }

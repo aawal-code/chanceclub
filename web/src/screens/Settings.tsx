@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { ArDialect, Locale, Strings } from '../i18n';
 import { Card, Seg } from '../components/ui';
+import { getMotion, applyMotion, type Motion } from '../motion';
 import type { ThemeName } from '../App';
 
 const THEMES: { id: ThemeName; bg: string; surface: string; ink: string }[] = [
@@ -23,6 +24,7 @@ export default function Settings({ t, locale, setLocale, dialect, setDialect, th
     () => ({ ink: t.themeInk, paper: t.themePaper, midnight: t.themeMidnight, sand: t.themeSand, neon: t.themeNeon, brutal: t.themeBrutal, terminal: t.themeTerminal, candy: t.themeCandy, forest: t.themeForest, newsprint: t.themeNewsprint }),
     [t],
   );
+  const [motion, setMotion] = React.useState<Motion>(getMotion());
   return (
     <div className="stage fade-up stack gap-16">
       <div className="stack gap-6">
@@ -30,6 +32,10 @@ export default function Settings({ t, locale, setLocale, dialect, setDialect, th
         <h1 className="h1">{t.settings}</h1>
         <p className="caption">{t.settingsHint}</p>
       </div>
+      <Card pad="lg" className="stack gap-12">
+        <h3 className="h3">{t.motion}</h3>
+        <Seg value={motion} options={[{ value: 'auto' as Motion, label: t.motionAuto }, { value: 'reduced' as Motion, label: t.motionReduced }, { value: 'off' as Motion, label: t.motionOff }]} onChange={(m) => { applyMotion(m); setMotion(m); }} />
+      </Card>
       <Card pad="lg" className="stack gap-12">
         <h3 className="h3">{t.language}</h3>
         <Seg value={locale} options={[{ value: 'en' as Locale, label: 'English' }, { value: 'ar' as Locale, label: 'العربية' }, { value: 'de' as Locale, label: 'Deutsch' }]} onChange={setLocale} />

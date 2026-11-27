@@ -1,3 +1,4 @@
+import { friendlyError } from '../friendly';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api, type WordleGame } from '../api';
 import type { Strings } from '../i18n';
@@ -21,7 +22,7 @@ export default function WordleSolo({ t, onBack }: { t: Strings; onBack: () => vo
       const result = await api.wordleStart();
       setGame(result.data);
     } catch (error: any) {
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }
@@ -54,7 +55,7 @@ export default function WordleSolo({ t, onBack }: { t: Strings; onBack: () => vo
     } catch (error: any) {
       setShake(true);
       window.setTimeout(() => setShake(false), 420);
-      toast(error?.message || t.error);
+      toast(friendlyError(error, t));
     } finally {
       setBusy(false);
     }

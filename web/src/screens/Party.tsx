@@ -72,7 +72,18 @@ export default function PartyScreen({
                 <p className="caption">{t.invite}</p>
                 <span className="code-value">{activeParty.code}</span>
               </div>
-              <CopyButton value={invite} label={t.copyLink} onCopied={() => toast(t.copied)} />
+              <div className="row gap-8 wrap">
+                <CopyButton value={invite} label={t.copyLink} onCopied={() => toast(t.copied)} />
+                <Btn size="sm" variant="soft" onClick={async () => {
+                  try {
+                    if ((navigator as any).share) await (navigator as any).share({ title: 'ChanceClub', text: `${t.shareText} (${activeParty.code})`, url: invite });
+                    else { await navigator.clipboard.writeText(invite); toast(t.copied); }
+                  } catch { /* cancelled */ }
+                }}>{t.shareInvite}</Btn>
+              </div>
+            </div>
+            <div className="tip-steps">
+              <span><b>1</b>{t.tipShare}</span><span><b>2</b>{t.tipJoin}</span><span><b>3</b>{t.tipPick}</span>
             </div>
 
             <div className="stack gap-4">
