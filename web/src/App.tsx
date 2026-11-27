@@ -28,12 +28,13 @@ export type Route =
 
 export type Identity = { kind: 'user' | 'guest'; name: string } | null;
 
-export type ThemeName = 'ink' | 'paper' | 'midnight' | 'sand';
-const THEME_ORDER: ThemeName[] = ['ink', 'paper', 'midnight', 'sand'];
+export type ThemeName = 'ink' | 'paper' | 'midnight' | 'sand' | 'neon' | 'brutal' | 'terminal' | 'candy' | 'forest' | 'newsprint';
+const THEME_ORDER: ThemeName[] = ['ink', 'paper', 'midnight', 'sand', 'neon', 'brutal', 'terminal', 'candy', 'forest', 'newsprint'];
+const THEME_ICON: Record<ThemeName, string> = { ink: '◐', paper: '☀', midnight: '☾', sand: '◑', neon: '✦', brutal: '■', terminal: '>_', candy: '♥', forest: '❦', newsprint: '❡' };
 const THEME_KEY = 'cc.theme';
 
 function normalizeTheme(value: string | null): ThemeName {
-  if (value === 'ink' || value === 'paper' || value === 'midnight' || value === 'sand') return value;
+  if (value && (THEME_ORDER as string[]).includes(value)) return value as ThemeName;
   if (value === 'light') return 'paper';
   return 'ink';
 }
@@ -499,7 +500,7 @@ export default function App() {
             aria-label={t.theme}
             title={t.theme}
           >
-            {theme === 'ink' ? '◐' : theme === 'paper' ? '☀' : theme === 'midnight' ? '☾' : '◑'}
+            {THEME_ICON[theme]}
           </button>
           <button className="avatar" onClick={() => go({ name: 'profile' })} aria-label={t.profile}>
             {(identity?.name || 'A').charAt(0).toUpperCase()}

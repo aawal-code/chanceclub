@@ -9,6 +9,12 @@ const THEMES: { id: ThemeName; bg: string; surface: string; ink: string }[] = [
   { id: 'paper', bg: '#f3f2ee', surface: '#ffffff', ink: '#111110' },
   { id: 'midnight', bg: '#070b16', surface: '#121b2f', ink: '#eef2ff' },
   { id: 'sand', bg: '#efe7d8', surface: '#fbf6ec', ink: '#211b12' },
+  { id: 'neon', bg: '#0a0614', surface: '#ff2bd6', ink: '#00e5ff' },
+  { id: 'brutal', bg: '#ffe14d', surface: '#ff4fa3', ink: '#000000' },
+  { id: 'terminal', bg: '#020a04', surface: '#0b2c16', ink: '#3dff7a' },
+  { id: 'candy', bg: '#ffe6f2', surface: '#ff4f9f', ink: '#4a1d5c' },
+  { id: 'forest', bg: '#0e1c16', surface: '#e3b04b', ink: '#f3ead2' },
+  { id: 'newsprint', bg: '#e9e4d5', surface: '#c0271c', ink: '#141414' },
 ];
 
 export default function Profile({
@@ -41,7 +47,7 @@ export default function Profile({
   const nameValid = trimmedName.length >= 2;
 
   const themeLabels: Record<ThemeName, string> = useMemo(
-    () => ({ ink: t.themeInk, paper: t.themePaper, midnight: t.themeMidnight, sand: t.themeSand }),
+    () => ({ ink: t.themeInk, paper: t.themePaper, midnight: t.themeMidnight, sand: t.themeSand, neon: t.themeNeon, brutal: t.themeBrutal, terminal: t.themeTerminal, candy: t.themeCandy, forest: t.themeForest, newsprint: t.themeNewsprint }),
     [t],
   );
 
