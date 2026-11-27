@@ -1,4 +1,4 @@
-import{r,j as e,B as o,G as m,C as u}from"./index-wr6Fe1i6.js";import{d as j,B as g,p as b,S as N,b as f,m as w}from"./Bracket-DevkKaNY.js";function v({t:a,onBack:p}){const[n,d]=r.useState({...j,text:`Alex
+import{r,j as e,B as o,G as m,C as u}from"./index-CU_ZsIVB.js";import{d as j,B as g,p as b,S as N,b as f,m as w}from"./Bracket-COaK6Z_B.js";function v({t:a,onBack:p}){const[n,d]=r.useState({...j,text:`Alex
 Sam
 Noor
 Jo
