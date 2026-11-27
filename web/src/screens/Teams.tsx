@@ -66,7 +66,7 @@ export default function Teams({ t, identity, onSignIn }: { t: Strings; identity:
         <h1 className="h1">{t.teams}</h1>
       </div>
 
-      <div className="game-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+      <div className="game-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 240px), 1fr))' }}>
         <Card className="stack gap-10">
           <h3 className="h3">{t.createTeam}</h3>
           <Field label={t.teamName} value={name} onChange={setName} placeholder="The crew" maxLength={60} />
