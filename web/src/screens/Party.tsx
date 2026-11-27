@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Glyph } from '../components/brand';
-import { Btn, Card, CopyButton, Field, useToast, LagPill } from '../components/ui';
+import { Btn, Card, CopyButton, Field, Seg, useToast, LagPill } from '../components/ui';
 
 const GAMES = ['wordle', 'trivia', 'charades', 'whoami', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
 
@@ -23,7 +23,7 @@ export default function PartyScreen({
   onJoin: (code: string) => void;
   onOpen: (code: string) => void;
   onReady: (ready: boolean) => void;
-  onStart: (game: string) => void;
+  onStart: (game: string, opts?: { entries?: string[]; eliminate?: boolean }) => void;
   onLeave: () => void;
   onOpenGame: () => void;
   onSignIn: () => void;
@@ -32,6 +32,8 @@ export default function PartyScreen({
   const [partyName, setPartyName] = useState('');
   const [joinCode, setJoinCode] = useState(initialCode || '');
   const [picked, setPicked] = useState('wordle');
+  const [wheelText, setWheelText] = useState('');
+  const [wheelMode, setWheelMode] = useState<'keep' | 'remove'>('keep');
 
   useEffect(() => {
     if (initialCode) setJoinCode(initialCode.toUpperCase());
@@ -91,7 +93,7 @@ export default function PartyScreen({
               </Btn>
               <Btn variant="ghost" onClick={onLeave}>{t.leave}</Btn>
               {activeParty.is_host && (
-                <Btn disabled={!canStart || busy} onClick={() => onStart(picked)}>
+                <Btn disabled={!canStart || busy} onClick={() => onStart(picked, picked === 'wheel' ? { entries: wheelText.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 24), eliminate: wheelMode === 'remove' } : undefined)}>
                   {t.startGame}
                 </Btn>
               )}
@@ -123,6 +125,16 @@ export default function PartyScreen({
                   </button>
                 ))}
               </div>
+              {picked === 'wheel' && (
+                <div className="stack gap-10">
+                  <label className="field">
+                    <span>{t.wheelEntries}</span>
+                    <textarea className="input" rows={5} value={wheelText} placeholder={t.wheelPartyHint} onChange={(e) => setWheelText(e.target.value)} />
+                  </label>
+                  <p className="caption">{t.wheelMode}</p>
+                  <Seg value={wheelMode} onChange={setWheelMode} options={[{ value: 'keep', label: t.wheelKeep }, { value: 'remove', label: t.wheelRemove }]} />
+                </div>
+              )}
             </Card>
           )}
         </div>

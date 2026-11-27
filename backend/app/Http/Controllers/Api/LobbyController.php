@@ -158,7 +158,13 @@ class LobbyController extends Controller
 
     public function start(Request $request, string $code): JsonResponse
     {
-        $data = $request->validate(['game' => ['required', 'string', 'in:'.implode(',', self::GAMES)], 'locale' => ['sometimes', 'in:en,ar,de']]);
+        $data = $request->validate([
+            'game' => ['required', 'string', 'in:'.implode(',', self::GAMES)],
+            'locale' => ['sometimes', 'in:en,ar,de'],
+            'entries' => ['nullable', 'array', 'max:24'],
+            'entries.*' => ['string', 'max:40'],
+            'eliminate' => ['nullable', 'boolean'],
+        ]);
         $identity = $this->identity($request);
         $party = $this->party($code);
         $this->requireHost($party, $identity);
@@ -179,12 +185,18 @@ class LobbyController extends Controller
             $answer = isset($answerBank[$game]) ? $answerBank[$game][$promptIndex] : null;
             if ($game === 'wordle') $answer = Wordle::pick();
             $turn = $players->first(fn ($player) => (int) $player->id === (int) $locked->host_player_id) ?? $players->first();
+            $wheelState = null;
+            if ($game === 'wheel') {
+                $entries = array_values(array_filter(array_map(fn ($entry) => trim((string) $entry), $data['entries'] ?? []), fn ($entry) => $entry !== ''));
+                if (count($entries) < 2) $entries = $players->pluck('display_name')->all();
+                $wheelState = ['entries' => $entries, 'remaining' => $entries, 'eliminate' => (bool) ($data['eliminate'] ?? false)];
+            }
             DB::table('party_rounds')->insert([
                 'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
                 'prompt' => $prompt, 'answer' => $answer, 'status' => 'active',
                 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
-            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => null, 'updated_at' => now()]);
+            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => $wheelState ? json_encode(['wheel' => $wheelState], JSON_THROW_ON_ERROR) : null, 'updated_at' => now()]);
             return DB::table('parties')->find($locked->id);
         });
         return response()->json(['data' => $this->partyView($result, $identity)]);
@@ -222,7 +234,7 @@ class LobbyController extends Controller
                     'coin' => ['result' => $round->locale === 'ar' ? (random_int(0, 1) ? 'وجه' : 'كتابة') : (random_int(0, 1) ? 'Heads' : 'Tails')],
                     'yesno' => ['result' => $round->locale === 'ar' ? ['بالتأكيد نعم!', 'ليس هذه المرة.', 'الحظ يقول نعم.', 'اسأل لاحقاً.', 'لا بكل تأكيد.', 'الأمر محتمل.'][random_int(0, 5)] : ['Absolutely yes!', 'Not this time.', 'The odds say yes.', 'Ask again later.', 'A confident no.', 'It could go either way.'][random_int(0, 5)]],
                     'number' => ['result' => (string) random_int(1, (int) ($data['max'] ?? 100))],
-                    'wheel' => ['result' => $members->random()->display_name],
+                    'wheel' => $this->spinWheel($party->id, $members),
                 };
                 DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
             } elseif ($data['type'] === 'guess') {
@@ -384,6 +396,10 @@ class LobbyController extends Controller
                 'solved' => !empty($ownPayload['solved']),
             ];
         }
+        $wheel = null;
+        if ($party->current_game === 'wheel' && $party->state) {
+            $wheel = json_decode($party->state, true)['wheel'] ?? null;
+        }
         $roundView = $round ? [
             'number' => (int) $round->round_number,
             'game' => $round->game,
@@ -411,6 +427,7 @@ class LobbyController extends Controller
             'self_player_id' => $myPlayer ? (string) $myPlayer->id : null,
             'is_host' => (int) $party->host_player_id === (int) $myPlayer->id,
             'status' => $party->status, 'game' => $party->current_game,
+            'wheel' => $wheel,
             'round' => $roundView, 'createdAt' => $party->created_at,
         ];
     }
@@ -419,6 +436,27 @@ class LobbyController extends Controller
     {
         do { $code = Str::upper(Str::random(8)); } while (DB::table('parties')->where('invite_code', $code)->exists());
         return $code;
+    }
+
+    private function spinWheel(int $partyId, $members): array
+    {
+        $row = DB::table('parties')->where('id', $partyId)->first();
+        $wheel = $row && $row->state ? (json_decode($row->state, true)['wheel'] ?? null) : null;
+        $entries = $wheel['entries'] ?? $members->pluck('display_name')->all();
+        $remaining = $wheel['remaining'] ?? $entries;
+        if (count($remaining) === 0) $remaining = $entries;
+        $index = random_int(0, count($remaining) - 1);
+        $picked = $remaining[$index];
+        $eliminate = !empty($wheel['eliminate']);
+        if ($eliminate) {
+            array_splice($remaining, $index, 1);
+            if (count($remaining) === 0) $remaining = $entries;
+        }
+        if ($wheel) {
+            $wheel['remaining'] = $remaining;
+            DB::table('parties')->where('id', $partyId)->update(['state' => json_encode(['wheel' => $wheel], JSON_THROW_ON_ERROR), 'updated_at' => now()]);
+        }
+        return ['result' => $picked, 'remaining' => $remaining, 'eliminate' => $eliminate];
     }
 
     private function rollDice(int $count): array

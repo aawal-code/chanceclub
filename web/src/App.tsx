@@ -299,11 +299,11 @@ export default function App() {
     }
   }, [activeParty, t.error, toast]);
 
-  const startGame = useCallback(async (game: string) => {
+  const startGame = useCallback(async (game: string, opts?: { entries?: string[]; eliminate?: boolean }) => {
     if (!activeParty) return;
     setBusy(true);
     try {
-      const result = await api.start(activeParty.code, game, locale);
+      const result = await api.start(activeParty.code, game, locale, opts);
       setActiveParty(result.data);
       go({ name: 'game' });
     } catch (error: any) {

@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Party, Round } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Glyph } from '../components/brand';
 import { Btn, Card, Field, useToast, LagPill } from '../components/ui';
+import { Wheel, angleFor } from '../games/Wheel';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 
 const AWARD_GAMES = ['categories', 'whoami', 'charades'];
@@ -71,7 +72,7 @@ export default function GameScreen({
               <AwardRound t={t} round={round} party={party} onAct={onAct} />
             )}
             {ROLL_GAMES.includes(game) && (
-              <RollRound t={t} round={round} game={game} isMyTurn={isMyTurn} onAct={onAct} />
+              <RollRound t={t} round={round} game={game} wheel={party.wheel || null} isMyTurn={isMyTurn} onAct={onAct} />
             )}
           </Card>
 
@@ -259,18 +260,27 @@ function AwardRound({ t, round, party, onAct }: { t: Strings; round: Round; part
 }
 
 /* ---------------- chance games ---------------- */
-function RollRound({ t, round, game, isMyTurn, onAct }: { t: Strings; round: Round; game: string; isMyTurn: boolean; onAct: (body: Record<string, unknown>) => void }) {
+function RollRound({ t, round, game, wheel, isMyTurn, onAct }: { t: Strings; round: Round; game: string; wheel: Party['wheel'] | null; isMyTurn: boolean; onAct: (body: Record<string, unknown>) => void }) {
   const [rolling, setRolling] = useState(false);
   const result = round.result;
   const complete = round.status === 'complete';
 
   const roll = () => {
+    if (game === 'wheel') { onAct({ type: 'roll' }); return; }
     setRolling(true);
     window.setTimeout(() => {
       setRolling(false);
       onAct({ type: 'roll' });
     }, 650);
   };
+  const wEntries = wheel?.entries || [];
+  const pickIdx = result?.result ? wEntries.indexOf(result.result) : -1;
+  const spins = useRef(0);
+  const lastKey = useRef<string>('');
+  const key = `${round.number}:${result?.result ?? ''}`;
+  if (game === 'wheel' && key !== lastKey.current) { lastKey.current = key; if (pickIdx >= 0) spins.current += 1; }
+  const wAngle = pickIdx >= 0 ? angleFor(pickIdx, wEntries.length, spins.current) : 0;
+  const wDim = wheel ? wEntries.filter((e) => !wheel.remaining.includes(e) && e !== result?.result) : [];
 
   const faces: number[] = result?.faces || [];
 
@@ -292,7 +302,14 @@ function RollRound({ t, round, game, isMyTurn, onAct }: { t: Strings; round: Rou
           <span style={{ fontWeight: 800, fontSize: 13 }}>{rolling ? '…' : (result?.result || '?')}</span>
         </div>
       )}
-      {(game === 'number' || game === 'yesno' || game === 'wheel') && (
+      {game === 'wheel' && wEntries.length > 0 && (
+        <div className="stack gap-10" style={{ width: '100%', alignItems: 'center' }}>
+          <Wheel entries={wEntries} angle={wAngle} dim={wDim} spinning />
+          {result?.result && <div className="prompt-text" style={{ textAlign: 'center' }}>{result.result}</div>}
+          {wheel && wheel.eliminate && <p className="caption">{wheel.remaining.length} {t.wheelRemaining}</p>}
+        </div>
+      )}
+      {(game === 'number' || game === 'yesno' || (game === 'wheel' && wEntries.length === 0)) && (
         <div className="prompt-text" style={{ textAlign: 'center' }}>
           {rolling ? '…' : result?.result || '—'}
         </div>

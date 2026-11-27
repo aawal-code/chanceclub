@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import type { Strings } from '../i18n';
-import { Btn, Card, Field } from '../components/ui';
+import { Btn, Card, Field, Seg } from '../components/ui';
+import { Wheel, angleFor } from './Wheel';
 import { Glyph } from '../components/brand';
 
 export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: string; onBack: () => void }) {
@@ -10,7 +11,14 @@ export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: 
   const [number, setNumber] = useState<number | null>(null);
   const [max, setMax] = useState('100');
   const [answer, setAnswer] = useState<string | null>(null);
-  const [wheelPick, setWheelPick] = useState<number | null>(null);
+  const [wheelPick, setWheelPick] = useState<string | null>(null);
+  const [wText, setWText] = useState('Pizza\nTacos\nSushi\nBurgers');
+  const [wMode, setWMode] = useState<'keep' | 'remove'>('keep');
+  const [wRemoved, setWRemoved] = useState<string[]>([]);
+  const [wAngle, setWAngle] = useState(0);
+  const [wSpins, setWSpins] = useState(0);
+  const wEntries = wText.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 24);
+  const wLeft = wEntries.filter((e) => !wRemoved.includes(e));
 
   useEffect(() => {
     setRolling(false);
@@ -19,7 +27,26 @@ export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: 
     setNumber(null);
     setAnswer(null);
     setWheelPick(null);
+    setWRemoved([]);
   }, [gameId]);
+
+  const spinWheel = () => {
+    if (wEntries.length < 2) return;
+    let pool = wLeft;
+    let removed = wRemoved;
+    if (pool.length === 0) { pool = wEntries; removed = []; }
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    const idx = wEntries.indexOf(pick);
+    setRolling(true);
+    setWheelPick(null);
+    setWSpins((n) => n + 1);
+    setWAngle(angleFor(idx, wEntries.length, wSpins + 1));
+    window.setTimeout(() => {
+      setRolling(false);
+      setWheelPick(pick);
+      setWRemoved(wMode === 'remove' ? [...removed, pick] : []);
+    }, 3300);
+  };
 
   const roll = useCallback(() => {
     setRolling(true);
@@ -31,7 +58,6 @@ export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: 
         const top = Math.max(2, Math.min(10000, Number(max) || 100));
         setNumber(1 + Math.floor(Math.random() * top));
       }
-      if (gameId === 'wheel') setWheelPick(1 + Math.floor(Math.random() * 10));
       if (gameId === 'yesno') setAnswer(t.yesNo[Math.floor(Math.random() * t.yesNo.length)]);
     }, 780);
   }, [gameId, max, t]);
@@ -72,10 +98,15 @@ export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: 
 
         {gameId === 'wheel' && (
           <>
-            <div className="wheel-pointer" />
-            <div className="wheel-disc" data-spin={rolling ? 'true' : undefined}>
-              <span className="h1" style={{ opacity: rolling ? 0.2 : 1 }}>{wheelPick ?? '—'}</span>
-            </div>
+            <Wheel entries={wEntries} angle={wAngle} dim={wRemoved} spinning={wSpins > 0} />
+            <div className="prompt-text center-text" style={{ minHeight: 40 }}>{rolling ? '…' : wheelPick ?? '—'}</div>
+            {wMode === 'remove' && <p className="caption">{wLeft.length} {t.wheelRemaining}</p>}
+            <label className="field" style={{ width: '100%' }}>
+              <span>{t.wheelEntries}</span>
+              <textarea className="input" rows={5} value={wText} placeholder={t.wheelPlaceholder} onChange={(e) => { setWText(e.target.value); setWRemoved([]); }} />
+            </label>
+            <Seg value={wMode} onChange={(v) => { setWMode(v); setWRemoved([]); }} options={[{ value: 'keep', label: t.wheelKeep }, { value: 'remove', label: t.wheelRemove }]} />
+            {wRemoved.length > 0 && <Btn variant="ghost" size="sm" onClick={() => setWRemoved([])}>{t.wheelReset}</Btn>}
           </>
         )}
 
@@ -94,7 +125,7 @@ export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: 
           </div>
         )}
 
-        <Btn size="lg" onClick={roll} disabled={rolling}>{rolling ? t.loading : t.roll}</Btn>
+        <Btn size="lg" onClick={gameId === 'wheel' ? spinWheel : roll} disabled={rolling || (gameId === 'wheel' && wEntries.length < 2)}>{rolling ? t.loading : t.roll}</Btn>
 
         {gameId === 'dice' && !rolling && (
           <p className="caption">{faces[0]} + {faces[1]} = <b style={{ color: 'var(--ink)' }}>{faces[0] + faces[1]}</b></p>
