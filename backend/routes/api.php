@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/parties', [LobbyController::class, 'index']);
         Route::post('/parties', [LobbyController::class, 'create']);
         Route::get('/parties/{code}', [LobbyController::class, 'show']);
+        Route::post('/parties/{code}/heartbeat', [LobbyController::class, 'heartbeat']);
         Route::post('/parties/{code}/join', [LobbyController::class, 'join']);
         Route::post('/parties/{code}/ready', [LobbyController::class, 'ready']);
         Route::post('/parties/{code}/start', [LobbyController::class, 'start']);

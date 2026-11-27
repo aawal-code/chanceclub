@@ -112,6 +112,17 @@ class LobbyController extends Controller
         return response()->json(['data' => $this->partyView($party, $identity)]);
     }
 
+    public function heartbeat(Request $request, string $code): JsonResponse
+    {
+        $data = $request->validate(['rtt_ms' => ['required', 'integer', 'min:0', 'max:60000']]);
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $player = $this->player($party->id, $identity);
+        if (!$player) return response()->json(['message' => 'Party not found.'], 404);
+        DB::table('party_players')->where('id', $player->id)->update(['last_rtt_ms' => $data['rtt_ms'], 'last_seen_at' => now(), 'updated_at' => now()]);
+        return response()->json(['ok' => true]);
+    }
+
     public function join(Request $request, string $code): JsonResponse
     {
         $identity = $this->identity($request);
@@ -395,6 +406,7 @@ class LobbyController extends Controller
                 'ready' => (bool) $person->is_ready, 'score' => (int) $person->score,
                 'is_host' => (int) $person->id === (int) $party->host_player_id,
                 'online' => $person->last_seen_at && now()->diffInSeconds($person->last_seen_at) < 20,
+                'rtt' => $person->last_rtt_ms === null ? null : (int) $person->last_rtt_ms,
             ])->values()->all(),
             'self_player_id' => $myPlayer ? (string) $myPlayer->id : null,
             'is_host' => (int) $party->host_player_id === (int) $myPlayer->id,
