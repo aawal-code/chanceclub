@@ -524,3 +524,12 @@ html[data-theme='paper'] .form-error, html[data-theme='sand'] .form-error { colo
   .card[data-pad='lg'] { padding: 18px; }
   .stat-row { gap: 18px; }
 }
+
+/* phone keyboards + invite code */
+@media (max-width: 420px) {
+  .kb-row { gap: 4px; }
+  .key { height: 44px; font-size: 11.5px; border-radius: 7px; }
+  .key[data-wide='true'] { flex: 1.4; font-size: 10px; letter-spacing: -.02em; padding: 0 2px; }
+  .code-block { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .code-value { font-size: 22px; letter-spacing: .18em; overflow-wrap: normal; word-break: keep-all; white-space: nowrap; }
+}
