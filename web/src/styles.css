@@ -533,3 +533,17 @@ html[data-theme='paper'] .form-error, html[data-theme='sand'] .form-error { colo
   .code-block { flex-direction: column; align-items: flex-start; gap: 10px; }
   .code-value { font-size: 22px; letter-spacing: .18em; overflow-wrap: normal; word-break: keep-all; white-space: nowrap; }
 }
+
+/* bracket */
+.bracket-scroll { display: flex; gap: 14px; overflow-x: auto; padding-bottom: 8px; max-width: 100%; -webkit-overflow-scrolling: touch; }
+.bracket-col { display: flex; flex-direction: column; gap: 8px; min-width: 150px; flex: 1 0 150px; }
+.bracket-matches { display: flex; flex-direction: column; justify-content: space-around; gap: 10px; flex: 1; }
+.bracket-match { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--surface-2); }
+.bracket-slot { display: flex; flex-direction: column; gap: 2px; text-align: start; border: 0; background: none; color: var(--ink); padding: 9px 11px; font: inherit; font-size: 13px; cursor: pointer; min-width: 0; overflow-wrap: anywhere; }
+.bracket-slot + .bracket-slot { border-top: 1px solid var(--line); }
+.bracket-slot small { color: var(--muted); font-size: 11px; }
+.bracket-slot:disabled { cursor: default; }
+.bracket-slot[data-won='true'] { background: var(--ink); color: var(--bg); }
+.bracket-slot[data-won='true'] small { color: inherit; opacity: .7; }
+.bracket-slot[data-lost='true'] { opacity: .4; text-decoration: line-through; }
+textarea.input { resize: vertical; width: 100%; font: inherit; }

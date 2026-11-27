@@ -4,6 +4,7 @@ import type { Locale, Strings } from '../i18n';
 import { Glyph } from '../components/brand';
 import { Btn, Card, Field, useToast, LagPill } from '../components/ui';
 import { Wheel, angleFor } from '../games/Wheel';
+import { BracketView } from '../games/Bracket';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 
 const AWARD_GAMES = ['categories', 'whoami', 'charades'];
@@ -66,6 +67,9 @@ export default function GameScreen({
 
           <Card pad="lg" className="stack gap-16">
             {game === 'wordle' && <WordleParty t={t} party={party} round={round} onAct={onAct} />}
+            {game === 'bracket' && party.bracket && (
+              <BracketView t={t} bracket={party.bracket} onPick={party.is_host ? (r, m, side) => onAct({ type: 'pick', value: `${r}:${m}:${side}` }) : undefined} />
+            )}
             {game === 'trivia' && <TriviaRound t={t} round={round} onAct={onAct} />}
             {VOTE_GAMES.includes(game) && <VoteRound t={t} round={round} game={game} onAct={onAct} />}
             {AWARD_GAMES.includes(game) && (

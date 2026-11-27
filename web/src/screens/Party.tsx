@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Glyph } from '../components/brand';
+import { SetupForm, buildTeams, defaultSetup } from '../games/Bracket';
+import type { SetupState } from '../games/Bracket';
 import { Btn, Card, CopyButton, Field, Seg, useToast, LagPill } from '../components/ui';
 
-const GAMES = ['wordle', 'trivia', 'charades', 'whoami', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
+const GAMES = ['wordle', 'bracket', 'trivia', 'charades', 'whoami', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
 
 export default function PartyScreen({
   t, locale, identity, guestName, setGuestName, parties, activeParty, busy, initialCode,
@@ -23,7 +25,7 @@ export default function PartyScreen({
   onJoin: (code: string) => void;
   onOpen: (code: string) => void;
   onReady: (ready: boolean) => void;
-  onStart: (game: string, opts?: { entries?: string[]; eliminate?: boolean }) => void;
+  onStart: (game: string, opts?: { entries?: string[]; eliminate?: boolean; teams?: { name: string; members: string[] }[] }) => void;
   onLeave: () => void;
   onOpenGame: () => void;
   onSignIn: () => void;
@@ -33,6 +35,7 @@ export default function PartyScreen({
   const [joinCode, setJoinCode] = useState(initialCode || '');
   const [picked, setPicked] = useState('wordle');
   const [wheelText, setWheelText] = useState('');
+  const [bSetup, setBSetup] = useState<SetupState>(defaultSetup);
   const [wheelMode, setWheelMode] = useState<'keep' | 'remove'>('keep');
 
   useEffect(() => {
@@ -93,7 +96,7 @@ export default function PartyScreen({
               </Btn>
               <Btn variant="ghost" onClick={onLeave}>{t.leave}</Btn>
               {activeParty.is_host && (
-                <Btn disabled={!canStart || busy} onClick={() => onStart(picked, picked === 'wheel' ? { entries: wheelText.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 24), eliminate: wheelMode === 'remove' } : undefined)}>
+                <Btn disabled={!canStart || busy} onClick={() => onStart(picked, picked === 'bracket' ? { teams: buildTeams(bSetup, activeParty.members.map((x) => x.name)) } : picked === 'wheel' ? { entries: wheelText.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 24), eliminate: wheelMode === 'remove' } : undefined)}>
                   {t.startGame}
                 </Btn>
               )}
@@ -125,6 +128,7 @@ export default function PartyScreen({
                   </button>
                 ))}
               </div>
+              {picked === 'bracket' && <SetupForm t={t} setup={bSetup} onChange={setBSetup} hint={t.bracketPartyHint} />}
               {picked === 'wheel' && (
                 <div className="stack gap-10">
                   <label className="field">

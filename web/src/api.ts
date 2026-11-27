@@ -40,6 +40,7 @@ export type Party = {
   is_host: boolean;
   status: 'lobby' | 'playing';
   game: string | null;
+  bracket?: { teams: { name: string; members: string[] }[]; rounds: { a: number | null; b: number | null; w: number | null }[][] } | null;
   wheel?: { entries: string[]; remaining: string[]; eliminate: boolean } | null;
   round: Round | null;
   createdAt: string;
@@ -190,7 +191,7 @@ export const api = {
   party: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}`),
   joinParty: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/join`, 'POST'),
   ready: (code: string, ready: boolean) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/ready`, 'POST', { ready }),
-  start: (code: string, game: string, locale: string, opts?: { entries?: string[]; eliminate?: boolean }) =>
+  start: (code: string, game: string, locale: string, opts?: { entries?: string[]; eliminate?: boolean; teams?: { name: string; members: string[] }[] }) =>
     request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/start`, 'POST', { game, locale, ...(opts || {}) }),
   action: (code: string, body: Record<string, unknown>) =>
     request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/action`, 'POST', body),

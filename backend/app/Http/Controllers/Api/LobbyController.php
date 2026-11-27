@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LobbyController extends Controller
 {
-    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle'];
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket'];
 
     private const PROMPTS = [
         'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],
@@ -23,7 +23,7 @@ class LobbyController extends Controller
         'wyr' => ['Explore space or the deep ocean?', 'Always sing instead of speaking or dance everywhere?', 'Live without music or without movies?', 'Have a rewind button or a pause button for life?'],
         'likely' => ['Who is most likely to become a famous chef?', 'Who would survive longest on a desert island?', 'Who is most likely to laugh at the wrong moment?', 'Who would plan the best surprise party?'],
         'yesno' => ['Ask chance to decide!'], 'dice' => ['Ready to roll?'], 'coin' => ['Flip the coin'],
-        'wheel' => ['Who will chance pick?'], 'number' => ['Pick a number from 1 to 100'],
+        'bracket' => ['Who takes the crown?'], 'wheel' => ['Who will chance pick?'], 'number' => ['Pick a number from 1 to 100'],
         'wordle' => ['Guess the five-letter word'],
     ];
 
@@ -41,7 +41,7 @@ class LobbyController extends Controller
         'wyr' => ['استكشاف الفضاء أم أعماق المحيط؟', 'الغناء دائماً أم الرقص في كل مكان؟', 'العيش بلا موسيقى أم بلا أفلام؟', 'زر لإعادة الوقت أم لإيقافه؟'],
         'likely' => ['من الأكثر احتمالاً أن يصبح طاهياً مشهوراً؟', 'من سيصمد أكثر في جزيرة مهجورة؟', 'من سيضحك في وقت غير مناسب؟', 'من سينظم أفضل حفلة مفاجأة؟'],
         'yesno' => ['اسأل الحظ ليقرر!'], 'dice' => ['ارمِ النرد'], 'coin' => ['اقلب العملة'],
-        'wheel' => ['من سيختاره الحظ؟'], 'number' => ['اختر رقماً من 1 إلى 100'],
+        'bracket' => ['من سيحمل التاج؟'], 'wheel' => ['من سيختاره الحظ؟'], 'number' => ['اختر رقماً من 1 إلى 100'],
         'wordle' => ['خمّن الكلمة'],
     ];
 
@@ -60,7 +60,7 @@ class LobbyController extends Controller
         'wyr' => ['Weltraum oder Tiefsee erkunden?', 'Immer singen statt sprechen oder überall tanzen?', 'Ohne Musik oder ohne Filme leben?', 'Eine Rückspultaste oder eine Pausentaste fürs Leben?'],
         'likely' => ['Wer wird am ehesten ein berühmter Koch?', 'Wer überlebt am längsten auf einer einsamen Insel?', 'Wer lacht am ehesten im falschen Moment?', 'Wer plant die beste Überraschungsparty?'],
         'yesno' => ['Lass den Zufall entscheiden!'], 'dice' => ['Bereit zu würfeln?'], 'coin' => ['Münze werfen'],
-        'wheel' => ['Wen wählt der Zufall?'], 'number' => ['Wähle eine Zahl von 1 bis 100'],
+        'bracket' => ['Wer holt sich die Krone?'], 'wheel' => ['Wen wählt der Zufall?'], 'number' => ['Wähle eine Zahl von 1 bis 100'],
         'wordle' => ['Errate das fünfstellige Wort'],
     ];
 
@@ -164,6 +164,10 @@ class LobbyController extends Controller
             'entries' => ['nullable', 'array', 'max:24'],
             'entries.*' => ['string', 'max:40'],
             'eliminate' => ['nullable', 'boolean'],
+            'teams' => ['nullable', 'array', 'max:32'],
+            'teams.*.name' => ['required', 'string', 'max:40'],
+            'teams.*.members' => ['nullable', 'array', 'max:12'],
+            'teams.*.members.*' => ['string', 'max:40'],
         ]);
         $identity = $this->identity($request);
         $party = $this->party($code);
@@ -191,12 +195,13 @@ class LobbyController extends Controller
                 if (count($entries) < 2) $entries = $players->pluck('display_name')->all();
                 $wheelState = ['entries' => $entries, 'remaining' => $entries, 'eliminate' => (bool) ($data['eliminate'] ?? false)];
             }
+            $bracketState = $game === 'bracket' ? $this->buildBracket($data['teams'] ?? [], $players) : null;
             DB::table('party_rounds')->insert([
                 'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
                 'prompt' => $prompt, 'answer' => $answer, 'status' => 'active',
                 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
-            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => $wheelState ? json_encode(['wheel' => $wheelState], JSON_THROW_ON_ERROR) : null, 'updated_at' => now()]);
+            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => $wheelState ? json_encode(['wheel' => $wheelState], JSON_THROW_ON_ERROR) : ($bracketState ? json_encode(['bracket' => $bracketState], JSON_THROW_ON_ERROR) : null), 'updated_at' => now()]);
             return DB::table('parties')->find($locked->id);
         });
         return response()->json(['data' => $this->partyView($result, $identity)]);
@@ -205,7 +210,7 @@ class LobbyController extends Controller
     public function action(Request $request, string $code): JsonResponse
     {
         $data = $request->validate([
-            'type' => ['required', 'string', 'in:answer,vote,roll,point,guess'],
+            'type' => ['required', 'string', 'in:answer,vote,roll,point,guess,pick'],
             'target_player_id' => ['nullable', 'integer', 'min:1'],
             'value' => ['nullable', 'string', 'max:120'],
             'count' => ['nullable', 'integer', 'in:1,2'],
@@ -237,6 +242,20 @@ class LobbyController extends Controller
                     'wheel' => $this->spinWheel($party->id, $members),
                 };
                 DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
+            } elseif ($data['type'] === 'pick') {
+                if ($round->game !== 'bracket') throw new HttpException(422, 'This game has no bracket.');
+                if ((int) $party->host_player_id !== (int) $player->id) throw new HttpException(403, 'Only the host can pick winners.');
+                $fresh = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+                $bracket = $fresh && $fresh->state ? (json_decode($fresh->state, true)['bracket'] ?? null) : null;
+                if (!$bracket) throw new HttpException(409, 'No bracket yet.');
+                $parts = explode(':', (string) ($data['value'] ?? ''));
+                if (count($parts) !== 3 || !in_array($parts[2], ['a', 'b'], true)) throw new HttpException(422, 'Pick a side of a match.');
+                $r = (int) $parts[0]; $m = (int) $parts[1];
+                $match = $bracket['rounds'][$r][$m] ?? null;
+                if (!$match || $match['a'] === null || $match['b'] === null) throw new HttpException(422, 'That match is not ready.');
+                $bracket['rounds'][$r][$m]['w'] = $parts[2] === 'a' ? $match['a'] : $match['b'];
+                $bracket = $this->normalizeBracket($bracket);
+                DB::table('parties')->where('id', $party->id)->update(['state' => json_encode(['bracket' => $bracket], JSON_THROW_ON_ERROR), 'updated_at' => now()]);
             } elseif ($data['type'] === 'guess') {
                 if ($round->game !== 'wordle') throw new HttpException(422, 'This game does not take word guesses.');
                 $guess = mb_strtolower(trim($data['value'] ?? ''));
@@ -400,6 +419,10 @@ class LobbyController extends Controller
         if ($party->current_game === 'wheel' && $party->state) {
             $wheel = json_decode($party->state, true)['wheel'] ?? null;
         }
+        $bracketView = null;
+        if ($party->current_game === 'bracket' && $party->state) {
+            $bracketView = json_decode($party->state, true)['bracket'] ?? null;
+        }
         $roundView = $round ? [
             'number' => (int) $round->round_number,
             'game' => $round->game,
@@ -428,6 +451,7 @@ class LobbyController extends Controller
             'is_host' => (int) $party->host_player_id === (int) $myPlayer->id,
             'status' => $party->status, 'game' => $party->current_game,
             'wheel' => $wheel,
+            'bracket' => $bracketView,
             'round' => $roundView, 'createdAt' => $party->created_at,
         ];
     }
@@ -436,6 +460,52 @@ class LobbyController extends Controller
     {
         do { $code = Str::upper(Str::random(8)); } while (DB::table('parties')->where('invite_code', $code)->exists());
         return $code;
+    }
+
+    private function buildBracket(array $teams, $players): array
+    {
+        $clean = [];
+        foreach ($teams as $team) {
+            $name = trim((string) ($team['name'] ?? ''));
+            if ($name === '') continue;
+            $members = array_values(array_filter(array_map(fn ($x) => trim((string) $x), $team['members'] ?? []), fn ($x) => $x !== ''));
+            $clean[] = ['name' => $name, 'members' => $members];
+        }
+        if (count($clean) < 2) $clean = $players->map(fn ($person) => ['name' => $person->display_name, 'members' => []])->values()->all();
+        $clean = array_slice($clean, 0, 32);
+        $seeds = array_keys($clean);
+        shuffle($seeds);
+        $size = 2;
+        while ($size < count($seeds)) $size *= 2;
+        $slots = array_pad($seeds, $size, null);
+        $rounds = [];
+        $matches = [];
+        for ($i = 0; $i < $size; $i += 2) $matches[] = ['a' => $slots[$i], 'b' => $slots[$i + 1], 'w' => null];
+        $rounds[] = $matches;
+        while (count($matches) > 1) {
+            $matches = array_map(fn () => ['a' => null, 'b' => null, 'w' => null], range(1, intdiv(count($matches), 2)));
+            $rounds[] = $matches;
+        }
+        return $this->normalizeBracket(['teams' => $clean, 'rounds' => $rounds]);
+    }
+
+    private function normalizeBracket(array $bracket): array
+    {
+        $rounds = $bracket['rounds'];
+        foreach ($rounds as $r => $matches) {
+            foreach ($matches as $m => $match) {
+                if ($r > 0) {
+                    $match['a'] = $rounds[$r - 1][2 * $m]['w'];
+                    $match['b'] = $rounds[$r - 1][2 * $m + 1]['w'];
+                } elseif (($match['a'] === null) !== ($match['b'] === null)) {
+                    $match['w'] = $match['a'] ?? $match['b'];
+                }
+                if ($match['w'] !== null && $match['w'] !== $match['a'] && $match['w'] !== $match['b']) $match['w'] = null;
+                $rounds[$r][$m] = $match;
+            }
+        }
+        $bracket['rounds'] = $rounds;
+        return $bracket;
     }
 
     private function spinWheel(int $partyId, $members): array

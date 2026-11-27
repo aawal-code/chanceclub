@@ -12,6 +12,7 @@ const Profile = React.lazy(() => import('./screens/Profile'));
 const WordleSolo = React.lazy(() => import('./games/WordleSolo'));
 const GameDetail = React.lazy(() => import('./screens/GameDetail'));
 const SoloChance = React.lazy(() => import('./games/SoloChance'));
+const SoloBracket = React.lazy(() => import('./games/SoloBracket'));
 import { gameById } from './games/meta';
 
 export type Route =
@@ -299,7 +300,7 @@ export default function App() {
     }
   }, [activeParty, t.error, toast]);
 
-  const startGame = useCallback(async (game: string, opts?: { entries?: string[]; eliminate?: boolean }) => {
+  const startGame = useCallback(async (game: string, opts?: { entries?: string[]; eliminate?: boolean; teams?: { name: string; members: string[] }[] }) => {
     if (!activeParty) return;
     setBusy(true);
     try {
@@ -437,6 +438,7 @@ export default function App() {
         const meta = gameById(route.id);
         if (!meta) return <Games t={t} onOpen={(id) => go({ name: 'detail', id })} onParty={() => go({ name: 'party' })} />;
         if (meta.id === 'wordle') return <WordleSolo t={t} onBack={() => go({ name: 'detail', id: 'wordle' })} />;
+        if (meta.id === 'bracket') return <SoloBracket t={t} onBack={() => go({ name: 'detail', id: 'bracket' })} />;
         return <SoloChance t={t} gameId={meta.id} onBack={() => go({ name: 'detail', id: meta.id })} />;
       }
       default:
