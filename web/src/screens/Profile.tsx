@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { api, setSavedUser, setToken } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Btn, Card, Field, Seg, useToast } from '../components/ui';
+import type { ThemeName } from '../App';
+
+const THEMES: { id: ThemeName; bg: string; surface: string; ink: string }[] = [
+  { id: 'ink', bg: '#0b0b0c', surface: '#1c1c21', ink: '#f6f6f3' },
+  { id: 'paper', bg: '#f3f2ee', surface: '#ffffff', ink: '#111110' },
+  { id: 'midnight', bg: '#070b16', surface: '#121b2f', ink: '#eef2ff' },
+  { id: 'sand', bg: '#efe7d8', surface: '#fbf6ec', ink: '#211b12' },
+];
 
 export default function Profile({
   t, locale, setLocale, theme, setTheme, identity, setIdentity, guestName, setGuestName, onSignOut,
@@ -9,8 +17,8 @@ export default function Profile({
   t: Strings;
   locale: Locale;
   setLocale: (locale: Locale) => void;
-  theme: 'dark' | 'light';
-  setTheme: (theme: 'dark' | 'light') => void;
+  theme: ThemeName;
+  setTheme: (theme: ThemeName) => void;
   identity: { kind: 'user' | 'guest'; name: string } | null;
   setIdentity: (identity: { kind: 'user' | 'guest'; name: string } | null) => void;
   guestName: string;
@@ -18,110 +26,181 @@ export default function Profile({
   onSignOut: () => void;
 }) {
   const toast = useToast();
-  const [mode, setMode] = useState<'signin' | 'signup'>('signup');
-  const [name, setName] = useState(guestName);
+  const [mode, setMode] = useState<'signup' | 'signin'>('signup');
+  const [name, setName] = useState(identity?.name || guestName || '');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [savedName, setSavedName] = useState(false);
+
+  const isAccount = identity?.kind === 'user';
+  const displayName = identity?.name || guestName || '';
+  const trimmedName = name.trim();
+  const nameValid = trimmedName.length >= 2;
+
+  const themeLabels: Record<ThemeName, string> = useMemo(
+    () => ({ ink: t.themeInk, paper: t.themePaper, midnight: t.themeMidnight, sand: t.themeSand }),
+    [t],
+  );
 
   const saveName = async () => {
-    setGuestName(name.trim());
-    if (identity?.kind === 'user') {
-      try {
-        await api.updateMe({ name: name.trim() });
-        setIdentity({ kind: 'user', name: name.trim() });
-        toast(t.saved);
-      } catch (error: any) {
-        toast(error?.message || t.error);
-      }
-    } else {
-      toast(t.saved);
+    setError(null);
+    if (!nameValid) { setError(t.displayNameHint); return; }
+    setGuestName(trimmedName);
+    if (!identity) { setSavedName(true); window.setTimeout(() => setSavedName(false), 1800); return; }
+    setBusy(true);
+    try {
+      await api.updateMe({ name: trimmedName });
+      setIdentity({ kind: identity.kind, name: trimmedName });
+      setSavedName(true);
+      window.setTimeout(() => setSavedName(false), 1800);
+    } catch (problem: any) {
+      setError(problem?.message || t.error);
+    } finally {
+      setBusy(false);
     }
   };
 
   const submitAuth = async () => {
+    setError(null);
+    if (mode === 'signup' && !nameValid) { setError(t.displayNameHint); return; }
+    if (!email.trim()) { setError(t.email); return; }
+    if (mode === 'signup' && password.length < 8) { setError(t.passwordHint); return; }
+    if (mode === 'signin' && password.length < 1) { setError(t.password); return; }
     setBusy(true);
     try {
-      const result = mode === 'signup' ? await api.register(name.trim() || 'Player', email.trim(), password) : await api.login(email.trim(), password);
+      const result = mode === 'signup'
+        ? await api.register(trimmedName, email.trim(), password)
+        : await api.login(email.trim(), password);
       setToken(result.token);
       setSavedUser({ name: result.user.name });
       setIdentity({ kind: 'user', name: result.user.name });
+      setName(result.user.name);
+      setPassword('');
+      setEmail('');
       toast(t.saved);
-    } catch (error: any) {
-      toast(error?.message || t.error);
+    } catch (problem: any) {
+      setError(problem?.message || t.error);
     } finally {
       setBusy(false);
     }
   };
 
   return (
-    <div className="stack gap-20 fade-up" style={{ maxWidth: 720 }}>
+    <div className="stack gap-20 fade-up" style={{ maxWidth: 760 }}>
       <div className="stack gap-6">
         <p className="eyebrow">{t.profile}</p>
         <h1 className="h1">{t.profileTitle}</h1>
       </div>
 
       <Card pad="lg" className="stack gap-16">
-        <div className="row gap-14 center">
+        <div className="row gap-14 center wrap">
           <span className="avatar-chip" style={{ width: 56, height: 56, borderRadius: 18, fontSize: 22 }}>
-            {(identity?.name || guestName || 'A').charAt(0).toUpperCase()}
+            {(displayName || 'A').charAt(0).toUpperCase()}
           </span>
-          <div className="stack">
-            <span className="h2">{identity?.name || guestName || t.guestName}</span>
-            <span className="caption">{identity?.kind === 'user' ? t.account : t.guestAccount}</span>
+          <div className="stack gap-4">
+            <span className="h2">{displayName || t.guestName}</span>
+            <span className="caption">{isAccount ? t.account : t.guestAccount}</span>
           </div>
         </div>
 
-        <div className="row gap-10 wrap" style={{ alignItems: 'flex-end' }}>
-          <div className="grow" style={{ minWidth: 220 }}>
-            <Field label={t.displayName} value={name} onChange={setName} placeholder={t.guestNamePh} maxLength={60} />
-          </div>
-          <Btn onClick={saveName}>{t.save}</Btn>
-        </div>
-      </Card>
-
-      <Card pad="lg" className="stack gap-14">
-        <h3 className="h3">{t.theme} · {t.language}</h3>
-        <div className="row gap-12 wrap">
-          <Seg
-            value={theme}
-            options={[{ value: 'dark', label: t.dark }, { value: 'light', label: t.light }]}
-            onChange={(value) => setTheme(value)}
-          />
-          <Seg
-            value={locale}
-            options={[{ value: 'en', label: 'English' }, { value: 'ar', label: 'عربي' }]}
-            onChange={(value) => setLocale(value)}
-          />
-        </div>
-      </Card>
-
-      <Card pad="lg" className="stack gap-14">
-        <div className="row between center wrap gap-10">
-          <h3 className="h3">{identity?.kind === 'user' ? t.account : t.continueAsGuest}</h3>
-          {identity?.kind !== 'user' && (
-            <Seg
-              value={mode}
-              options={[{ value: 'signup', label: t.signUp }, { value: 'signin', label: t.signIn }]}
-              onChange={(value) => setMode(value)}
-            />
-          )}
-        </div>
-
-        {identity?.kind === 'user' ? (
-          <Btn variant="ghost" onClick={onSignOut}>{t.signOut}</Btn>
-        ) : (
-          <div className="stack gap-10">
-            <p className="caption">{t.guestNote}</p>
-            {mode === 'signup' && <Field label={t.displayName} value={name} onChange={setName} placeholder={t.guestNamePh} maxLength={60} />}
-            <Field label={t.email} value={email} onChange={setEmail} placeholder="you@example.com" type="email" />
-            <Field label={t.password} value={password} onChange={setPassword} placeholder="••••••••" type="password" />
-            <div className="row gap-10 wrap">
-              <Btn disabled={busy || !email.trim() || password.length < 6} onClick={submitAuth}>
-                {mode === 'signup' ? t.signUp : t.signIn}
-              </Btn>
+        <div className="stack gap-8">
+          <div className="row gap-10 wrap" style={{ alignItems: 'flex-end' }}>
+            <div className="grow" style={{ minWidth: 220 }}>
+              <Field label={t.displayName} value={name} onChange={(value) => { setName(value); setError(null); }} placeholder={t.guestNamePh} maxLength={60} />
             </div>
+            <Btn onClick={saveName} disabled={busy || !nameValid}>{savedName ? t.saved : t.save}</Btn>
           </div>
+          <p className="caption">{t.displayNameHint}</p>
+        </div>
+      </Card>
+
+      <Card pad="lg" className="stack gap-16">
+        <h3 className="h3">{t.theme}</h3>
+        <div className="theme-grid">
+          {THEMES.map((option) => (
+            <button
+              key={option.id}
+              className="theme-swatch"
+              data-on={theme === option.id}
+              onClick={() => setTheme(option.id)}
+              aria-pressed={theme === option.id}
+            >
+              <span className="swatch-preview" style={{ background: option.bg }}>
+                <span className="swatch-chip" style={{ background: option.ink }} />
+                <span className="swatch-chip" style={{ background: option.surface }} />
+              </span>
+              <span className="swatch-name">{themeLabels[option.id]}</span>
+            </button>
+          ))}
+        </div>
+
+        <hr className="divider" />
+
+        <h3 className="h3">{t.language}</h3>
+        <Seg
+          value={locale}
+          options={[{ value: 'en' as Locale, label: 'English' }, { value: 'ar' as Locale, label: 'عربي' }, { value: 'de' as Locale, label: 'Deutsch' }]}
+          onChange={(value) => setLocale(value)}
+        />
+      </Card>
+
+      <Card pad="lg" className="stack gap-14">
+        {isAccount ? (
+          <>
+            <div className="row between center wrap gap-10">
+              <h3 className="h3">{t.account}</h3>
+              <Btn variant="ghost" onClick={onSignOut}>{t.signOut}</Btn>
+            </div>
+            <p className="caption">{t.guestNote}</p>
+          </>
+        ) : (
+          <>
+            <div className="row between center wrap gap-10">
+              <h3 className="h3">{mode === 'signup' ? t.createAccount : t.signIn}</h3>
+              <Seg
+                value={mode}
+                options={[{ value: 'signup' as const, label: t.signUp }, { value: 'signin' as const, label: t.signIn }]}
+                onChange={(value) => { setMode(value); setError(null); }}
+              />
+            </div>
+            <p className="caption">{t.guestNote}</p>
+
+            <Field label={t.email} value={email} onChange={(value) => { setEmail(value); setError(null); }} placeholder="you@example.com" type="email" />
+            <div className="stack gap-6">
+              <label className="field">
+                <span>{t.password}</span>
+                <span className="pw-wrap">
+                  <input
+                    className="input"
+                    value={password}
+                    onChange={(event) => { setPassword(event.target.value); setError(null); }}
+                    placeholder="••••••••"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+                    onKeyDown={(event) => { if (event.key === 'Enter') submitAuth(); }}
+                  />
+                  <button type="button" className="pw-toggle" onClick={() => setShowPassword(!showPassword)}>
+                    {showPassword ? t.hidePassword : t.showPassword}
+                  </button>
+                </span>
+              </label>
+              {mode === 'signup' && <p className="caption">{t.passwordHint}</p>}
+            </div>
+
+            {error && <p className="form-error">{error}</p>}
+
+            <div className="row gap-10 wrap">
+              <Btn disabled={busy} onClick={submitAuth}>
+                {busy ? t.loading : mode === 'signup' ? t.createAccount : t.signIn}
+              </Btn>
+              {mode === 'signup' && (
+                <Btn variant="ghost" onClick={() => { setMode('signin'); setError(null); }}>{t.haveAccount}</Btn>
+              )}
+            </div>
+          </>
         )}
       </Card>
     </div>

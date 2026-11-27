@@ -84,7 +84,33 @@ export class ApiError extends Error {
   constructor(message: string, status: number) { super(message); this.status = status; }
 }
 
-async function request<T>(path: string, method = 'GET', body?: unknown): Promise<T> {
+export type Session = {
+  identity: { kind: 'user' | 'guest'; id: string; name: string } | null;
+  user: { id: string; name: string; email?: string; preferred_language?: string; theme?: string } | null;
+  guest: { id: string; name: string } | null;
+};
+
+/** A guest token can expire or be cleared. Mint a fresh guest from the saved name instead of 401-ing. */
+async function healGuest(): Promise<boolean> {
+  const name = getGuestName().trim();
+  if (name.length < 2) { setToken(null); return false; }
+  try {
+    const response = await fetch(`${BASE}/guest`, {
+      method: 'POST',
+      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name }),
+    });
+    if (!response.ok) { setToken(null); return false; }
+    const payload = await response.json();
+    if (!payload?.token) { setToken(null); return false; }
+    setToken(payload.token);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function request<T>(path: string, method = 'GET', body?: unknown, retry = true): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (body !== undefined) headers['Content-Type'] = 'application/json';
@@ -107,7 +133,10 @@ async function request<T>(path: string, method = 'GET', body?: unknown): Promise
       payload?.message ||
       (payload?.errors ? Object.values(payload.errors).flat().join(' ') : '') ||
       `Request failed (${response.status})`;
-    if (response.status === 401) { setToken(null); setSavedUser(null); }
+    const authRoute = path === '/guest' || path === '/login' || path === '/register';
+    if (response.status === 401 && retry && !authRoute) {
+      if (await healGuest()) return request<T>(path, method, body, false);
+    }
     throw new ApiError(String(message), response.status);
   }
   return payload as T;
@@ -120,8 +149,8 @@ export const api = {
     request<{ token: string; user: { id: string; name: string } }>('/register', 'POST', { name, email, password }),
   login: (email: string, password: string) =>
     request<{ token: string; user: { id: string; name: string } }>('/login', 'POST', { email, password }),
-  me: () => request<{ user: { id: string; name: string; email?: string; preferred_language?: string; theme?: string } }>('/me'),
-  updateMe: (body: Record<string, unknown>) => request<{ user: any }>('/me', 'PATCH', body),
+  me: () => request<Session>('/me'),
+  updateMe: (body: Record<string, unknown>) => request<{ user?: any; guest?: any }>('/me', 'PATCH', body),
   logout: () => request<{ message: string }>('/logout', 'POST'),
   parties: () => request<{ data: Party[] }>('/parties'),
   createParty: (name: string) => request<{ data: Party }>('/parties', 'POST', { name }),

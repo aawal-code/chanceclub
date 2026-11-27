@@ -3,11 +3,10 @@ import type { Party } from '../api';
 import type { Strings } from '../i18n';
 import { DieLogo, Glyph } from '../components/brand';
 import { Btn, Card, Field } from '../components/ui';
-
-const GAMES = ['wordle', 'dice', 'trivia', 'wyr', 'charades', 'likely', 'categories', 'whoami', 'coin', 'wheel', 'number', 'yesno'];
+import { soloGames, partyGames } from '../games/meta';
 
 export default function Home({
-  t, parties, identity, guestName, setGuestName, onStart, onJoin, onOpen, onBrowse, onSolo, busy,
+  t, parties, identity, guestName, setGuestName, onStart, onJoin, onOpen, onBrowse, onSolo, onGame, busy,
 }: {
   t: Strings;
   parties: Party[];
@@ -19,13 +18,14 @@ export default function Home({
   onOpen: (code: string) => void;
   onBrowse: () => void;
   onSolo: () => void;
+  onGame: (id: string) => void;
   busy: boolean;
 }) {
   const [partyName, setPartyName] = useState('');
   const [joinCode, setJoinCode] = useState('');
 
   return (
-    <>
+    <div className="landing">
       <section className="hero">
         <div className="hero-copy">
           <p className="eyebrow">ChanceClub</p>
@@ -49,38 +49,61 @@ export default function Home({
       </section>
 
       <section className="section">
-        <div className="game-grid stagger">
-          <Card id="start-card" className="stack gap-12" style={{ gridColumn: 'span 2', minWidth: 0 }}>
-            <div className="row between center">
-              <h2 className="h2">{t.createParty}</h2>
-              <Glyph name="party" />
+        <div className="section-head">
+          <h2 className="h1">{t.whatTitle}</h2>
+        </div>
+        <p className="lead">{t.whatBody}</p>
+        <div className="band">
+          {[
+            { n: '01', title: t.step1T, body: t.step1B },
+            { n: '02', title: t.step2T, body: t.step2B },
+            { n: '03', title: t.step3T, body: t.step3B },
+          ].map((step) => (
+            <div className="band-card" key={step.n}>
+              <span className="step-num">{step.n}</span>
+              <span className="h3">{step.title}</span>
+              <span className="caption">{step.body}</span>
             </div>
-            {!identity && (
-              <Field label={t.guestName} value={guestName} onChange={setGuestName} placeholder={t.guestNamePh} maxLength={60} />
-            )}
-            <Field label={t.partyName} value={partyName} onChange={setPartyName} placeholder={t.partyNamePh} maxLength={80} />
-            <Btn block disabled={busy} onClick={() => onStart(partyName.trim() || t.partyNamePh)}>{t.createAction}</Btn>
-          </Card>
+          ))}
+        </div>
+      </section>
 
-          <Card className="stack gap-12" style={{ gridColumn: 'span 2', minWidth: 0 }}>
-            <div className="row between center">
-              <h2 className="h2">{t.joinParty}</h2>
-              <Glyph name="games" />
-            </div>
-            {!identity && (
-              <Field label={t.guestName} value={guestName} onChange={setGuestName} placeholder={t.guestNamePh} maxLength={60} />
-            )}
-            <Field
-              label={t.code}
-              value={joinCode}
-              onChange={(value) => setJoinCode(value.toUpperCase())}
-              placeholder={t.codePh}
-              maxLength={12}
-            />
-            <Btn block variant="ghost" disabled={busy || joinCode.trim().length < 4} onClick={() => onJoin(joinCode)}>
-              {t.joinAction}
-            </Btn>
-          </Card>
+      <section className="section">
+        <div className="section-title">
+          <div className="stack gap-4">
+            <h2 className="h1">{t.soloGames}</h2>
+            <p className="section-sub">{t.soloHint}</p>
+          </div>
+        </div>
+        <div className="game-grid stagger">
+          {soloGames.map((game) => (
+            <button key={`solo-${game.id}`} className="game-card" onClick={() => onGame(game.id)}>
+              <span className="badge">{t.solo}</span>
+              <span className="glyph"><Glyph name={game.id} /></span>
+              <span className="name">{t.gameNames[game.id]}</span>
+              <span className="cat">{t.gameCats[game.id]}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="section-title">
+          <div className="stack gap-4">
+            <h2 className="h1">{t.partyGames}</h2>
+            <p className="section-sub">{t.partyHint}</p>
+          </div>
+          <Btn variant="ghost" size="sm" onClick={onBrowse}>{t.allGames} →</Btn>
+        </div>
+        <div className="game-grid stagger">
+          {partyGames.map((game) => (
+            <button key={`party-${game.id}`} className="game-card" onClick={() => onGame(game.id)}>
+              <span className="badge">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
+              <span className="glyph"><Glyph name={game.id} /></span>
+              <span className="name">{t.gameNames[game.id]}</span>
+              <span className="cat">{t.gameCats[game.id]}</span>
+            </button>
+          ))}
         </div>
       </section>
 
@@ -103,28 +126,36 @@ export default function Home({
       )}
 
       <section className="section">
-        <div className="section-head">
-          <h2 className="h1">{t.pickGame}</h2>
-          <Btn variant="ghost" size="sm" onClick={onBrowse}>{t.allGames} →</Btn>
-        </div>
-        <div className="game-grid stagger">
-          {GAMES.slice(0, 6).map((game) => (
-            <button
-              key={game}
-              className="game-card"
-              onClick={() => (game === 'wordle' ? onSolo() : document.getElementById('start-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))}
-            >
-              <span className="glyph"><Glyph name={game} /></span>
-              <span className="name">{t.gameNames[game]}</span>
-              <span className="cat">{t.gameCats[game]}</span>
-            </button>
-          ))}
+        <div className="game-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+          <Card id="start-card" pad="lg" className="stack gap-12">
+            <div className="row between center">
+              <h2 className="h2">{t.createParty}</h2>
+              <Glyph name="party" />
+            </div>
+            {!identity && (
+              <Field label={t.guestName} value={guestName} onChange={setGuestName} placeholder={t.guestNamePh} maxLength={60} />
+            )}
+            <Field label={t.partyName} value={partyName} onChange={setPartyName} placeholder={t.partyNamePh} maxLength={80} />
+            <Btn block disabled={busy} onClick={() => onStart(partyName.trim() || t.partyNamePh)}>{t.createAction}</Btn>
+          </Card>
+
+          <Card pad="lg" className="stack gap-12">
+            <div className="row between center">
+              <h2 className="h2">{t.joinParty}</h2>
+              <Glyph name="games" />
+            </div>
+            {!identity && (
+              <Field label={t.guestName} value={guestName} onChange={setGuestName} placeholder={t.guestNamePh} maxLength={60} />
+            )}
+            <Field label={t.code} value={joinCode} onChange={(value) => setJoinCode(value.toUpperCase())} placeholder={t.codePh} maxLength={12} />
+            <Btn block variant="ghost" disabled={busy || joinCode.trim().length < 4} onClick={() => onJoin(joinCode)}>{t.joinAction}</Btn>
+          </Card>
         </div>
       </section>
 
       <p className="caption" style={{ textAlign: 'center', marginTop: 44, letterSpacing: '.2em' }}>
         CHANCECLUB · PLAY MORE, SCROLL LESS
       </p>
-    </>
+    </div>
   );
 }

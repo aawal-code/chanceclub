@@ -10,6 +10,9 @@ import Games from './screens/Games';
 import Teams from './screens/Teams';
 import Profile from './screens/Profile';
 import WordleSolo from './games/WordleSolo';
+import GameDetail from './screens/GameDetail';
+import SoloChance from './games/SoloChance';
+import { gameById } from './games/meta';
 
 export type Route =
   | { name: 'home' }
@@ -18,11 +21,25 @@ export type Route =
   | { name: 'games' }
   | { name: 'teams' }
   | { name: 'profile' }
-  | { name: 'wordle' };
+  | { name: 'wordle' }
+  | { name: 'detail'; id: string }
+  | { name: 'solo'; id: string };
 
 export type Identity = { kind: 'user' | 'guest'; name: string } | null;
 
+export type ThemeName = 'ink' | 'paper' | 'midnight' | 'sand';
+const THEME_ORDER: ThemeName[] = ['ink', 'paper', 'midnight', 'sand'];
 const THEME_KEY = 'cc.theme';
+
+function normalizeTheme(value: string | null): ThemeName {
+  if (value === 'ink' || value === 'paper' || value === 'midnight' || value === 'sand') return value;
+  if (value === 'light') return 'paper';
+  return 'ink';
+}
+
+function normalizeLocale(value: string | null): Locale {
+  return value === 'ar' || value === 'de' ? value : 'en';
+}
 const LOCALE_KEY = 'cc.locale';
 
 function parseHash(): Route {
@@ -31,10 +48,12 @@ function parseHash(): Route {
   if (head === 'party') return { name: 'party', code: tail || undefined };
   if (head === 'join' && tail) return { name: 'party', code: tail };
   if (head === 'game') return { name: 'game' };
+  if (head === 'games' && tail) return { name: 'detail', id: tail };
   if (head === 'games') return { name: 'games' };
   if (head === 'teams') return { name: 'teams' };
   if (head === 'profile') return { name: 'profile' };
   if (head === 'wordle') return { name: 'wordle' };
+  if (head === 'play' && tail) return { name: 'solo', id: tail };
   return { name: 'home' };
 }
 
@@ -42,13 +61,15 @@ function go(route: Route) {
   const hash =
     route.name === 'home' ? '#/' :
     route.name === 'party' ? `#/party${route.code ? `/${route.code}` : ''}` :
+    route.name === 'detail' ? `#/games/${route.id}` :
+    route.name === 'solo' ? `#/play/${route.id}` :
     `#/${route.name}`;
   if (window.location.hash !== hash) window.location.hash = hash;
 }
 
 export default function App() {
-  const [locale, setLocale] = useState<Locale>(() => ((localStorage.getItem(LOCALE_KEY) as Locale) || 'en'));
-  const [theme, setTheme] = useState<'dark' | 'light'>(() => (localStorage.getItem(THEME_KEY) as 'dark' | 'light') || 'dark');
+  const [locale, setLocale] = useState<Locale>(() => normalizeLocale(localStorage.getItem(LOCALE_KEY)));
+  const [theme, setTheme] = useState<ThemeName>(() => normalizeTheme(localStorage.getItem(THEME_KEY)));
   const [route, setRoute] = useState<Route>(() => parseHash());
   const [identity, setIdentity] = useState<Identity>(null);
   const [booting, setBooting] = useState(true);
@@ -89,17 +110,13 @@ export default function App() {
       const token = getToken();
       if (token) {
         try {
-          const me = await api.me();
-          setIdentity({ kind: 'user', name: me.user.name });
+          const session = await api.me();
+          if (session.user) setIdentity({ kind: 'user', name: session.user.name });
+          else if (session.guest) setIdentity({ kind: 'guest', name: session.guest.name });
         } catch {
-          try {
-            const guest = await api.guestMe();
-            setIdentity({ kind: 'guest', name: guest.guest.name });
-          } catch {
-            setToken(null);
-            setSavedUser(null);
-            setIdentity(null);
-          }
+          // A stale token must never dead-end a guest: they stay a visitor and get a fresh
+          // guest session the moment they create or join a lobby.
+          setIdentity(null);
         }
       }
       setBooting(false);
@@ -313,12 +330,13 @@ export default function App() {
           <Home t={t} parties={parties} identity={identity} guestName={guestName}
             setGuestName={(name) => { setGuestNameState(name); setGuestName(name); }}
             onStart={createParty} onJoin={joinParty} onOpen={openParty}
-            onBrowse={() => go({ name: 'games' })} onSolo={() => go({ name: 'wordle' })} busy={busy} />
+            onBrowse={() => go({ name: 'games' })} onSolo={() => go({ name: 'detail', id: 'wordle' })}
+            onGame={(id) => go({ name: 'detail', id })} busy={busy} />
         );
       case 'games':
-        return <Games t={t} onSolo={() => go({ name: 'wordle' })} onParty={() => go({ name: 'party' })} />;
+        return <Games t={t} onOpen={(id) => go({ name: 'detail', id })} onParty={() => go({ name: 'party' })} />;
       case 'teams':
-        return <Teams t={t} identity={identity} />;
+        return <Teams t={t} identity={identity} onSignIn={() => go({ name: 'profile' })} />;
       case 'profile':
         return (
           <Profile
@@ -336,6 +354,27 @@ export default function App() {
         );
       case 'wordle':
         return <WordleSolo t={t} onBack={() => go({ name: 'games' })} />;
+      case 'detail': {
+        const meta = gameById(route.id);
+        if (!meta) return <Games t={t} onOpen={(id) => go({ name: 'detail', id })} onParty={() => go({ name: 'party' })} />;
+        return (
+          <GameDetail
+            t={t}
+            gameId={meta.id}
+            meta={meta}
+            parties={parties}
+            onBack={() => go({ name: 'games' })}
+            onSolo={() => go({ name: 'solo', id: meta.id })}
+            onParty={() => go({ name: 'party' })}
+          />
+        );
+      }
+      case 'solo': {
+        const meta = gameById(route.id);
+        if (!meta) return <Games t={t} onOpen={(id) => go({ name: 'detail', id })} onParty={() => go({ name: 'party' })} />;
+        if (meta.id === 'wordle') return <WordleSolo t={t} onBack={() => go({ name: 'detail', id: 'wordle' })} />;
+        return <SoloChance t={t} gameId={meta.id} onBack={() => go({ name: 'detail', id: meta.id })} />;
+      }
       default:
         return (
           <Home
@@ -348,7 +387,8 @@ export default function App() {
             onJoin={joinParty}
             onOpen={openParty}
             onBrowse={() => go({ name: 'games' })}
-            onSolo={() => go({ name: 'wordle' })}
+            onSolo={() => go({ name: 'detail', id: 'wordle' })}
+            onGame={(id) => go({ name: 'detail', id })}
             busy={busy}
           />
         );
@@ -380,11 +420,20 @@ export default function App() {
           ))}
         </nav>
         <div className="top-actions">
-          <button className="icon-btn" onClick={() => setLocale(locale === 'en' ? 'ar' : 'en')} aria-label={t.language}>
-            {locale === 'en' ? 'عربي' : 'EN'}
+          <button
+            className="icon-btn"
+            onClick={() => setLocale(locale === 'en' ? 'ar' : locale === 'ar' ? 'de' : 'en')}
+            aria-label={t.language}
+          >
+            {locale === 'en' ? 'عربي' : locale === 'ar' ? 'DE' : 'EN'}
           </button>
-          <button className="icon-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={t.theme}>
-            {theme === 'dark' ? '☾' : '☀'}
+          <button
+            className="icon-btn"
+            onClick={() => setTheme(THEME_ORDER[(THEME_ORDER.indexOf(theme) + 1) % THEME_ORDER.length])}
+            aria-label={t.theme}
+            title={t.theme}
+          >
+            {theme === 'ink' ? '◐' : theme === 'paper' ? '☀' : theme === 'midnight' ? '☾' : '◑'}
           </button>
           <button className="avatar" onClick={() => go({ name: 'profile' })} aria-label={t.profile}>
             {(identity?.name || 'A').charAt(0).toUpperCase()}

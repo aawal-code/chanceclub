@@ -1,11 +1,9 @@
 import React from 'react';
 import type { Strings } from '../i18n';
 import { Glyph } from '../components/brand';
-import { Card } from '../components/ui';
+import { soloGames, partyGames } from '../games/meta';
 
-const ALL = ['wordle', 'trivia', 'charades', 'whoami', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
-
-export default function Games({ t, onSolo, onParty }: { t: Strings; onSolo: () => void; onParty: () => void }) {
+export default function Games({ t, onOpen, onParty }: { t: Strings; onOpen: (id: string) => void; onParty: () => void }) {
   return (
     <div className="stack gap-20 fade-up">
       <div className="stack gap-6">
@@ -14,26 +12,44 @@ export default function Games({ t, onSolo, onParty }: { t: Strings; onSolo: () =
         <p className="lead">{t.heroLead}</p>
       </div>
 
-      <div className="game-grid stagger">
-        {ALL.map((game) => {
-          const solo = game === 'wordle';
-          return (
-            <button key={game} className="game-card" onClick={() => (solo ? onSolo() : onParty())}>
-              <span className="badge">{solo ? t.solo : t.multiplayer}</span>
-              <span className="glyph"><Glyph name={game} /></span>
-              <span className="name">{t.gameNames[game]}</span>
-              <span className="cat">{t.gameCats[game]}</span>
+      <section className="section">
+        <div className="section-title">
+          <div className="stack gap-4">
+            <h2 className="h2">{t.soloGames}</h2>
+            <p className="section-sub">{t.soloHint}</p>
+          </div>
+        </div>
+        <div className="game-grid stagger">
+          {soloGames.map((game) => (
+            <button key={`s-${game.id}`} className="game-card" onClick={() => onOpen(game.id)}>
+              <span className="badge">{t.solo}</span>
+              <span className="glyph"><Glyph name={game.id} /></span>
+              <span className="name">{t.gameNames[game.id]}</span>
+              <span className="cat">{t.gameCats[game.id]}</span>
             </button>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </section>
 
-      <Card className="stack gap-8">
-        <h3 className="h3">{t.wordleSolo}</h3>
-        <p className="caption">
-          {t.wordle} · {t.solo} — six guesses, five letters. The word is checked on the server, so nobody can peek.
-        </p>
-      </Card>
+      <section className="section">
+        <div className="section-title">
+          <div className="stack gap-4">
+            <h2 className="h2">{t.partyGames}</h2>
+            <p className="section-sub">{t.partyHint}</p>
+          </div>
+          <button className="nav-link" onClick={onParty}>{t.startParty} →</button>
+        </div>
+        <div className="game-grid stagger">
+          {partyGames.map((game) => (
+            <button key={`p-${game.id}`} className="game-card" onClick={() => onOpen(game.id)}>
+              <span className="badge">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
+              <span className="glyph"><Glyph name={game.id} /></span>
+              <span className="name">{t.gameNames[game.id]}</span>
+              <span className="cat">{t.gameCats[game.id]}</span>
+            </button>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

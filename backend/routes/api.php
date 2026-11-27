@@ -13,7 +13,8 @@ Route::prefix('v1')->group(function () {
         Route::post('/guest', [GuestIdentityController::class, 'create']);
     });
 
-    Route::middleware('cc.auth')->group(function () {
+    // Session + teams answer for guests too: no screen may require an account.
+    Route::middleware(['cc.player', 'throttle:120,1'])->group(function () {
         Route::get('/me', [ChanceClubController::class, 'me']);
         Route::patch('/me', [ChanceClubController::class, 'updateMe']);
         Route::post('/logout', [ChanceClubController::class, 'logout']);

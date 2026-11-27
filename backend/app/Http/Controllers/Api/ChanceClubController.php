@@ -39,7 +39,14 @@ class ChanceClubController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json(['user' => $this->userView($this->user($request))]);
+        $identity = $request->attributes->get('cc.identity');
+        $user = $this->user($request);
+
+        return response()->json([
+            'identity' => $identity,
+            'user' => $user ? $this->userView($user) : null,
+            'guest' => $user ? null : $this->guestView($request->attributes->get('cc.guest')),
+        ]);
     }
 
     public function updateMe(Request $request): JsonResponse
@@ -49,14 +56,45 @@ class ChanceClubController extends Controller
             'preferred_language' => ['sometimes', 'in:en,ar,de'],
             'theme' => ['sometimes', 'in:ink,paper,midnight,sand,light,dark'],
         ]);
+
         $user = $this->user($request);
-        $user->fill($data)->save();
-        return response()->json(['user' => $this->userView($user->fresh())]);
+        if ($user) {
+            $user->fill($data)->save();
+            return response()->json(['user' => $this->userView($user->fresh())]);
+        }
+
+        // Guests can rename themselves; language and theme live on the device for a guest.
+        $guest = $request->attributes->get('cc.guest');
+        if (isset($data['name']) && $guest) {
+            DB::table('guest_identities')->where('id', $guest->id)->update([
+                'display_name' => trim($data['name']),
+                'updated_at' => now(),
+            ]);
+            $guest = DB::table('guest_identities')->find($guest->id);
+        }
+
+        return response()->json(['guest' => $this->guestView($guest)]);
     }
 
     public function logout(Request $request): JsonResponse
     {
-        DB::table('api_tokens')->where('id', $request->attributes->get('cc.token_id'))->delete();
+        $tokenId = $request->attributes->get('cc.token_id');
+        if ($tokenId) {
+            DB::table('api_tokens')->where('id', $tokenId)->delete();
+            return response()->json(['message' => 'Signed out.']);
+        }
+
+        // Guest sessions end here too, so no screen needs an account to sign out.
+        $guest = $request->attributes->get('cc.guest');
+        if ($guest) {
+            $hasActiveLobby = DB::table('party_players')->join('parties', 'parties.id', '=', 'party_players.party_id')
+                ->where('party_players.guest_id', $guest->id)->whereIn('parties.status', ['lobby', 'playing'])->exists();
+            if ($hasActiveLobby) {
+                return response()->json(['message' => 'Finish or leave your active lobby before ending this guest session.'], 409);
+            }
+            DB::table('guest_identities')->where('id', $guest->id)->delete();
+        }
+
         return response()->json(['message' => 'Signed out.']);
     }
 
@@ -117,6 +155,7 @@ class ChanceClubController extends Controller
     public function teams(Request $request): JsonResponse
     {
         $user = $this->user($request);
+        if (!$user) return response()->json(['data' => []]);
         $memberIds = DB::table('team_members')->where('user_id', $user->id)->pluck('team_id');
         $items = DB::table('teams')->where('owner_id', $user->id)->orWhereIn('id', $memberIds)->latest()->limit(50)->get();
         return response()->json(['data' => $items->map(fn ($team) => $this->teamView($team))]);
@@ -124,8 +163,8 @@ class ChanceClubController extends Controller
 
     public function createTeam(Request $request): JsonResponse
     {
+        if (!$user = $this->user($request)) return $this->needsAccount();
         $data = $request->validate(['name' => ['required', 'string', 'min:2', 'max:80']]);
-        $user = $this->user($request);
         $id = DB::transaction(function () use ($data, $user) {
             $id = DB::table('teams')->insertGetId(['owner_id' => $user->id, 'name' => trim($data['name']), 'invite_code' => $this->uniqueCode('teams', 'invite_code'), 'created_at' => now(), 'updated_at' => now()]);
             DB::table('team_members')->insert(['team_id' => $id, 'user_id' => $user->id, 'display_name' => $user->name, 'role' => 'owner', 'created_at' => now(), 'updated_at' => now()]);
@@ -144,7 +183,7 @@ class ChanceClubController extends Controller
     {
         $team = DB::table('teams')->where('invite_code', strtoupper($code))->first();
         if (!$team) return response()->json(['message' => 'Team not found.'], 404);
-        $user = $this->user($request);
+        if (!$user = $this->user($request)) return $this->needsAccount();
         DB::table('team_members')->updateOrInsert(['team_id' => $team->id, 'user_id' => $user->id], ['display_name' => $user->name, 'role' => 'member', 'updated_at' => now(), 'created_at' => now()]);
         return response()->json(['data' => $this->teamView($team)]);
     }
@@ -156,7 +195,17 @@ class ChanceClubController extends Controller
         return response()->json(['token' => $plain, 'user' => $this->userView($user)], $status);
     }
 
-    private function user(Request $request): User { return $request->attributes->get('cc.user'); }
+    private function user(Request $request): ?User { return $request->attributes->get('cc.user'); }
+
+    private function guestView(?object $guest): ?array
+    {
+        return $guest ? ['id' => (string) $guest->id, 'name' => $guest->display_name] : null;
+    }
+
+    private function needsAccount(): JsonResponse
+    {
+        return response()->json(['message' => 'Teams need a free account. Everything else works as a guest.'], 403);
+    }
 
     private function userView(User $user): array
     {

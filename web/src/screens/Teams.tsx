@@ -3,7 +3,7 @@ import { api, type Team } from '../api';
 import type { Strings } from '../i18n';
 import { Btn, Card, Field, useToast } from '../components/ui';
 
-export default function Teams({ t, identity }: { t: Strings; identity: { kind: 'user' | 'guest'; name: string } | null }) {
+export default function Teams({ t, identity, onSignIn }: { t: Strings; identity: { kind: 'user' | 'guest'; name: string } | null; onSignIn: () => void }) {
   const toast = useToast();
   const [teams, setTeams] = useState<Team[]>([]);
   const [name, setName] = useState('');
@@ -43,11 +43,19 @@ export default function Teams({ t, identity }: { t: Strings; identity: { kind: '
     }
   };
 
-  if (!identity) {
+  if (!identity || identity.kind !== 'user') {
     return (
-      <Card className="empty">
-        <p className="body">{t.guestNote}</p>
-      </Card>
+      <div className="stack gap-16 fade-up" style={{ maxWidth: 620 }}>
+        <div className="stack gap-6">
+          <p className="eyebrow">{t.teams}</p>
+          <h1 className="h1">{t.teams}</h1>
+        </div>
+        <Card className="empty stack gap-12">
+          <p className="body">{t.teamsEmpty}</p>
+          <p className="caption">{t.guestNote}</p>
+          <Btn onClick={onSignIn}>{t.signUp}</Btn>
+        </Card>
+      </div>
     );
   }
 
