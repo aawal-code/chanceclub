@@ -108,7 +108,9 @@ class LobbyController extends Controller
         $party = $this->party($code);
         $player = $this->player($party->id, $identity);
         if (!$player) return response()->json(['message' => 'Party not found.'], 404);
-        DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
+        if (!$player->last_seen_at || now()->diffInSeconds($player->last_seen_at) >= 8) {
+            DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
+        }
         return response()->json(['data' => $this->partyView($party, $identity)]);
     }
 
@@ -176,8 +178,11 @@ class LobbyController extends Controller
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if ($locked->status !== 'lobby') throw new HttpException(409, 'The game has already started.');
             $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
-            if ($players->count() < 2) throw new HttpException(409, 'At least two players are needed.');
-            if ($players->contains(fn ($player) => !$player->is_ready)) throw new HttpException(409, 'Everyone must be ready first.');
+            $isOnline = fn ($p) => $p->last_seen_at && now()->diffInSeconds($p->last_seen_at) < 25;
+            $present = $players->filter(fn ($p) => $isOnline($p) || (int) $p->id === (int) $locked->host_player_id)->values();
+            if ($present->count() < 2) throw new HttpException(409, 'At least two players are needed.');
+            if ($present->contains(fn ($player) => !$player->is_ready)) throw new HttpException(409, 'Everyone must be ready first.');
+            $players = $present;
             $number = (int) $locked->round_number + 1;
             $game = $data['game'];
             $locale = $data['locale'] ?? 'en';
@@ -345,6 +350,23 @@ class LobbyController extends Controller
                 'status' => 'active', 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
             DB::table('parties')->where('id', $locked->id)->update(['round_number' => $number, 'updated_at' => now()]);
+            return DB::table('parties')->find($locked->id);
+        });
+        return response()->json(['data' => $this->partyView($result, $identity)]);
+    }
+
+    public function finish(Request $request, string $code): JsonResponse
+    {
+        $identity = $this->identity($request);
+        $party = $this->party($code);
+        $this->requireHost($party, $identity);
+        $result = DB::transaction(function () use ($party) {
+            $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+            if ($locked->status === 'playing') {
+                DB::table('party_players')->where('party_id', $locked->id)->update(['score' => 0, 'is_ready' => false, 'updated_at' => now()]);
+                DB::table('party_players')->where('id', $locked->host_player_id)->update(['is_ready' => true]);
+                DB::table('parties')->where('id', $locked->id)->update(['status' => 'lobby', 'current_game' => null, 'state' => null, 'updated_at' => now()]);
+            }
             return DB::table('parties')->find($locked->id);
         });
         return response()->json(['data' => $this->partyView($result, $identity)]);

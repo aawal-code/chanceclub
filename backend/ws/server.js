@@ -218,7 +218,9 @@ wss.on('connection', (ws) => {
       const party = await fetchParty(String(m.code || '').toUpperCase(), String(m.token || ''));
       if (!party || party.game !== 'draw') { ws.send(JSON.stringify({ t: 'error', error: party ? 'wrong-game' : 'auth' })); ws.close(); return; }
       const code = party.code;
-      room = rooms.get(code) || newRoom(code); rooms.set(code, room);
+      let existing = rooms.get(code);
+      if (existing && existing.phase === 'over' && ![...existing.players.values()].some((q) => q.ws && q.ws.readyState === 1)) existing = null; // stale finished game: start clean
+      room = existing || newRoom(code); rooms.set(code, room);
       const host = party.members.find((x) => x.is_host);
       room.hostId = host ? host.id : room.hostId;
       for (const mem of party.members) {

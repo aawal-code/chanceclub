@@ -45,8 +45,9 @@ export default function PartyScreen({
   /* ---------- lobby ---------- */
   if (activeParty && activeParty.status === 'lobby') {
     const me = activeParty.members.find((member) => member.id === activeParty.self_player_id);
-    const everyoneReady = activeParty.members.every((member) => member.ready);
-    const canStart = activeParty.is_host && activeParty.members.length >= 2 && everyoneReady;
+    const present = activeParty.members.filter((member) => member.online || member.is_host);
+    const everyoneReady = present.every((member) => member.ready);
+    const canStart = activeParty.is_host && present.length >= 2 && everyoneReady;
     const invite = `${window.location.origin}${window.location.pathname}#/party/${activeParty.code}`;
 
     return (
@@ -103,7 +104,7 @@ export default function PartyScreen({
             </div>
             {activeParty.is_host && !canStart && (
               <p className="caption">
-                {activeParty.members.length < 2 ? t.needTwo : !everyoneReady ? t.everyoneReady : ''}
+                {present.length < 2 ? t.needTwo : !everyoneReady ? t.everyoneReady : ''}
               </p>
             )}
           </Card>

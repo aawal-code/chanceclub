@@ -219,6 +219,7 @@ export default function App() {
         ticks += 1;
         if (ticks % 5 === 1) api.heartbeat(code, rtt).catch(() => { /* best effort */ });
         setActiveParty(result.data);
+        if (result.data.status === 'lobby' && parseHash().name === 'game') go({ name: 'party', code: result.data.code });
       } catch (error) {
         if (cancelled) return;
         if (error instanceof ApiError && (error.status === 404 || error.status === 401)) {
@@ -325,6 +326,17 @@ export default function App() {
     }
   }, [activeParty, t.error, toast]);
 
+  const finishParty = useCallback(async () => {
+    if (!activeParty) return;
+    try {
+      const result = await api.finish(activeParty.code);
+      setActiveParty(result.data);
+      go({ name: 'party', code: result.data.code });
+    } catch (error: any) {
+      toast(error?.message || t.error);
+    }
+  }, [activeParty, t.error, toast]);
+
   const leaveParty = useCallback(() => {
     setActiveParty(null);
     try { localStorage.removeItem(PARTY_KEY); } catch { /* ignore */ }
@@ -388,6 +400,7 @@ export default function App() {
             party={activeParty}
             onAct={act}
             onAdvance={advance}
+            onFinish={finishParty}
             onLeave={leaveParty}
             onBack={() => go({ name: 'party', code: activeParty.code })}
           />
@@ -460,7 +473,7 @@ export default function App() {
           />
         );
     }
-  }, [booting, route, t, locale, identity, guestName, parties, activeParty, busy, theme, createParty, joinParty, openParty, setReady, startGame, leaveParty, act, advance, signOut]);
+  }, [booting, route, t, locale, identity, guestName, parties, activeParty, busy, theme, createParty, joinParty, openParty, setReady, startGame, leaveParty, act, advance, finishParty, signOut]);
 
   const navItems: { id: Route['name']; label: string; icon: string }[] = [
     { id: 'home', label: t.home, icon: 'home' },

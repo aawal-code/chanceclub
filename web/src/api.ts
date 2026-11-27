@@ -197,6 +197,7 @@ export const api = {
   action: (code: string, body: Record<string, unknown>) =>
     request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/action`, 'POST', body),
   advance: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/advance`, 'POST'),
+  finish: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/finish`, 'POST'),
   heartbeat: (code: string, rttMs: number) =>
     request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/heartbeat`, 'POST', { rtt_ms: rttMs }),
   teams: () => request<{ data: Team[] }>('/teams'),

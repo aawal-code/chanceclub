@@ -13,13 +13,14 @@ const ROLL_GAMES = ['dice', 'coin', 'wheel', 'number', 'yesno'];
 const VOTE_GAMES = ['wyr', 'likely'];
 
 export default function GameScreen({
-  t, locale, party, onAct, onAdvance, onLeave, onBack,
+  t, locale, party, onAct, onAdvance, onFinish, onLeave, onBack,
 }: {
   t: Strings;
   locale: Locale;
   party: Party;
   onAct: (body: Record<string, unknown>) => void;
   onAdvance: () => void;
+  onFinish: () => void;
   onLeave: () => void;
   onBack: () => void;
 }) {
@@ -32,7 +33,7 @@ export default function GameScreen({
   if (game === 'draw') {
     return (
       <React.Suspense fallback={<p className="caption">{t.loading}</p>}>
-        <DrawGame t={t} locale={locale} party={party} onLeave={onLeave} onBack={onBack} />
+        <DrawGame t={t} locale={locale} party={party} onLeave={onLeave} onBack={party.is_host ? onFinish : onBack} />
       </React.Suspense>
     );
   }
@@ -41,7 +42,7 @@ export default function GameScreen({
     <div className="stage fade-up">
       <div className="row between center wrap gap-10">
         <div className="row gap-10 center">
-          <Btn variant="ghost" size="sm" onClick={onBack}>← {t.lobby}</Btn>
+          <Btn variant="ghost" size="sm" onClick={party.is_host ? onFinish : onBack}>← {party.is_host ? t.endGame : t.lobby}</Btn>
           <span className="caption">{party.name} · {party.code}</span>
         </div>
         <div className="row gap-8 center">
@@ -108,7 +109,7 @@ export default function GameScreen({
           {party.is_host && (
             <div className="row gap-10 wrap">
               <Btn onClick={onAdvance}>{t.nextRound}</Btn>
-              <Btn variant="ghost" onClick={onBack}>{t.lobby}</Btn>
+              <Btn variant="ghost" onClick={onFinish}>{t.endGame}</Btn>
             </div>
           )}
         </>

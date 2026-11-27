@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\LobbyController;
 use App\Http\Controllers\Api\WordleController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/v1/up', function () {
+// Keep-alive ping: must NOT touch the database, so Neon can scale to zero between real visits.
+Route::get('/v1/up', fn () => response()->json(['up' => true]));
+Route::get('/v1/health', function () {
     $t0 = microtime(true);
     try {
         \Illuminate\Support\Facades\DB::select('select 1');
@@ -46,6 +48,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/parties/{code}/start', [LobbyController::class, 'start']);
         Route::post('/parties/{code}/action', [LobbyController::class, 'action']);
         Route::post('/parties/{code}/advance', [LobbyController::class, 'advance']);
+        Route::post('/parties/{code}/finish', [LobbyController::class, 'finish']);
         Route::post('/wordle/solo', [WordleController::class, 'start']);
         Route::get('/wordle/solo/{id}', [WordleController::class, 'show']);
         Route::post('/wordle/solo/{id}/guess', [WordleController::class, 'guess']);
