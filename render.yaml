@@ -1,12 +1,15 @@
+# Reference only - the service is managed manually in the Render dashboard
+# (no blueprint connected). Service: chanceclub-api-eu (srv-dc4h9nuc6qcc73djge40),
+# region Frankfurt, free plan, branch main, root directory backend/.
 services:
   - type: web
-    name: chanceclub-api
+    name: chanceclub-api-eu
     runtime: docker
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    region: frankfurt
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
     plan: free
-    autoDeploy: true
-    healthCheckPath: /up
+    healthCheckPath: /api/v1/up
     envVars:
       - key: APP_ENV
         value: production
@@ -15,9 +18,9 @@ services:
       - key: APP_NAME
         value: ChanceClub API
       - key: APP_URL
-        value: https://chanceclub-api.onrender.com
+        value: https://chanceclub-api-eu.onrender.com
       - key: APP_KEY
-        generateValue: true
+        sync: false
       - key: LOG_CHANNEL
         value: stderr
       - key: DB_CONNECTION
@@ -26,6 +29,6 @@ services:
         sync: false
       - key: CORS_ALLOWED_ORIGINS
         value: https://aawal-code.github.io
-databases:
-  - name: chanceclub-db
-    plan: free
+# Database: Neon (Frankfurt, eu-central-1), project chanceclub / dark-unit-97872046.
+# Keep-alive: cron-job.org job 8955209 + .github/workflows/keepalive.yml ping
+# https://chanceclub-api-eu.onrender.com/api/v1/up every 5 min (DB-touching).
