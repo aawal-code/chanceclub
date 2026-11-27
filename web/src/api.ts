@@ -92,18 +92,22 @@ export type Session = {
 
 /** A guest token can expire or be cleared. Mint a fresh guest from the saved name instead of 401-ing. */
 async function healGuest(): Promise<boolean> {
-  const name = getGuestName().trim();
-  if (name.length < 2) { setToken(null); return false; }
+  let name = getGuestName().trim();
+  if (name.length < 2) {
+    const saved = (getSavedUser()?.name || '').trim();
+    name = saved.length >= 2 ? saved : `Player-${Math.floor(1000 + Math.random() * 9000)}`;
+  }
   try {
     const response = await fetch(`${BASE}/guest`, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
     });
-    if (!response.ok) { setToken(null); return false; }
+    if (!response.ok) return false;
     const payload = await response.json();
-    if (!payload?.token) { setToken(null); return false; }
+    if (!payload?.token) return false;
     setToken(payload.token);
+    setGuestName(name);
     return true;
   } catch {
     return false;

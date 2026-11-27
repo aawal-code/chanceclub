@@ -115,7 +115,7 @@ export default function Home({
           <div className="game-grid stagger">
             {parties.map((party) => (
               <button key={party.code} className="game-card" onClick={() => onOpen(party.code)}>
-                <span className="badge">{party.status}</span>
+                <span className="badge">{party.status === 'playing' ? t.multiplayer : t.lobby}</span>
                 <span className="glyph"><Glyph name="party" /></span>
                 <span className="name">{party.name}</span>
                 <span className="cat">{party.code} · {party.players.length} {t.members.toLowerCase()}</span>

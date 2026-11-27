@@ -144,7 +144,7 @@ export default function PartyScreen({
                   <span className="avatar-chip">{party.name.charAt(0).toUpperCase()}</span>
                   <div className="grow stack">
                     <span className="name">{party.name}</span>
-                    <span className="meta">{party.code} · {party.players.length} {t.members.toLowerCase()}</span>
+                    <span className="meta">{party.code} · {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.players.length} {t.members.toLowerCase()}</span>
                   </div>
                   <Glyph name="arrow" size={18} />
                 </button>
@@ -209,7 +209,7 @@ export default function PartyScreen({
               <span className="avatar-chip">{party.name.charAt(0).toUpperCase()}</span>
               <div className="grow stack">
                 <span className="name">{party.name}</span>
-                <span className="meta">{party.code} · {party.status} · {party.players.length} {t.members.toLowerCase()}</span>
+                <span className="meta">{party.code} · {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.players.length} {t.members.toLowerCase()}</span>
               </div>
               <Glyph name="arrow" size={18} />
             </button>

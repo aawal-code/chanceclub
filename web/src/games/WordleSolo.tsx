@@ -112,9 +112,7 @@ export default function WordleSolo({ t, onBack }: { t: Strings; onBack: () => vo
         )}
       </Card>
 
-      <p className="caption" style={{ textAlign: 'center' }}>
-        {t.multiplayer}: {t.wordle} {t.comingSoon.toLowerCase()} — {t.startParty.toLowerCase()} → {t.chooseGame.toLowerCase()}.
-      </p>
+      <p className="caption" style={{ textAlign: 'center' }}>{t.wordleHint}</p>
     </div>
   );
 }

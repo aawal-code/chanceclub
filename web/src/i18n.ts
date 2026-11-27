@@ -52,6 +52,7 @@ const en = {
   themeInk: 'Ink', themePaper: 'Paper', themeMidnight: 'Midnight', themeSand: 'Sand',
   error: 'Something went wrong',
   heads: 'Heads', tails: 'Tails', maxLabel: 'Highest number',
+  wordleHint: 'Play it solo right here, or start a lobby and race your friends.',
   yesNo: ['Absolutely yes!', 'The odds say yes.', 'Ask again later.', 'A confident no.'],
   loading: 'Loading…',
   gameNames: {
@@ -134,6 +135,7 @@ const ar: Strings = {
   themeInk: 'حبر', themePaper: 'ورق', themeMidnight: 'منتصف الليل', themeSand: 'رمل',
   error: 'حدث خطأ',
   heads: 'وجه', tails: 'كتابة', maxLabel: 'أعلى رقم',
+  wordleHint: 'العبها منفرداً هنا، أو افتح جلسة وتحدّ أصحابك.',
   yesNo: ['بالتأكيد نعم!', 'الحظ يقول نعم.', 'اسأل لاحقاً.', 'لا بكل تأكيد.'],
   loading: 'جارٍ التحميل…',
   gameNames: {
@@ -214,6 +216,7 @@ const de: Strings = {
   themeInk: 'Tinte', themePaper: 'Papier', themeMidnight: 'Mitternacht', themeSand: 'Sand',
   error: 'Etwas ist schiefgelaufen',
   heads: 'Kopf', tails: 'Zahl', maxLabel: 'Höchste Zahl',
+  wordleHint: 'Spiel es hier allein oder starte eine Runde und tritt gegen Freunde an.',
   yesNo: ['Auf jeden Fall!', 'Die Chancen stehen gut.', 'Frag später nochmal.', 'Ein klares Nein.'],
   loading: 'Lädt…',
   gameNames: {
