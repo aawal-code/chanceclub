@@ -1,0 +1,6 @@
+import{r,j as e,B as o,G as k,C as u}from"./index-B4ooEXaQ.js";import{d as j,B as g,p as N,S as b,b as f,m as w}from"./Bracket-BGJbFkZY.js";function v({t:a,onBack:p}){const[n,m]=r.useState({...j,text:`Alex
+Sam
+Noor
+Jo
+Mia
+Leo`}),[s,c]=r.useState(null),[i,l]=r.useState(""),d=()=>{const t=f(n);if(t.length<2){l(a.bracketNeed2);return}l(""),c(w(t))};return e.jsxs("div",{className:"stack gap-20 fade-up",style:{maxWidth:860,margin:"0 auto",width:"100%",minWidth:0},children:[e.jsxs("div",{className:"row between center wrap gap-10",children:[e.jsxs("div",{className:"row gap-10 center",children:[e.jsxs(o,{variant:"ghost",size:"sm",onClick:p,children:["← ",a.back]}),e.jsxs("span",{className:"row gap-8 center",children:[e.jsx(k,{name:"bracket",size:18}),e.jsx("span",{className:"caption",children:a.gameNames.bracket})]})]}),e.jsx("span",{className:"caption",children:a.solo})]}),e.jsxs(u,{pad:"lg",className:"stack gap-16",style:{minWidth:0},children:[s&&e.jsx(g,{t:a,bracket:s,onPick:(t,x,h)=>c(N(s,t,x,h))}),e.jsx(b,{t:a,setup:n,onChange:m}),i&&e.jsx("p",{className:"caption",children:i}),e.jsx("div",{className:"row gap-10 wrap",children:e.jsx(o,{onClick:d,children:s?a.bracketReshuffle:a.bracketGenerate})})]}),e.jsx("p",{className:"caption center-text",children:a.gameBlurbs.bracket})]})}export{v as default};
