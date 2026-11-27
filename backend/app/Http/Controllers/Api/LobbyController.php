@@ -7,12 +7,13 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use App\Support\Wordle;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LobbyController extends Controller
 {
-    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number'];
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle'];
 
     private const PROMPTS = [
         'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],
@@ -23,6 +24,7 @@ class LobbyController extends Controller
         'likely' => ['Who is most likely to become a famous chef?', 'Who would survive longest on a desert island?', 'Who is most likely to laugh at the wrong moment?', 'Who would plan the best surprise party?'],
         'yesno' => ['Ask chance to decide!'], 'dice' => ['Ready to roll?'], 'coin' => ['Flip the coin'],
         'wheel' => ['Who will chance pick?'], 'number' => ['Pick a number from 1 to 100'],
+        'wordle' => ['Guess the five-letter word'],
     ];
 
     private const ANSWERS = [
@@ -40,6 +42,7 @@ class LobbyController extends Controller
         'likely' => ['من الأكثر احتمالاً أن يصبح طاهياً مشهوراً؟', 'من سيصمد أكثر في جزيرة مهجورة؟', 'من سيضحك في وقت غير مناسب؟', 'من سينظم أفضل حفلة مفاجأة؟'],
         'yesno' => ['اسأل الحظ ليقرر!'], 'dice' => ['ارمِ النرد'], 'coin' => ['اقلب العملة'],
         'wheel' => ['من سيختاره الحظ؟'], 'number' => ['اختر رقماً من 1 إلى 100'],
+        'wordle' => ['خمّن الكلمة'],
     ];
 
     private const ANSWERS_AR = [
@@ -143,6 +146,7 @@ class LobbyController extends Controller
             $promptIndex = random_int(0, count($promptBank[$game]) - 1);
             $prompt = $promptBank[$game][$promptIndex];
             $answer = isset($answerBank[$game]) ? $answerBank[$game][$promptIndex] : null;
+            if ($game === 'wordle') $answer = Wordle::pick();
             $turn = $players->first(fn ($player) => (int) $player->id === (int) $locked->host_player_id) ?? $players->first();
             DB::table('party_rounds')->insert([
                 'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
@@ -158,7 +162,7 @@ class LobbyController extends Controller
     public function action(Request $request, string $code): JsonResponse
     {
         $data = $request->validate([
-            'type' => ['required', 'string', 'in:answer,vote,roll,point'],
+            'type' => ['required', 'string', 'in:answer,vote,roll,point,guess'],
             'target_player_id' => ['nullable', 'integer', 'min:1'],
             'value' => ['nullable', 'string', 'max:120'],
             'count' => ['nullable', 'integer', 'in:1,2'],
@@ -190,6 +194,41 @@ class LobbyController extends Controller
                     'wheel' => ['result' => $members->random()->display_name],
                 };
                 DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
+            } elseif ($data['type'] === 'guess') {
+                if ($round->game !== 'wordle') throw new HttpException(422, 'This game does not take word guesses.');
+                $guess = mb_strtolower(trim($data['value'] ?? ''));
+                if (!preg_match('/^[a-z]{5}$/', $guess)) throw ValidationException::withMessages(['value' => 'Enter a five-letter word.']);
+                if (!Wordle::isValid($guess)) throw ValidationException::withMessages(['value' => 'That word is not in the dictionary.']);
+                $row = DB::table('party_submissions')->where('round_id', $round->id)->where('player_id', $player->id)->first();
+                $payload = $row ? (json_decode($row->payload, true) ?: []) : [];
+                $attempts = $payload['guesses'] ?? [];
+                if (!empty($payload['solved'])) throw new HttpException(409, 'You already solved this word.');
+                if (count($attempts) >= Wordle::MAX_GUESSES) throw new HttpException(409, 'No guesses left.');
+                if (in_array($guess, array_column($attempts, 'word'), true)) throw new HttpException(409, 'You already tried that word.');
+                $attempts[] = ['word' => $guess, 'pattern' => Wordle::pattern($guess, (string) $round->answer)];
+                $solved = $guess === mb_strtolower((string) $round->answer);
+                $payload = ['guesses' => $attempts, 'solved' => $solved];
+                if ($row) DB::table('party_submissions')->where('id', $row->id)->update(['payload' => json_encode($payload, JSON_THROW_ON_ERROR), 'updated_at' => now()]);
+                else DB::table('party_submissions')->insert(['round_id' => $round->id, 'player_id' => $player->id, 'payload' => json_encode($payload, JSON_THROW_ON_ERROR), 'created_at' => now(), 'updated_at' => now()]);
+                if ($solved) {
+                    DB::table('party_players')->where('id', $player->id)->increment('score');
+                    DB::table('party_rounds')->where('id', $round->id)->update([
+                        'outcome' => json_encode(['word' => mb_strtoupper((string) $round->answer), 'winner_player_id' => (string) $player->id, 'solved' => true, 'attempts' => count($attempts)], JSON_THROW_ON_ERROR),
+                        'status' => 'complete', 'updated_at' => now(),
+                    ]);
+                } else {
+                    $all = DB::table('party_submissions')->where('round_id', $round->id)->whereIn('player_id', $members->pluck('id'))->get();
+                    $exhausted = $all->count() >= $members->count() && $all->every(function ($submission) {
+                        $payload = json_decode($submission->payload, true) ?: [];
+                        return !empty($payload['solved']) || count($payload['guesses'] ?? []) >= Wordle::MAX_GUESSES;
+                    });
+                    if ($exhausted) {
+                        DB::table('party_rounds')->where('id', $round->id)->update([
+                            'outcome' => json_encode(['word' => mb_strtoupper((string) $round->answer), 'winner_player_id' => null, 'solved' => false], JSON_THROW_ON_ERROR),
+                            'status' => 'complete', 'updated_at' => now(),
+                        ]);
+                    }
+                }
             } else {
                 if (!in_array($round->game, ['trivia', 'wyr', 'likely'], true)) throw new HttpException(422, 'This game does not accept private submissions.');
                 $value = trim($data['value'] ?? '');
@@ -239,7 +278,7 @@ class LobbyController extends Controller
             if (!$previousRound?->turn_player_id) $turn = $players->first(fn ($person) => (int) $person->id === (int) $locked->host_player_id) ?? $players->first();
             DB::table('party_rounds')->insert([
                 'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
-                'prompt' => $promptBank[$game][$index], 'answer' => $answerBank[$game][$index] ?? null,
+                'prompt' => $promptBank[$game][$index], 'answer' => $game === 'wordle' ? Wordle::pick() : ($answerBank[$game][$index] ?? null),
                 'status' => 'active', 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
             DB::table('parties')->where('id', $locked->id)->update(['round_number' => $number, 'updated_at' => now()]);
@@ -302,6 +341,17 @@ class LobbyController extends Controller
         $privateClue = null;
         if ($round?->game === 'charades' && (int) $round->turn_player_id === (int) $myPlayer->id) $privateClue = $round->answer;
         if ($round?->game === 'whoami' && (int) $round->turn_player_id !== (int) $myPlayer->id) $privateClue = $round->answer;
+        $wordle = null;
+        if ($round && $round->game === 'wordle') {
+            $ownRow = $submissions->firstWhere('player_id', $myPlayer->id);
+            $ownPayload = $ownRow ? (json_decode($ownRow->payload, true) ?: []) : [];
+            $wordle = [
+                'length' => Wordle::LENGTH,
+                'max' => Wordle::MAX_GUESSES,
+                'attempts' => $ownPayload['guesses'] ?? [],
+                'solved' => !empty($ownPayload['solved']),
+            ];
+        }
         $roundView = $round ? [
             'number' => (int) $round->round_number,
             'game' => $round->game,
@@ -309,6 +359,7 @@ class LobbyController extends Controller
             'status' => $round->status,
             'turn_player_id' => $round->turn_player_id ? (string) $round->turn_player_id : null,
             'private_clue' => $privateClue,
+            'wordle' => $wordle,
             'result' => $outcome,
             'submitted' => (bool) $ownSubmission,
             'submission_count' => $submissions->count(),
