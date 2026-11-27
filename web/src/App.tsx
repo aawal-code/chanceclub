@@ -107,18 +107,31 @@ export default function App() {
     (async () => {
       /* Wake gate: never let the app boot into a sleeping server. Poll /up and show real progress. */
       const isUp = async (): Promise<boolean> => {
-        try { const r = await fetch(HEALTH_URL, { cache: 'no-store' }); return r.ok; } catch { return false; }
+        try {
+          const r = await fetch(HEALTH_URL, { cache: 'no-store', signal: AbortSignal.timeout(12000) });
+          return r.ok;
+        } catch { return false; }
       };
-      if (!(await isUp())) {
+      /* Always run the progress loop: a cold Render service makes the very first probe hang
+         for ~50s instead of failing, so the bar must tick from the start. The loop checks
+         immediately, so a warm server still boots without added delay. */
+      {
         const startedAt = Date.now();
         await new Promise<void>((resolve) => {
-          const timer = window.setInterval(async () => {
+          let busy = false;
+          const tick = async () => {
             const elapsed = (Date.now() - startedAt) / 1000;
             const pct = elapsed < 3 ? 10 + elapsed * 8 : Math.min(95, 34 + 61 * (1 - Math.exp(-(elapsed - 3) / 25)));
             setWakePct(Math.round(pct));
-            if (await isUp()) { window.clearInterval(timer); setWakePct(100); resolve(); }
+            if (busy) return;
+            busy = true;
+            const up = await isUp();
+            busy = false;
+            if (up) { window.clearInterval(timer); setWakePct(100); resolve(); }
             else if (elapsed > 180) { window.clearInterval(timer); resolve(); }
-          }, 1500);
+          };
+          const timer = window.setInterval(tick, 1500);
+          void tick();
         });
       }
       const params = new URLSearchParams(window.location.search);
