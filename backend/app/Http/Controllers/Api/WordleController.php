@@ -54,6 +54,13 @@ class WordleController extends Controller
             'solved' => $solved,
             'updated_at' => now(),
         ]);
+        if ($solved || count($guesses) >= Wordle::MAX_GUESSES) {
+            \App\Support\History::record('solo', 'wordle', null, null, 0, 1, [[
+                'user_id' => $game->user_id ? (int) $game->user_id : null, 'guest_id' => $game->guest_id ? (int) $game->guest_id : null,
+                'name' => $request->attributes->get('cc.identity')['name'] ?? 'Player',
+                'score' => $solved ? (Wordle::MAX_GUESSES + 1 - count($guesses)) : 0,
+            ]]);
+        }
         return response()->json(['data' => $this->view($this->game($request, $id))]);
     }
 

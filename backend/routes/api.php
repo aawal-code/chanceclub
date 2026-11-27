@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\ChanceClubController;
 use App\Http\Controllers\Api\GuestIdentityController;
+use App\Http\Controllers\Api\HistoryController;
 use App\Http\Controllers\Api\LobbyController;
 use App\Http\Controllers\Api\WordleController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,8 @@ Route::get('/v1/health', function () {
     }
     return response()->json(['up' => true, 'db_ms' => $db]);
 });
+
+Route::post('/internal/draw-result', [HistoryController::class, 'drawResult']);
 
 Route::prefix('v1')->group(function () {
     Route::middleware('throttle:30,1')->group(function () {
@@ -48,6 +51,10 @@ Route::prefix('v1')->group(function () {
         Route::post('/parties/{code}/start', [LobbyController::class, 'start']);
         Route::post('/parties/{code}/action', [LobbyController::class, 'action']);
         Route::post('/parties/{code}/advance', [LobbyController::class, 'advance']);
+        Route::get('/history', [HistoryController::class, 'mine']);
+        Route::get('/leaderboard', [HistoryController::class, 'global']);
+        Route::get('/parties/{code}/leaderboard', [HistoryController::class, 'party']);
+        Route::get('/parties/{code}/history', [HistoryController::class, 'partyHistory']);
         Route::post('/parties/{code}/finish', [LobbyController::class, 'finish']);
         Route::post('/wordle/solo', [WordleController::class, 'start']);
         Route::get('/wordle/solo/{id}', [WordleController::class, 'show']);

@@ -76,6 +76,14 @@ function view(room, p, withStrokes) {
 function broadcastState(room) { for (const p of room.players.values()) send(p, view(room, p)); }
 function sys(room, text, extra) { toAll(room, { t: 'chat', kind: 'sys', text, ...extra }); }
 
+function reportResult(room) {
+  const scores = {}; for (const p of room.players.values()) scores[p.id] = p.score | 0;
+  room.games = (room.games || 0) + 1;
+  const key = require('crypto').createHash('sha256').update(String(process.env.APP_KEY || '')).digest('hex');
+  const body = JSON.stringify({ code: room.code, seq: room.games, scores });
+  const req = http.request({ host: UP_HOST, port: UP_PORT, path: '/api/internal/draw-result', method: 'POST', timeout: 8000, headers: { 'content-type': 'application/json', accept: 'application/json', 'content-length': Buffer.byteLength(body), 'x-internal-key': key, Host: 'localhost' } }, (r) => { r.resume(); });
+  req.on('error', () => {}); req.on('timeout', () => req.destroy()); req.end(body);
+}
 function startGame(room) {
   const ids = [...room.players.values()].filter((p) => p.ws && p.ws.readyState === 1).map((p) => p.id);
   if (ids.length < 2) return false;
@@ -87,12 +95,12 @@ function startGame(room) {
 function nextTurn(room) {
   room.turn += 1;
   if (room.turn >= room.order.length) { room.turn = 0; room.round += 1; room.order = [...room.players.values()].map((p) => p.id); }
-  if (room.round > room.settings.rounds) { room.phase = 'over'; room.drawer = null; room.endsAt = 0; broadcastState(room); return; }
+  if (room.round > room.settings.rounds) { room.phase = 'over'; room.drawer = null; room.endsAt = 0; reportResult(room); broadcastState(room); return; }
   let drawer = room.order[room.turn];
   const dp = room.players.get(drawer);
   if (!dp || !dp.ws || dp.ws.readyState !== 1) { // skip absent drawers
     if (room.order.some((id) => { const q = room.players.get(id); return q && q.ws && q.ws.readyState === 1; })) return nextTurn(room);
-    room.phase = 'over'; broadcastState(room); return;
+    room.phase = 'over'; reportResult(room); broadcastState(room); return;
   }
   room.drawer = drawer; room.phase = 'choosing'; room.word = ''; room.revealed = new Set(); room.strokes = [];
   room.guessed = new Map(); room.turnPoints = []; room.drawerGoneAt = 0;

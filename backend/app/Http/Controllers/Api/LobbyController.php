@@ -363,6 +363,7 @@ class LobbyController extends Controller
         $result = DB::transaction(function () use ($party) {
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if ($locked->status === 'playing') {
+                if ($locked->current_game !== 'draw') \App\Support\History::recordParty($locked);
                 DB::table('party_players')->where('party_id', $locked->id)->update(['score' => 0, 'is_ready' => false, 'updated_at' => now()]);
                 DB::table('party_players')->where('id', $locked->host_player_id)->update(['is_ready' => true]);
                 DB::table('parties')->where('id', $locked->id)->update(['status' => 'lobby', 'current_game' => null, 'state' => null, 'updated_at' => now()]);

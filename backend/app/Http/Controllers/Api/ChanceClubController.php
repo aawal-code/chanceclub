@@ -242,6 +242,7 @@ class ChanceClubController extends Controller
                     DB::table('party_players')->where('id', $player->id)->update(['guest_id' => null, 'user_id' => $user->id, 'display_name' => $user->name, 'updated_at' => now()]);
                 }
             }
+            DB::table('match_results')->where('guest_id', $guest->id)->update(['user_id' => $user->id, 'guest_id' => null, 'player_key' => 'u'.$user->id, 'display_name' => $user->name]);
             DB::table('guest_identities')->where('id', $guest->id)->delete();
         });
     }
