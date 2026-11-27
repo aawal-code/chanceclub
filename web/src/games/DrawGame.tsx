@@ -149,7 +149,7 @@ export default function DrawGame({ t, locale, party, onLeave, onBack }: {
   };
   const onDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!isDrawer || e.button > 0) return;
-    e.preventDefault(); e.currentTarget.setPointerCapture(e.pointerId);
+    e.preventDefault(); try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* ignore */ }
     const [x, y] = toPt(e);
     const id = ++counter.current;
     const s: Stroke = { id, c: eraser ? '#ffffff' : color, w: eraser ? size * 1.8 : size, p: [x, y] };
