@@ -30,12 +30,14 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
     run(() => api.tournamentAct(party.code, 'reorder', { lineup: rest }));
   };
 
+  const rankOf = (i: number) => { const st = tour!.standings; let r = i; while (r > 0 && st[r - 1].points === st[i].points && st[r - 1].wins === st[i].wins) r--; return r; };
+  const champs = tour ? tour.standings.filter((_, i) => rankOf(i) === 0) : [];
   const standings = tour && tour.standings.length > 0 && (
     <div className="stack gap-8">
       <p className="caption">{t.tStandings}</p>
       {tour.standings.map((s, i) => (
         <div key={s.player_key} className="row gap-10 center">
-          <span className="mono" style={{ width: 24 }}>{s.points > 0 ? (i < 3 ? <span className={`medal m${i + 1}`}><Glyph name="medal" size={20} /></span> : i + 1) : '·'}</span>
+          <span className="mono" style={{ width: 24 }}>{s.points > 0 ? (rankOf(i) < 3 ? <span className={`medal m${rankOf(i) + 1}`}><Glyph name="medal" size={20} /></span> : rankOf(i) + 1) : '·'}</span>
           <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{s.name}</span>
           <span className="mono" style={{ fontWeight: 800 }}><CountUp to={s.points} /> {t.tPoints}</span>
         </div>
@@ -47,7 +49,7 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
     return (
       <Card pad="lg" className="stack gap-12" style={{ position: 'relative', overflow: 'hidden' }}>
         <div className="row gap-12 center"><span className="trophy-drop" ><Glyph name="trophy" size={38} /></span>{motionOn() && <span className="confetti" aria-hidden>{Array.from({ length: 22 }, (_, i) => <i key={i} style={{ left: `${(i * 37) % 100}%`, animationDelay: `${(i % 7) * 0.08}s`, background: ["var(--accent)","var(--ink)","var(--muted)","var(--accent)","var(--faint)"][i % 5] }} />)}</span>}
-          <div className="grow"><div className="caption">{t.tChampion}</div><div className="h2">{tour.standings[0]?.name ?? ''}</div></div></div>
+          <div className="grow"><div className="caption">{champs.length > 1 ? t.tCoChamps : t.tChampion}</div><div className="h2">{champs.map((c) => c.name).join(' & ')}</div>{champs.length > 1 && <div className="caption">{t.tTieNote}</div>}</div></div>
         {standings}
         {party.is_host && <Btn variant="ghost" onClick={() => run(() => api.tournamentCreate(party.code, pool, count))} disabled={busy}>{t.tNewOne}</Btn>}
       </Card>

@@ -228,14 +228,14 @@ export default function DrawGame({ t, locale, party, onLeave, onBack }: {
         <Card pad="lg" className="stack gap-16">
           <div className="stack gap-4">
             <p className="eyebrow">{t.drSetup}</p>
-            <h1 className="h1">{over ? `${sorted[0]?.name || ''} ${t.drWinner}` : t.gameNames.draw}</h1>
+            <h1 className="h1">{over ? `${sorted.filter((p) => p.score === sorted[0]?.score).map((p) => p.name).join(' & ')} ${sorted.filter((p) => p.score === sorted[0]?.score).length > 1 ? t.drTie : t.drWinner}` : t.gameNames.draw}</h1>
             {!over && <p className="body">{t.drSetupHint}</p>}
           </div>
           <div className="stack gap-6">
             <p className="caption">{over ? t.drFinal : t.drPlayers}</p>
             {sorted.map((p, i) => (
               <div key={p.id} className="row gap-10 center">
-                <span className="caption mono" style={{ width: 18 }}>{over ? i + 1 : ''}</span>
+                <span className="caption mono" style={{ width: 18 }}>{over ? sorted.findIndex((q) => q.score === p.score) + 1 : ''}</span>
                 <span className="avatar-chip" style={{ width: 30, height: 30, borderRadius: 9, fontSize: 12 }}>{p.name.charAt(0).toUpperCase()}</span>
                 <span className="grow" style={{ fontWeight: 700 }}>{p.name}{p.id === st.me ? ` · ${t.you}` : ''}</span>
                 <span className="dot" data-on={p.online} />
