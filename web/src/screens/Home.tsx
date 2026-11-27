@@ -22,6 +22,7 @@ export default function Home({
   busy: boolean;
 }) {
   const [joinCode, setJoinCode] = useState('');
+  const [tipOpen, setTipOpen] = useState(() => { try { return !localStorage.getItem('cc.tip1'); } catch { return false; } });
 
   return (
     <div className="landing">
@@ -30,6 +31,11 @@ export default function Home({
           <p className="eyebrow">ChanceClub</p>
           <h1 className="display">{t.heroTitle}</h1>
           <p className="lead">{t.heroLead}</p>
+          {tipOpen && (
+            <p className="tip-line" onClick={() => { setTipOpen(false); try { localStorage.setItem('cc.tip1', '1'); } catch { /* ignore */ } }}>
+              💡 {t.firstTip} <b>×</b>
+            </p>
+          )}
           <div className="hero-actions">
             <Btn size="lg" disabled={busy} onClick={() => onStart(t.partyNamePh)}>{t.playFriends}</Btn>
             <Btn size="lg" variant="ghost" onClick={onSolo}>{t.playSolo}</Btn>

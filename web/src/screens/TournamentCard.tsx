@@ -1,3 +1,4 @@
+import CountUp from '../components/CountUp';
 import { motionOn } from '../motion';
 import { friendlyError } from '../friendly';
 import React, { useState } from 'react';
@@ -35,7 +36,7 @@ export default function TournamentCard({ t, locale, party, onParty }: { t: Strin
         <div key={s.player_key} className="row gap-10 center">
           <span className="mono" style={{ width: 24 }}>{s.points > 0 ? (i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1) : '·'}</span>
           <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{s.name}</span>
-          <span className="mono" style={{ fontWeight: 800 }}>{s.points} {t.tPoints}</span>
+          <span className="mono" style={{ fontWeight: 800 }}><CountUp to={s.points} /> {t.tPoints}</span>
         </div>
       ))}
     </div>

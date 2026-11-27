@@ -97,7 +97,7 @@ export default function PartyScreen({
                       {member.is_host ? <span className="caption" style={{ marginLeft: 8 }}>· {t.host}</span> : null}
                       {member.id === activeParty.self_player_id ? <span className="caption" style={{ marginLeft: 8 }}>· {t.you}</span> : null}
                     </span>
-                    <span className="meta">{member.online ? t.connected : t.offline} · {member.ready ? t.ready : t.notReady} · <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} /></span>
+                    <span className="meta">{member.online ? t.connected : t.offline} · {member.ready ? <span className="ready-pop">✓ {t.ready}</span> : t.notReady} · <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} /></span>
                   </div>
                   <span className="dot" data-on={member.online} />
                   <span className="mono" style={{ fontWeight: 700 }}>{member.score}</span>
