@@ -9,13 +9,20 @@ import { Glyph } from '../components/brand';
 import { SetupForm, buildTeams, defaultSetup } from '../games/Bracket';
 import type { SetupState } from '../games/Bracket';
 import { Btn, Card, CopyButton, Field, Seg, useToast, LagPill } from '../components/ui';
+import { OwnPrompts, RequestsBar, WaitingRoom } from '../components/PartyFlow';
 
 const GAMES = ['wordle', 'draw', 'bracket', 'trivia', 'charades', 'whoami', 'imposter', 'wordbomb', 'truths', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
 
 export default function PartyScreen({
   t, locale, identity, guestName, setGuestName, parties, activeParty, busy, initialCode,
   onCreate, onJoin, onOpen, onReady, onStart, onLeave, onOpenGame, onSignIn, onTournament, onLeaveGroup,
+  pending, onClaim, onCancelPending, onDecide, onHost,
 }: {
+  pending: { code: string; status: 'pending' | 'denied' } | null;
+  onClaim: (code: string, playerId: string) => void;
+  onCancelPending: () => void;
+  onDecide: (id: string, action: 'approve' | 'deny') => void;
+  onHost: (playerId: string) => void;
   t: Strings;
   locale: Locale;
   identity: { kind: 'user' | 'guest'; name: string } | null;
@@ -48,6 +55,11 @@ export default function PartyScreen({
     if (initialCode) setJoinCode(initialCode.toUpperCase());
   }, [initialCode]);
 
+  /* ---------- waiting for a host to let me in ---------- */
+  if (pending && !activeParty) {
+    return <WaitingRoom t={t} code={pending.code} status={pending.status} onClaim={(id) => onClaim(pending.code, id)} onCancel={onCancelPending} />;
+  }
+
   /* ---------- lobby ---------- */
   if (activeParty && activeParty.status === 'lobby') {
     const me = activeParty.members.find((member) => member.id === activeParty.self_player_id);
@@ -59,6 +71,7 @@ export default function PartyScreen({
     return (
       <div className="lobby fade-up">
         <div className="stack gap-16">
+          <RequestsBar t={t} party={activeParty} onDecide={onDecide} />
           <Card pad="lg" className="stack gap-16">
             <div className="row between center wrap gap-10">
               <div className="stack gap-4">
@@ -101,8 +114,9 @@ export default function PartyScreen({
                       {member.is_host ? <span className="caption" style={{ marginLeft: 8 }}>· {t.host}</span> : null}
                       {member.id === activeParty.self_player_id ? <span className="caption" style={{ marginLeft: 8 }}>· {t.you}</span> : null}
                     </span>
-                    <span className="meta">{member.online ? t.connected : t.offline} · {member.ready ? <span className="ready-pop"><Glyph name="check" size={13} /> {t.ready}</span> : t.notReady} · <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} /></span>
+                    <span className="meta">{member.online ? t.connected : <span className="sit-out">{t.sittingOut}</span>} · {member.ready ? <span className="ready-pop"><Glyph name="check" size={13} /> {t.ready}</span> : t.notReady} · <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.sittingOut }} /></span>
                   </div>
+                  {activeParty.is_host && !member.is_host ? <Btn size="sm" variant="ghost" onClick={() => onHost(member.id)}>{t.makeHost}</Btn> : null}
                   <span className="dot" data-on={member.online} />
                   <span className="mono" style={{ fontWeight: 700 }}>{member.score}</span>
                 </div>
@@ -129,6 +143,8 @@ export default function PartyScreen({
           </Card>
 
           <TournamentCard t={t} locale={locale} party={activeParty} onParty={onTournament} />
+
+          {activeParty.is_host && <OwnPrompts t={t} party={activeParty} />}
 
           {activeParty.is_host && !(activeParty.tournament && activeParty.tournament.status === 'active') && (
             <Card pad="lg" className="stack gap-12">
@@ -203,6 +219,7 @@ export default function PartyScreen({
   if (activeParty && activeParty.status === 'playing') {
     return (
       <div className="fade-up" style={{ maxWidth: 620 }}>
+        <RequestsBar t={t} party={activeParty} onDecide={onDecide} />
         <Card pad="lg" className="stack gap-16">
           <p className="eyebrow">{t.round} {activeParty.round?.number ?? 1}</p>
           <h1 className="h1">{activeParty.name}</h1>

@@ -12,12 +12,36 @@ const TruthsGame = React.lazy(() => import('../games/Truths'));
 import type { Act } from '../games/kit';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 import { Avatar } from '../components/Avatar';
+import { NextBar, PlayersStrip, RequestsBar } from '../components/PartyFlow';
 
 const AWARD_GAMES = ['categories', 'whoami', 'charades'];
 const ROLL_GAMES = ['dice', 'coin', 'wheel', 'number', 'yesno'];
 const VOTE_GAMES = ['wyr', 'likely'];
 
-export default function GameScreen({
+export default function GameScreen(props: {
+  t: Strings;
+  locale: Locale;
+  party: Party;
+  onAct: Act;
+  onAdvance: () => void;
+  onFinish: () => void;
+  onLeave: () => void;
+  onBack: () => void;
+  onDecide: (id: string, action: 'approve' | 'deny') => void;
+  onHost: (playerId: string) => void;
+}) {
+  const { t, party } = props;
+  return (
+    <>
+      <RequestsBar t={t} party={party} onDecide={props.onDecide} />
+      <NextBar t={t} party={party} onSkip={props.onAdvance} />
+      <GameInner t={t} locale={props.locale} party={party} onAct={props.onAct} onAdvance={props.onAdvance} onFinish={props.onFinish} onLeave={props.onLeave} onBack={props.onBack} />
+      <div style={{ marginTop: 14 }}><PlayersStrip t={t} party={party} onHost={props.onHost} /></div>
+    </>
+  );
+}
+
+function GameInner({
   t, locale, party, onAct, onAdvance, onFinish, onLeave, onBack,
 }: {
   t: Strings;
@@ -129,7 +153,7 @@ export default function GameScreen({
                 <span className="caption mono" style={{ width: 18 }}>{index + 1}</span>
                 <Avatar avatar={member.avatar} name={member.name} size={30} />
                 <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{member.name}{member.id === party.self_player_id ? ` · ${t.you}` : ''}</span>
-                <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} />
+                <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.sittingOut }} />
                 <span className="mono" style={{ fontWeight: 800 }}>{member.score}</span>
               </div>
             ))}
@@ -224,9 +248,10 @@ function TriviaRound({ t, round, onAct }: { t: Strings; round: Round; onAct: (bo
 /* ---------------- votes ---------------- */
 function VoteRound({ t, round, game, onAct }: { t: Strings; round: Round; game: string; onAct: (body: Record<string, unknown>) => void }) {
   const options = useMemo(() => {
+    if (round.options && round.options.length === 2) return round.options;
     const parts = round.prompt.split(/\s+or\s+/i).map((part) => part.replace(/[?؟]$/, '').trim());
     return parts.length === 2 ? parts : [];
-  }, [round.prompt]);
+  }, [round.prompt, round.options]);
   const [value, setValue] = useState('');
   const complete = round.status === 'complete';
 

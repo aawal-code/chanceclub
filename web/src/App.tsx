@@ -90,6 +90,7 @@ export default function App() {
   const [activeParty, setActiveParty] = useState<Party | null>(null);
   const [guestName, setGuestNameState] = useState(() => getGuestName());
   const [busy, setBusy] = useState(false);
+  const [pending, setPending] = useState<{ code: string; status: 'pending' | 'denied' } | null>(null);
   const pollRef = useRef<number | null>(null);
   useEffect(() => { applyMotion(getMotion()); }, []);
   const [slowNet, setSlowNet] = useState(false);
@@ -312,7 +313,15 @@ export default function App() {
     setBusy(true);
     try {
       await ensureIdentity();
-      const result = await api.joinParty(code.trim().toUpperCase(), getAvatarPreset());
+      const clean = code.trim().toUpperCase();
+      const result = await api.joinParty(clean, getAvatarPreset());
+      if (result.requested || !result.data) {
+        // The game is already running: the host decides.
+        setPending({ code: clean, status: 'pending' });
+        go({ name: 'party', code: clean });
+        return;
+      }
+      setPending(null);
       setActiveParty(result.data);
       go({ name: 'party', code: result.data.code });
       refreshParties();
@@ -396,6 +405,65 @@ export default function App() {
     }
   }, [activeParty, t.error, toast]);
 
+  /* ---- waiting to be let in: poll the request until the host answers ---- */
+  useEffect(() => {
+    if (!pending || pending.status !== 'pending' || !identity) return;
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const r = await api.myRequest(pending.code);
+        if (cancelled) return;
+        if (r.request?.status === 'approved') {
+          const party = await api.party(pending.code);
+          if (cancelled) return;
+          setPending(null);
+          setActiveParty(party.data);
+          go({ name: party.data.status === 'playing' ? 'game' : 'party', code: party.data.code });
+          refreshParties();
+        } else if (r.request?.status === 'denied') {
+          setPending({ code: pending.code, status: 'denied' });
+        }
+      } catch { /* keep waiting */ }
+    };
+    const id = window.setInterval(tick, 2000);
+    void tick();
+    return () => { cancelled = true; window.clearInterval(id); };
+  }, [pending?.code, pending?.status, identity, refreshParties]);
+
+  const claimSeat = useCallback(async (code: string, playerId: string) => {
+    try {
+      await api.claim(code, playerId, getAvatarPreset());
+      setPending({ code, status: 'pending' });
+      toast(t.claimSent);
+    } catch (error: any) { toast(friendlyError(error, t)); }
+  }, [t, toast]);
+
+  const decideRequest = useCallback(async (id: string, action: 'approve' | 'deny') => {
+    if (!activeParty) return;
+    try {
+      await api.decide(activeParty.code, id, action);
+      const fresh = await api.party(activeParty.code);
+      setActiveParty(fresh.data);
+    } catch (error: any) { toast(friendlyError(error, t)); }
+  }, [activeParty?.code, t, toast]);
+
+  const handHost = useCallback(async (playerId: string) => {
+    if (!activeParty) return;
+    try {
+      await api.makeHost(activeParty.code, playerId);
+      const fresh = await api.party(activeParty.code);
+      setActiveParty(fresh.data);
+    } catch (error: any) { toast(friendlyError(error, t)); }
+  }, [activeParty?.code, t, toast]);
+
+  /* ---- told once when the host role lands on me ---- */
+  const wasHost = useRef<boolean | null>(null);
+  useEffect(() => {
+    if (!activeParty) { wasHost.current = null; return; }
+    if (wasHost.current === false && activeParty.is_host) toast(t.youAreHost);
+    wasHost.current = activeParty.is_host;
+  }, [activeParty?.is_host, activeParty?.code]);
+
   const leaveGroup = useCallback(async (code: string) => {
     try { await api.leave(code); } catch (error: any) { toast(friendlyError(error, t)); return; }
     if (activeParty?.code === code) { setActiveParty(null); try { localStorage.removeItem(PARTY_KEY); } catch { /* ignore */ } }
@@ -455,6 +523,11 @@ export default function App() {
             onOpenGame={() => go({ name: 'game' })}
             onSignIn={() => go({ name: 'profile' })}
             onLeaveGroup={leaveGroup}
+            pending={pending}
+            onClaim={claimSeat}
+            onCancelPending={() => setPending(null)}
+            onDecide={decideRequest}
+            onHost={handHost}
             onTournament={(p, started) => { setActiveParty(p); if (started) go({ name: 'game' }); }}
           />
         );
@@ -469,6 +542,8 @@ export default function App() {
             onFinish={finishParty}
             onLeave={leaveParty}
             onBack={() => go({ name: 'party', code: activeParty.code })}
+            onDecide={decideRequest}
+            onHost={handHost}
           />
         ) : (
           <Home t={t} parties={parties} identity={identity} guestName={guestName}
@@ -543,7 +618,7 @@ export default function App() {
           />
         );
     }
-  }, [booting, route, t, locale, identity, guestName, parties, activeParty, busy, theme, createParty, joinParty, openParty, setReady, startGame, leaveParty, act, advance, finishParty, leaveGroup, setDialect, dialect, signOut]);
+  }, [booting, route, t, locale, identity, guestName, parties, activeParty, busy, theme, createParty, joinParty, openParty, setReady, startGame, leaveParty, act, advance, finishParty, leaveGroup, setDialect, dialect, signOut, pending, claimSeat, decideRequest, handHost]);
 
   const navItems: { id: Route['name']; label: string; icon: string }[] = [
     { id: 'home', label: t.home, icon: 'home' },

@@ -905,3 +905,13 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .credit:hover .credit-name { color: var(--ink); }
 .credit-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .45; flex: none; }
 @media (max-width: 560px) { .home-footer { margin-top: 34px; } }
+
+/* ---- party flow: join requests, countdown, own questions ---- */
+.flow-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); font-size: 14px; }
+.flow-bar .grow { min-width: 0; flex: 1 1 140px; overflow-wrap: anywhere; }
+.flow-next { position: sticky; top: 8px; z-index: 5; margin-bottom: 12px; }
+.flow-requests { margin-bottom: 12px; }
+.own-toggle { width: 100%; background: none; border: 0; padding: 0; color: inherit; cursor: pointer; text-align: start; }
+.own-item { font-size: 14px; padding: 4px 0; border-bottom: 1px solid var(--line); }
+.own-item .grow { overflow-wrap: anywhere; min-width: 0; }
+.member .sit-out { color: var(--muted); font-style: italic; }

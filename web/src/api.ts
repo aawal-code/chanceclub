@@ -19,6 +19,8 @@ export type Member = {
   score: number;
   is_host: boolean;
   online: boolean;
+  /** Away or disconnected: the room carries on without them and their seat and score wait. */
+  sitting_out?: boolean;
   rtt: number | null;
 };
 
@@ -26,6 +28,7 @@ export type Round = {
   number: number;
   game: string;
   prompt: string;
+  options?: string[] | null;
   status: 'active' | 'complete';
   turn_player_id: string | null;
   private_clue: string | null;
@@ -55,8 +58,21 @@ export type Party = {
   my_wins?: number;
   tournament?: Tournament | null;
   game_state?: Record<string, any> | null;
+  /** Milliseconds until the next round starts by itself, or null when nothing is counting down. */
+  next_in_ms?: number | null;
+  content_mode?: 'builtin' | 'mix' | 'only';
+  /** Host only: people asking to join, or to take over an abandoned seat. */
+  requests?: JoinRequest[];
+  custom_counts?: Record<string, number>;
   createdAt: string;
 };
+
+export type JoinRequest = { id: string; name: string; claim_player_id: string | null; claim_name: string | null };
+export type MyRequest = { id: string; status: 'pending' | 'approved' | 'denied'; claim_player_id: string | null } | null;
+export type Seat = { id: string; name: string; score: number };
+export type CustomPrompt = { id: string; game: string; prompt: string; answer: string | null };
+export type CustomPrompts = { mode: 'builtin' | 'mix' | 'only'; items: CustomPrompt[] };
+export type JoinResult = { data?: Party; requested?: boolean; request?: MyRequest; message?: string };
 
 export type Tournament = { id: string; status: 'active' | 'done'; total: number; index: number; lineup: string[]; next: string | null; standings: { player_key: string; name: string; points: number; wins: number }[] };
 
@@ -298,7 +314,7 @@ export const api = {
   parties: () => request<{ data: Party[] }>('/parties'),
   createParty: (name: string, avatarPreset?: string | null) => request<{ data: Party }>('/parties', 'POST', { name, avatar_preset: avatarPreset || undefined }),
   party: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}`),
-  joinParty: (code: string, avatarPreset?: string | null) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/join`, 'POST', { avatar_preset: avatarPreset || undefined }),
+  joinParty: (code: string, avatarPreset?: string | null) => request<JoinResult>(`/parties/${encodeURIComponent(code)}/join`, 'POST', { avatar_preset: avatarPreset || undefined }),
   ready: (code: string, ready: boolean) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/ready`, 'POST', { ready }),
   start: (code: string, game: string, locale: string, opts?: { entries?: string[]; eliminate?: boolean; teams?: { name: string; members: string[] }[] }) =>
     request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/start`, 'POST', { game, locale, ...(opts || {}) }),
@@ -314,6 +330,15 @@ export const api = {
   finish: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/finish`, 'POST'),
   heartbeat: (code: string, rttMs: number) =>
     request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/heartbeat`, 'POST', { rtt_ms: rttMs }),
+  seats: (code: string) => request<{ member: boolean; name?: string; status?: string; seats: Seat[]; request?: MyRequest }>(`/parties/${encodeURIComponent(code)}/seats`),
+  claim: (code: string, playerId: string, avatarPreset?: string | null) => request<{ requested: boolean; request: MyRequest }>(`/parties/${encodeURIComponent(code)}/claim`, 'POST', { player_id: Number(playerId), avatar_preset: avatarPreset || undefined }),
+  myRequest: (code: string) => request<{ request: MyRequest }>(`/parties/${encodeURIComponent(code)}/request`),
+  decide: (code: string, id: string, action: 'approve' | 'deny') => request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/requests/${id}/${action}`, 'POST'),
+  makeHost: (code: string, playerId: string) => request<{ ok: boolean }>(`/parties/${encodeURIComponent(code)}/host`, 'POST', { player_id: Number(playerId) }),
+  prompts: (code: string) => request<{ data: CustomPrompts }>(`/parties/${encodeURIComponent(code)}/prompts`),
+  addPrompts: (code: string, game: string, lines: string[]) => request<{ data: CustomPrompts; added: number; skipped: number }>(`/parties/${encodeURIComponent(code)}/prompts`, 'POST', { game, lines }),
+  removePrompt: (code: string, id: string) => request<{ data: CustomPrompts }>(`/parties/${encodeURIComponent(code)}/prompts/${id}`, 'DELETE'),
+  promptMode: (code: string, mode: string) => request<{ data: CustomPrompts }>(`/parties/${encodeURIComponent(code)}/prompt-mode`, 'POST', { mode }),
   teams: () => request<{ data: Team[] }>('/teams'),
   createTeam: (name: string) => request<{ data: Team }>('/teams', 'POST', { name }),
   joinTeam: (code: string) => request<{ data: Team }>(`/teams/${encodeURIComponent(code)}/join`, 'POST'),
