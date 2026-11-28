@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LobbyController extends Controller
 {
-    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw', 'imposter'];
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw', 'imposter', 'wordbomb'];
 
     private const PROMPTS = [
         'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],
@@ -144,7 +144,7 @@ class LobbyController extends Controller
         $preset = $this->presetFrom($request);
         $party = DB::table('parties')->where('invite_code', strtoupper($code))->first();
         if (!$party || $party->status !== 'lobby') return response()->json(['message' => 'Lobby not found or already started.'], 404);
-        $joined = DB::transaction(function () use ($party, $identity) {
+        $joined = DB::transaction(function () use ($party, $identity, $preset) {
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if (!$locked || $locked->status !== 'lobby') throw new HttpException(409, 'This lobby has already started.');
             $existing = $this->player($locked->id, $identity);

@@ -22,6 +22,7 @@ export const GAMES: GameMeta[] = [
   { id: 'charades', modes: ['party'] },
   { id: 'whoami', modes: ['party'] },
   { id: 'imposter', modes: ['party'] },
+  { id: 'wordbomb', modes: ['party'] },
 ];
 
 export const soloGames = GAMES.filter((game) => game.modes.includes('solo'));
@@ -33,6 +34,6 @@ export function gameById(id: string): GameMeta | undefined {
 
 export const GAME_GROUPS: { key: 'gWords' | 'gFun' | 'gChance'; ids: string[] }[] = [
   { key: 'gWords', ids: ['wordle', 'draw', 'categories', 'charades', 'whoami'] },
-  { key: 'gFun', ids: ['trivia', 'wyr', 'likely', 'imposter'] },
+  { key: 'gFun', ids: ['trivia', 'wyr', 'likely', 'imposter', 'wordbomb'] },
   { key: 'gChance', ids: ['dice', 'coin', 'wheel', 'number', 'yesno', 'bracket'] },
 ];

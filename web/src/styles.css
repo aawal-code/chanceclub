@@ -840,3 +840,6 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .avatar-progress { position: relative; height: 10px; border-radius: 999px; background: var(--bg-soft); overflow: hidden; }
 .avatar-progress i { position: absolute; inset: 0 auto 0 0; background: var(--accent); transition: width .2s var(--ease); }
 .avatar-progress span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; letter-spacing: .04em; }
+
+.gk-used { display: flex; flex-wrap: wrap; gap: 6px; }
+.gk-used-word { padding: 4px 10px; border-radius: 999px; background: var(--bg-soft); border: 1px solid var(--line); font-size: 12px; font-weight: 700; }
