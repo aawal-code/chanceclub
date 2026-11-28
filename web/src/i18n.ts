@@ -1088,3 +1088,8 @@ export function getStrings(locale: Locale, dialect: ArDialect = DEFAULT_AR_DIALE
   return { ...ar, ...arEG, ...arEgypt, gameNames: { ...ar.gameNames, ...(arEG.gameNames as object), whoami: 'أنا مين؟', likely: 'مين الأكتر احتمال', neverhave: 'عمري ما' } } as Strings;
 }
 
+
+/** Lowercase a UI word for running text, except German where nouns stay capitalised. */
+export function lcw(s: string): string {
+  return typeof document !== 'undefined' && document.documentElement.lang === 'de' ? s : s.toLowerCase();
+}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { Party } from '../api';
 import type { Strings } from '../i18n';
+import { lcw } from '../i18n';
 import { DieLogo, Glyph } from '../components/brand';
 import { Btn, Card, Field } from '../components/ui';
 import { soloGames, partyGames } from '../games/meta';
@@ -133,7 +134,7 @@ export default function Home({
                 <span className="badge">{party.status === 'playing' ? t.multiplayer : t.lobby}</span>
                 <span className="glyph"><Glyph name="party" /></span>
                 <span className="name">{party.name}</span>
-                <span className="cat">{party.code} · {party.players.length} {party.players.length === 1 ? t.playerOne : t.members.toLowerCase()}</span>
+                <span className="cat">{party.code} · {party.players.length} {party.players.length === 1 ? t.playerOne : lcw(t.members)}</span>
               </button>
             ))}
           </div>

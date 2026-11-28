@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
 import TournamentCard from './TournamentCard';
 import type { Locale, Strings } from '../i18n';
+import { lcw } from '../i18n';
 import { Glyph } from '../components/brand';
 import { SetupForm, buildTeams, defaultSetup } from '../games/Bracket';
 import type { SetupState } from '../games/Bracket';
@@ -79,7 +80,7 @@ export default function PartyScreen({
                 <h1 className="h1">{activeParty.name}</h1>
               </div>
               <span className="seg" style={{ padding: '6px 14px' }}>
-                <b style={{ fontSize: 12, letterSpacing: '.08em' }}>{activeParty.members.length} {activeParty.members.length === 1 ? t.playerOne : t.members.toLowerCase()}</b>
+                <b style={{ fontSize: 12, letterSpacing: '.08em' }}>{activeParty.members.length} {activeParty.members.length === 1 ? t.playerOne : lcw(t.members)}</b>
               </span>
             </div>
 
@@ -203,7 +204,7 @@ export default function PartyScreen({
                   <span className="avatar-chip">{party.name.charAt(0).toUpperCase()}</span>
                   <div className="grow stack">
                     <span className="name">{party.name}</span>
-                    <span className="meta">{party.code} · {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.players.length} {party.players.length === 1 ? t.playerOne : t.members.toLowerCase()}</span>
+                    <span className="meta">{party.code} · {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.players.length} {party.players.length === 1 ? t.playerOne : lcw(t.members)}</span>
                   </div>
                   <Glyph name="arrow" size={18} />
                 </button>

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import type { Party } from '../api';
 import type { Strings } from '../i18n';
+import { lcw } from '../i18n';
 import { Glyph } from '../components/brand';
 import { Avatar } from '../components/Avatar';
 import { Btn, Card } from '../components/ui';
@@ -86,7 +87,7 @@ export function Scores({ t, party }: { t: Strings; party: Party }) {
     <Card className="stack gap-10">
       <div className="row between center">
         <h3 className="h3">{t.scores}</h3>
-        <span className="caption">{party.members.length} {t.members.toLowerCase()}</span>
+        <span className="caption">{party.members.length} {lcw(t.members)}</span>
       </div>
       {sorted.map((member, index) => (
         <div key={member.id} className="row gap-10 center">

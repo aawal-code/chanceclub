@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Party, Round } from '../api';
 import type { Locale, Strings } from '../i18n';
+import { lcw } from '../i18n';
 import { Glyph } from '../components/brand';
 import { Btn, Card, Field, useToast, LagPill } from '../components/ui';
 import { Wheel, angleFor } from '../games/Wheel';
@@ -149,7 +150,7 @@ function GameInner({
           <Card className="stack gap-12">
             <div className="row between center">
               <h3 className="h3">{t.scores}</h3>
-              <span className="caption">{party.members.length} {t.members.toLowerCase()}</span>
+              <span className="caption">{party.members.length} {lcw(t.members)}</span>
             </div>
             {[...party.members].sort((a, b) => b.score - a.score).map((member, index) => (
               <div key={member.id} className="row gap-10 center">
