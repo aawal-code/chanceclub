@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LobbyController extends Controller
 {
-    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw', 'imposter', 'wordbomb'];
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw', 'imposter', 'wordbomb', 'truths'];
 
     private const PROMPTS = [
         'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],

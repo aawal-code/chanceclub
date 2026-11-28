@@ -10,7 +10,7 @@ import { SetupForm, buildTeams, defaultSetup } from '../games/Bracket';
 import type { SetupState } from '../games/Bracket';
 import { Btn, Card, CopyButton, Field, Seg, useToast, LagPill } from '../components/ui';
 
-const GAMES = ['wordle', 'draw', 'bracket', 'trivia', 'charades', 'whoami', 'imposter', 'wordbomb', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
+const GAMES = ['wordle', 'draw', 'bracket', 'trivia', 'charades', 'whoami', 'imposter', 'wordbomb', 'truths', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
 
 export default function PartyScreen({
   t, locale, identity, guestName, setGuestName, parties, activeParty, busy, initialCode,

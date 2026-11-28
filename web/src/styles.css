@@ -845,3 +845,10 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .gk-used-word { padding: 4px 10px; border-radius: 999px; background: var(--bg-soft); border: 1px solid var(--line); font-size: 12px; font-weight: 700; }
 
 .gk-error { margin: 0; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--miss) 16%, transparent); border: 1px solid var(--miss); color: var(--ink); font-weight: 700; font-size: 13px; }
+
+.tr-line { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: end; }
+.tr-lie { min-width: 62px; padding: 10px 10px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg-soft); font-weight: 700; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.tr-lie[data-active="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.gk-used-word[data-lie="true"] { border-color: var(--accent); }
+.gk-used-word[data-fooled="true"] { opacity: .65; }
+

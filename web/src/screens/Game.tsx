@@ -8,6 +8,7 @@ import { BracketView } from '../games/Bracket';
 const DrawGame = React.lazy(() => import('../games/DrawGame'));
 const ImposterGame = React.lazy(() => import('../games/Imposter'));
 const WordBombGame = React.lazy(() => import('../games/WordBomb'));
+const TruthsGame = React.lazy(() => import('../games/Truths'));
 import type { Act } from '../games/kit';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 import { Avatar } from '../components/Avatar';
@@ -46,6 +47,14 @@ export default function GameScreen({
     return (
       <React.Suspense fallback={<p className="caption">{t.loading}</p>}>
         <WordBombGame t={t} locale={locale} party={party} onAct={onAct} onAdvance={onAdvance} onFinish={onFinish} onLeave={onLeave} onBack={onBack} />
+      </React.Suspense>
+    );
+  }
+
+  if (game === 'truths') {
+    return (
+      <React.Suspense fallback={<p className="caption">{t.loading}</p>}>
+        <TruthsGame t={t} locale={locale} party={party} onAct={onAct} onAdvance={onAdvance} onFinish={onFinish} onLeave={onLeave} onBack={onBack} />
       </React.Suspense>
     );
   }
