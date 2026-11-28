@@ -1,4 +1,5 @@
 import { GAME_GROUPS } from '../games/meta';
+import { QR } from '../components/QR';
 import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
 import TournamentCard from './TournamentCard';
@@ -73,7 +74,8 @@ export default function PartyScreen({
                 <p className="caption">{t.invite}</p>
                 <span className="code-value">{activeParty.code}</span>
               </div>
-              <div className="row gap-8 wrap">
+              <div className="row gap-8 wrap" style={{ alignItems: 'center' }}>
+                <div className="stack gap-4" style={{ alignItems: 'center' }}><QR value={invite} size={112} label={t.scanToJoin} /><span className="caption" style={{ fontSize: 11 }}>{t.scanToJoin}</span></div>
                 <CopyButton value={invite} label={t.copyLink} onCopied={() => toast(t.copied)} />
                 <Btn size="sm" variant="soft" onClick={async () => {
                   try {
@@ -111,6 +113,7 @@ export default function PartyScreen({
                 {me?.ready ? t.notReady : t.ready}
               </Btn>
               <Btn variant="ghost" onClick={onLeave}>{t.leave}</Btn>
+              {activeParty.is_host && <Btn variant="ghost" onClick={() => { if (window.confirm(t.deleteConfirm)) onLeave(); }}>{t.deleteParty}</Btn>}
               {activeParty.is_host && !(activeParty.tournament && activeParty.tournament.status === 'active') && (
                 <Btn disabled={!canStart || busy} onClick={() => onStart(picked, picked === 'bracket' ? { teams: buildTeams(bSetup, activeParty.members.map((x) => x.name)) } : picked === 'wheel' ? { entries: wheelText.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 24), eliminate: wheelMode === 'remove' } : undefined)}>
                   {t.startGame}

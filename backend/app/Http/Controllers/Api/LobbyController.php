@@ -571,7 +571,14 @@ class LobbyController extends Controller
 
     private function uniqueCode(): string
     {
-        do { $code = Str::upper(Str::random(8)); } while (DB::table('parties')->where('invite_code', $code)->exists());
+        // 5 characters, easy to say aloud: no 0/O, 1/I/L, S/5. Pattern CVCVC or CVCDD.
+        $c = 'BDFGHJKMNPRTVWZ'; $v = 'AEU'; $d = '2346789';
+        $pick = fn (string $set) => $set[random_int(0, strlen($set) - 1)];
+        $tries = 0;
+        do {
+            $code = $pick($c).$pick($v).$pick($c).(random_int(0, 3) === 0 ? $pick($d).$pick($d) : $pick($v).$pick($c));
+            if (++$tries > 200) $code = Str::upper(Str::random(8));
+        } while (DB::table('parties')->where('invite_code', $code)->exists());
         return $code;
     }
 
