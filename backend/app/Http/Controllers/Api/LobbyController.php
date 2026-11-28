@@ -568,6 +568,8 @@ class LobbyController extends Controller
         $members = DB::table('party_players')->where('party_id', $party->id)->orderBy('id')->get();
         // One query for every custom picture in the party, so the 0.9s poll stays cheap.
         $customAvatars = DB::table('user_avatars')->whereIn('user_id', $members->pluck('user_id')->filter()->all())->pluck('user_id')->map(fn ($id) => (int) $id)->all();
+        // Live version, not the one snapshotted at join: a new photo must get a new address.
+        $avatarVersions = DB::table('users')->whereIn('id', $members->pluck('user_id')->filter()->all())->pluck('avatar_version', 'id');
         $myPlayer = $members->first(fn ($person) => ($identity['kind'] === 'user' ? (int) $person->user_id : (int) $person->guest_id) === (int) $identity['id']);
         if (!$myPlayer) throw new HttpException(404, 'Party not found.');
         $round = DB::table('party_rounds')->where('party_id', $party->id)->orderByDesc('round_number')->first();
@@ -631,7 +633,7 @@ class LobbyController extends Controller
                     $person->user_id ? in_array((int) $person->user_id, $customAvatars, true) : false,
                     $person->user_id ? (int) $person->user_id : null,
                     $person->avatar_preset,
-                    (int) ($person->avatar_version ?? 0)
+                    (int) ($avatarVersions[$person->user_id] ?? 0)
                 ),
             ])->values()->all(),
             'self_player_id' => $myPlayer ? (string) $myPlayer->id : null,

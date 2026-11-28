@@ -836,3 +836,7 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .avatar-pick[data-active="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
 .avatar-pick:disabled { opacity: .6; cursor: default; }
 @media (max-width: 520px) { .avatar-picker { grid-template-columns: repeat(5, 1fr); gap: 8px; } }
+
+.avatar-progress { position: relative; height: 10px; border-radius: 999px; background: var(--bg-soft); overflow: hidden; }
+.avatar-progress i { position: absolute; inset: 0 auto 0 0; background: var(--accent); transition: width .2s var(--ease); }
+.avatar-progress span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 800; letter-spacing: .04em; }

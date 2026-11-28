@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { api, setSavedUser, setSession, setAvatarPreset, type AvatarInfo } from '../api';
+import { api, avatarUploadWithProgress, setSavedUser, setSession, setAvatarPreset, type AvatarInfo } from '../api';
 import { Avatar, AVATAR_PRESETS } from '../components/Avatar';
 import type { Locale, Strings } from '../i18n';
 import { Btn, Card, Field, Seg, useToast } from '../components/ui';
@@ -32,6 +32,7 @@ export default function Profile({
   const [avatar, setAvatar] = useState<AvatarInfo | null>(null);
   const [avatarBusy, setAvatarBusy] = useState(false);
   const [avatarError, setAvatarError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<number | null>(null);
   const fileRef = React.useRef<HTMLInputElement | null>(null);
 
   const isAccount = identity?.kind === 'user';
@@ -98,13 +99,16 @@ export default function Profile({
     try {
       const data = await shrink(file);
       if (!data) throw new Error('resize');
-      const r = await api.avatarUpload(data);
+      setProgress(0);
+      const r = await avatarUploadWithProgress(data, setProgress);
       setAvatar(r.avatar);
+      setAvatarPreset(r.avatar.preset);
       toast(t.avatarSaved);
     } catch (problem: any) {
       setAvatarError(problem?.message || t.avatarUploadFailed);
     } finally {
       setAvatarBusy(false);
+      setProgress(null);
       if (fileRef.current) fileRef.current.value = '';
     }
   };
@@ -227,6 +231,12 @@ export default function Profile({
           {avatar?.custom ? <Btn variant="ghost" onClick={removePhoto} disabled={avatarBusy}>{t.avatarRemove}</Btn> : null}
           <span className="caption">{t.avatarUploadHint}</span>
         </div>
+        {progress !== null ? (
+          <div className="avatar-progress" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}>
+            <i style={{ width: `${progress}%` }} />
+            <span>{progress}%</span>
+          </div>
+        ) : null}
         {avatarError ? <p className="caption" style={{ color: 'var(--danger, #c33)' }}>{avatarError}</p> : null}
       </Card>
 

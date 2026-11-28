@@ -256,6 +256,33 @@ async function requestInner<T>(path: string, method = 'GET', body?: unknown, ret
 export const getAvatarPreset = () => { try { return localStorage.getItem('cc.avatar'); } catch { return null; } };
 export const setAvatarPreset = (preset: string) => { try { localStorage.setItem('cc.avatar', preset); } catch { /* ignore */ } };
 
+/** Upload with real progress, because a 200 KB body over mobile data is not instant. */
+export function avatarUploadWithProgress(data: string, onProgress: (pct: number) => void): Promise<{ avatar: AvatarInfo }> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', BASE + '/me/avatar');
+    xhr.setRequestHeader('content-type', 'application/json');
+    xhr.setRequestHeader('accept', 'application/json');
+    const token = getToken();
+    if (token) xhr.setRequestHeader('authorization', 'Bearer ' + token);
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable && event.total > 0) onProgress(Math.min(99, Math.round((event.loaded / event.total) * 100)));
+    };
+    xhr.onerror = () => reject(new Error('network'));
+    xhr.onload = () => {
+      let body: any = null;
+      try { body = JSON.parse(xhr.responseText); } catch { /* ignore */ }
+      if (xhr.status >= 200 && xhr.status < 300 && body && body.avatar) {
+        onProgress(100);
+        resolve(body as { avatar: AvatarInfo });
+        return;
+      }
+      reject(new Error((body && body.message) || 'upload'));
+    };
+    xhr.send(JSON.stringify({ data }));
+  });
+}
+
 export const api = {
   guest: (name: string) => request<{ token: string; guest: { id: string; name: string } }>('/guest', 'POST', { name }),
   guestMe: () => request<{ guest: { id: string; name: string } }>('/guest/me'),
