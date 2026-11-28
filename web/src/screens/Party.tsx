@@ -113,7 +113,7 @@ export default function PartyScreen({
                 {me?.ready ? t.notReady : t.ready}
               </Btn>
               <Btn variant="ghost" onClick={onLeave}>{t.leave}</Btn>
-              {activeParty.is_host && <Btn variant="ghost" onClick={() => { if (window.confirm(t.deleteConfirm)) onLeave(); }}>{t.deleteParty}</Btn>}
+              {activeParty.is_host && <Btn variant="ghost" onClick={() => { if (window.confirm(t.deleteConfirm)) { onLeaveGroup(activeParty.code); onLeave(); } }}>{t.deleteParty}</Btn>}
               {activeParty.is_host && !(activeParty.tournament && activeParty.tournament.status === 'active') && (
                 <Btn disabled={!canStart || busy} onClick={() => onStart(picked, picked === 'bracket' ? { teams: buildTeams(bSetup, activeParty.members.map((x) => x.name)) } : picked === 'wheel' ? { entries: wheelText.split('\n').map((x) => x.trim()).filter(Boolean).slice(0, 24), eliminate: wheelMode === 'remove' } : undefined)}>
                   {t.startGame}
