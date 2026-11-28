@@ -34,21 +34,21 @@ class LobbyController extends Controller
     ];
 
     private const PROMPTS_AR = [
-        'categories' => ['أشياء تجدها على الشاطئ', 'فواكه وخضروات', 'شخصيات أفلام', 'بلدان ومدن', 'أشياء لونها أحمر', 'رياضات وهوايات'],
-        'whoami' => ['كوالا نائمة', 'الهبوط على القمر', 'طاهٍ مشهور', 'أفعوانية', 'محقق', 'آخر قطعة بيتزا'],
-        'trivia' => ['ما الكوكب الذي يملك أكبر عدد من الأقمار؟', 'ما أكبر صحراء على الأرض؟', 'كم قلباً للأخطبوط؟', 'ما أصغر عدد أولي؟', 'أي بلد اخترع الورق؟'],
-        'charades' => ['تنظيف أسنانك', 'قطة رأت خياراً', 'الفوز بميدالية أولمبية', 'مصعد بطيء جداً', 'تحضير الشطيرة المثالية'],
-        'wyr' => ['استكشاف الفضاء أم أعماق المحيط؟', 'الغناء دائماً أم الرقص في كل مكان؟', 'العيش بلا موسيقى أم بلا أفلام؟', 'زر لإعادة الوقت أم لإيقافه؟'],
-        'likely' => ['من الأكثر احتمالاً أن يصبح طاهياً مشهوراً؟', 'من سيصمد أكثر في جزيرة مهجورة؟', 'من سيضحك في وقت غير مناسب؟', 'من سينظم أفضل حفلة مفاجأة؟'],
-        'yesno' => ['اسأل الحظ ليقرر!'], 'dice' => ['ارمِ النرد'], 'coin' => ['اقلب العملة'],
-        'bracket' => ['من سيحمل التاج؟'], 'draw' => ['ارسم وخمّن!'], 'wheel' => ['من سيختاره الحظ؟'], 'number' => ['اختر رقماً من 1 إلى 100'],
+        'categories' => ['حاجات تلاقيها على البحر', 'فاكهة وخضار', 'شخصيات أفلام', 'بلاد ومدن', 'حاجات لونها أحمر', 'رياضات وهوايات'],
+        'whoami' => ['كوالا نايمة', 'النزول على القمر', 'شيف مشهور', 'ملاهي القطر السريع', 'محقق', 'آخر حتة بيتزا'],
+        'trivia' => ['إيه الكوكب اللي عنده أكتر عدد أقمار؟', 'إيه أكبر صحرا في العالم؟', 'الأخطبوط عنده كام قلب؟', 'إيه أصغر رقم أولي؟', 'مين أول بلد اخترعت الورق؟'],
+        'charades' => ['بتغسل سنانك', 'قطة شافت خيارة', 'بتكسب ميدالية في الأولمبياد', 'أسانسير بطيء أوي', 'بتعمل أحلى ساندوتش'],
+        'wyr' => ['تستكشف الفضا ولا أعماق المحيط؟', 'تغني على طول ولا ترقص في كل حتة؟', 'تعيش من غير موسيقى ولا من غير أفلام؟', 'زرار يرجّع الوقت ولا يوقّفه؟'],
+        'likely' => ['مين الأكتر احتمال يبقى شيف مشهور؟', 'مين هيستحمل أكتر على جزيرة مهجورة؟', 'مين هيضحك في وقت مش مناسب؟', 'مين هينظم أحلى حفلة مفاجأة؟'],
+        'yesno' => ['اسأل الحظ يقرر!'], 'dice' => ['ارمي النرد'], 'coin' => ['اقلب العملة'],
+        'bracket' => ['مين هيلبس التاج؟'], 'draw' => ['ارسم وخمّن!'], 'wheel' => ['مين الحظ هيختاره؟'], 'number' => ['اختار رقم من ١ لـ ١٠٠'],
         'wordle' => ['خمّن الكلمة'],
     ];
 
     private const ANSWERS_AR = [
-        'trivia' => ['زحل', 'القارة القطبية الجنوبية', 'ثلاثة', 'اثنان', 'الصين'],
-        'whoami' => ['كوالا نائمة', 'الهبوط على القمر', 'طاهٍ مشهور', 'أفعوانية', 'محقق', 'آخر قطعة بيتزا'],
-        'charades' => ['تنظيف أسنانك', 'قطة رأت خياراً', 'الفوز بميدالية أولمبية', 'مصعد بطيء جداً', 'تحضير الشطيرة المثالية'],
+        'trivia' => ['زحل', 'القارة القطبية الجنوبية', 'تلاتة', 'اتنين', 'الصين'],
+        'whoami' => ['كوالا نايمة', 'النزول على القمر', 'شيف مشهور', 'ملاهي القطر السريع', 'محقق', 'آخر حتة بيتزا'],
+        'charades' => ['بتغسل سنانك', 'قطة شافت خيارة', 'بتكسب ميدالية في الأولمبياد', 'أسانسير بطيء أوي', 'بتعمل أحلى ساندوتش'],
     ];
 
 
@@ -284,8 +284,8 @@ class LobbyController extends Controller
                 if ((int) $round->turn_player_id !== (int) $player->id) throw new HttpException(403, 'It is not your turn.');
                 $outcome = match ($round->game) {
                     'dice' => $this->rollDice((int) ($data['count'] ?? 2)),
-                    'coin' => ['result' => $round->locale === 'ar' ? (random_int(0, 1) ? 'وجه' : 'كتابة') : (random_int(0, 1) ? 'Heads' : 'Tails')],
-                    'yesno' => ['result' => $round->locale === 'ar' ? ['بالتأكيد نعم!', 'ليس هذه المرة.', 'الحظ يقول نعم.', 'اسأل لاحقاً.', 'لا بكل تأكيد.', 'الأمر محتمل.'][random_int(0, 5)] : ['Absolutely yes!', 'Not this time.', 'The odds say yes.', 'Ask again later.', 'A confident no.', 'It could go either way.'][random_int(0, 5)]],
+                    'coin' => ['result' => $round->locale === 'ar' ? (random_int(0, 1) ? 'صورة' : 'كتابة') : (random_int(0, 1) ? 'Heads' : 'Tails')],
+                    'yesno' => ['result' => $round->locale === 'ar' ? ['أكيد آه!', 'لأ المرة دي.', 'الحظ بيقول آه.', 'اسأل تاني بعدين.', 'لأ طبعاً.', 'ممكن آه وممكن لأ.'][random_int(0, 5)] : ['Absolutely yes!', 'Not this time.', 'The odds say yes.', 'Ask again later.', 'A confident no.', 'It could go either way.'][random_int(0, 5)]],
                     'number' => ['result' => (string) random_int(1, (int) ($data['max'] ?? 100))],
                     'wheel' => $this->spinWheel($party->id, $members),
                 };
@@ -650,8 +650,8 @@ class LobbyController extends Controller
         $roundScores = $round ? DB::table('party_round_scores')->where('round_id', $round->id)->pluck('player_id')->map(fn ($id) => (string) $id)->all() : [];
         $outcome = $round?->outcome ? json_decode($round->outcome, true) : null;
         $displayPrompt = $round?->prompt;
-        if ($round?->game === 'whoami') $displayPrompt = $round->locale === 'ar' ? 'من أنا؟' : 'Who am I?';
-        if ($round?->game === 'charades') $displayPrompt = $round->locale === 'ar' ? 'مثّلها!' : 'Act it out!';
+        if ($round?->game === 'whoami') $displayPrompt = $round->locale === 'ar' ? 'أنا مين؟' : 'Who am I?';
+        if ($round?->game === 'charades') $displayPrompt = $round->locale === 'ar' ? 'مثّلها من غير كلام!' : 'Act it out!';
         $privateClue = null;
         if ($round?->game === 'charades' && (int) $round->turn_player_id === (int) $myPlayer->id) $privateClue = $round->answer;
         if ($round?->game === 'whoami' && (int) $round->turn_player_id !== (int) $myPlayer->id) $privateClue = $round->answer;
@@ -828,7 +828,7 @@ class LobbyController extends Controller
         $bank = \App\Support\Content::bank($game, $locale);
         if ($game === 'wyr' && $bank !== null) {
             // The file holds "A|B"; the round shows "A or B?" and keeps the two sides for the buttons.
-            $joiner = ['en' => ' or ', 'ar' => ' أم ', 'de' => ' oder '][$locale] ?? ' or ';
+            $joiner = ['en' => ' or ', 'ar' => ' ولا ', 'de' => ' oder '][$locale] ?? ' or ';
             $mark = $locale === 'ar' ? '؟' : '?';
             $bank = array_map(fn ($row) => [rtrim($row[0], '?؟').$joiner.rtrim($row[1][0] ?? '', '?؟').$mark, [$row[0], $row[1][0] ?? '']], $bank);
             $used = array_flip(DB::table('party_rounds')->where('party_id', $partyId)->where('game', 'wyr')->pluck('prompt')->all());

@@ -191,7 +191,7 @@ export default function PartyScreen({
             <h3 className="h3">{t.hostControls}</h3>
             <p className="caption">
               {locale === 'ar'
-                ? 'المضيف يختار اللعبة ويبدأ الجولات. الجميع يحتاج للضغط على "أنا جاهز".'
+                ? 'المضيف بيختار اللعبة ويبدأ الجولات. وكله لازم يدوس "أنا جاهز".'
                 : 'The host picks the game and starts rounds. Everyone needs to hit ready.'}
             </p>
           </Card>

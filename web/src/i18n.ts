@@ -1,3 +1,4 @@
+import { arEgypt } from './i18n.eg';
 export type Locale = 'en' | 'ar' | 'de';
 
 /** The four answers every game page gives: what it is, how a round goes, how you win, how you lose. */
@@ -1053,13 +1054,13 @@ const arEG: Partial<Strings> = {
 
 export const arDialects: Record<ArDialect, { label: string; strings: Partial<Strings> }> = {
   eg: { label: 'مصري', strings: arEG },
-  msa: { label: 'فصحى', strings: {} },
+  msa: { label: 'مصري', strings: {} },
 };
 export const DEFAULT_AR_DIALECT: ArDialect = 'eg';
 
 export function getStrings(locale: Locale, dialect: ArDialect = DEFAULT_AR_DIALECT): Strings {
   if (locale !== 'ar') return strings[locale];
-  const d = arDialects[dialect] ?? arDialects[DEFAULT_AR_DIALECT];
-  return { ...ar, ...d.strings } as Strings;
+  // Arabic is Egyptian only: the base `ar` block is a fallback, the layers below win.
+  return { ...ar, ...arEG, ...arEgypt, gameNames: { ...ar.gameNames, ...(arEG.gameNames as object), whoami: 'أنا مين؟', likely: 'مين الأكتر احتمال' } } as Strings;
 }
 

@@ -39,12 +39,6 @@ export default function Settings({ t, locale, setLocale, dialect, setDialect, th
       <Card pad="lg" className="stack gap-12">
         <h3 className="h3">{t.language}</h3>
         <Seg value={locale} options={[{ value: 'en' as Locale, label: 'English' }, { value: 'ar' as Locale, label: 'العربية' }, { value: 'de' as Locale, label: 'Deutsch' }]} onChange={setLocale} />
-        {locale === 'ar' && (
-          <>
-            <p className="caption">{t.arabicStyle}</p>
-            <Seg value={dialect} options={[{ value: 'eg' as ArDialect, label: t.dialectEg }, { value: 'msa' as ArDialect, label: t.dialectMsa }]} onChange={setDialect} />
-          </>
-        )}
       </Card>
       <Card pad="lg" className="stack gap-12">
         <h3 className="h3">{t.theme}</h3>
