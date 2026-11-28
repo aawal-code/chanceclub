@@ -206,14 +206,13 @@ Welche Frucht trägt ihre Samen außen?|Erdbeere
 Wie nennt man gefrorenes Wasser?|Eis
 Welches Geräusch macht eine Katze?|Miau
 Wie nennt man jemanden, der Sterne erforscht?|Astronom
-Was ist das chemische Symbol für Gold?|Au
 Was ist das chemische Symbol für Natrium?|Na
 Was ist das chemische Symbol für Eisen?|Fe
 Welches Gas macht den größten Teil der Erdatmosphäre aus?|Stickstoff
-Welche Kraft hält uns auf dem Boden?|Schwerkraft;Gravitation
 Wie viele Kammern hat das menschliche Herz?|4;vier
 Was ist das größte Organ des menschlichen Körpers?|Haut
 Welche Blutgruppe ist der Universalspender?|0 negativ;Null negativ
+Wie viele Zähne hat ein Erwachsener normalerweise?|32;zweiunddreißig
 Welcher Teil der Pflanze stellt mit Sonnenlicht Nahrung her?|Blatt;Blätter
 Wie nennt man den Vorgang, mit dem Pflanzen Licht in Energie umwandeln?|Photosynthese
 Wie heißt der nächste Stern zur Erde?|Die Sonne;Sonne
@@ -234,8 +233,9 @@ Wer malte die Decke der Sixtinischen Kapelle?|Michelangelo
 Wer komponierte die „Mondscheinsonate“?|Beethoven;Ludwig van Beethoven
 Welches antike Weltwunder steht noch bei Kairo?|Cheops-Pyramide;Große Pyramide;Pyramiden
 Welcher Fluss ist nach gängiger Messung der längste der Welt?|Nil;Der Nil
+Welcher ist der längste Fluss Südamerikas?|Amazonas;Der Amazonas
+Wie heißt der höchste Berg der Welt?|Mount Everest;Everest
 Wie heißt der höchste Berg Afrikas?|Kilimandscharo
-Wie heißt der höchste Berg Ägyptens?|Katharinenberg;Gebel Katherina
 Auf welchem Berg soll Moses die Zehn Gebote empfangen haben?|Berg Sinai;Sinai
 Wie heißt der größte See Afrikas?|Victoriasee;Viktoriasee
 Welcher See ist der größte in Ägypten?|Nasser-See;Nassersee
@@ -247,10 +247,12 @@ Was ist der Regierungssitz Südafrikas?|Pretoria
 Was ist die Hauptstadt von Mexiko?|Mexiko-Stadt;Mexico City
 Was ist die Hauptstadt von Südkorea?|Seoul
 Was ist die Hauptstadt von Portugal?|Lissabon
+Was ist die Hauptstadt der Niederlande?|Amsterdam
 Was ist die Hauptstadt von Schweden?|Stockholm
 Was ist die Hauptstadt der Vereinigten Arabischen Emirate?|Abu Dhabi
 Was ist die Hauptstadt von Libyen?|Tripolis
 Welches Land hat die meisten Einwohner?|Indien
+Welches ist das kleinste Land der Welt?|Vatikanstadt;Vatikan
 Welcher ist der größte Kontinent?|Asien
 Welcher ist der kleinste Kontinent?|Australien;Ozeanien
 Welcher Ozean ist der kleinste?|Arktischer Ozean;Nordpolarmeer
@@ -259,6 +261,7 @@ Welches Land hat die Form eines Stiefels?|Italien
 Welches Land hat ein Ahornblatt in der Flagge?|Kanada
 Welches Land ist berühmt für Tulpen und Windmühlen?|Niederlande;Holland
 In welchem Land leben Kängurus?|Australien
+In welcher Stadt steht das Kolosseum?|Rom
 In welcher Stadt steht der Eiffelturm?|Paris
 In welcher Stadt steht Big Ben?|London
 In welcher Stadt steht das Brandenburger Tor?|Berlin
@@ -299,7 +302,7 @@ Welches Land erfand den Fußball, wie wir ihn kennen?|England
 Wie lang ist ein Marathon in Kilometern (ungefähr)?|42;42 km;42,195
 Wie viele Spieler hat ein Volleyballteam auf dem Feld?|6;sechs
 Wie viele Punkte ist ein Touchdown im American Football wert?|6;sechs
-Welches Land war 2022 Gastgeber der Fußball-WM?|Katar
+Wie viele Minuten dauert ein Fußballspiel ohne Nachspielzeit?|90;neunzig
 Welches Land hat die meisten Männer-Weltmeisterschaften gewonnen?|Brasilien
 Welcher ägyptische Klub trägt den Beinamen „Rote Burg“?|Al Ahly;Ahly
 Welcher ägyptische Klub trägt den Beinamen „Weiße Burg“?|Zamalek
@@ -328,6 +331,7 @@ Wofür steht „www“?|World Wide Web
 Wofür steht das „U“ in USB?|Universal
 Wofür steht das „G“ in GPS?|Global
 Welches soziale Netzwerk wurde durch einen blauen Vogel symbolisiert und heißt jetzt X?|Twitter
+Welche Sprache hat die meisten Muttersprachler?|Mandarin;Chinesisch
 Welche dieser Sprachen wird von rechts nach links geschrieben?|Arabisch
 Was ist die Währung Ägyptens?|Ägyptisches Pfund;Pfund
 Was ist die Währung des Vereinigten Königreichs?|Pfund Sterling;Pfund
@@ -350,9 +354,11 @@ Wie viele Gramm hat ein Kilogramm?|1000;1.000
 Wie viele Monate hat ein Jahr?|12;zwölf
 Welcher Monat hat 28 oder 29 Tage?|Februar
 Welcher ist der neunte Monat des Jahres?|September
+Welche Farbe hat eine reife Banane?|Gelb
 Welche Farbe hat der Himmel an einem klaren Tag?|Blau
 Was erhält man, wenn man Rot und Weiß mischt?|Rosa
 Was erhält man, wenn man Rot und Blau mischt?|Lila;Violett
+Was ist die Hauptzutat von Hummus?|Kichererbsen
 Was ist die Hauptzutat von Guacamole?|Avocado
 Was ist die Hauptzutat von Tahini?|Sesam
 Aus welcher Nuss wird Marzipan gemacht?|Mandel;Mandeln
@@ -361,6 +367,7 @@ Welches Gewürz stammt aus der Krokusblüte und ist sehr teuer?|Safran
 Welches ägyptische Dessert besteht aus Teigfäden mit Nüssen in Sirup?|Kunafa;Konafa
 Welches ägyptische Getränk wird aus Hibiskusblüten gemacht?|Karkade;Hibiskustee
 Welches ägyptische Nationalgericht wird oft aus Saubohnen gemacht?|Ful medames;Ful
+Aus welchem Land stammt Sushi?|Japan
 Aus welchem Land stammt Pizza?|Italien
 Aus welchem Land stammt Paella?|Spanien
 Mit welchem Land wird das Croissant berühmterweise verbunden?|Frankreich
@@ -373,4 +380,5 @@ Welches Tier ist bekannt dafür, die Farbe zu wechseln?|Chamäleon
 Welches Tier trägt sein Junges im Beutel?|Känguru
 Was fressen Pandas hauptsächlich?|Bambus
 Welches Insekt produziert Seide?|Seidenraupe;Seidenspinner
+Welches Meerestier hat acht Arme?|Oktopus;Krake
 Welcher Fisch ist der größte der Welt?|Walhai
