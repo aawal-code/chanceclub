@@ -201,7 +201,7 @@ export default function DrawGame({ t, locale, party, onLeave, onBack }: {
       </div>
       <div className="row gap-8 center">
         <span className="dr-pill" data-state={conn}>
-          <i />{conn === 'open' ? `${t.drLive}${ping !== null ? ` · ${ping} ms` : ''}` : conn === 'error' ? t.error : '…'}
+          <i />{conn === 'open' ? <>{t.drLive}{ping !== null ? <> · <bdi dir="ltr">{ping} ms</bdi></> : null}</> : conn === 'error' ? t.error : '…'}
         </span>
         <Btn variant="ghost" size="sm" onClick={onLeave}>{t.leave}</Btn>
       </div>
@@ -313,7 +313,7 @@ export default function DrawGame({ t, locale, party, onLeave, onBack }: {
                 {st.turnPoints && st.turnPoints.every((x) => x.pts === 0) ? <p className="caption">{t.drNoOne}</p> : (
                   <div className="dr-pts">
                     {(st.turnPoints || []).filter((x) => x.pts > 0).sort((a, b) => b.pts - a.pts).slice(0, 6).map((x) => (
-                      <span key={x.id}>{names.get(x.id)} <b>+{x.pts}</b></span>
+                      <span key={x.id}>{names.get(x.id)} <b dir="ltr">+{x.pts}</b></span>
                     ))}
                   </div>
                 )}
@@ -344,7 +344,7 @@ export default function DrawGame({ t, locale, party, onLeave, onBack }: {
           <div className="dr-feed" ref={feedRef}>
             {msgs.map((m) => {
               const who = m.from ? names.get(m.from) || '' : '';
-              if (m.kind === 'correct') return <p key={m.k} className="dr-m good">{m.from === st.me ? t.drYouGuessed : `${who} ${t.drGuessed}`} <b>+{m.pts}</b></p>;
+              if (m.kind === 'correct') return <p key={m.k} className="dr-m good">{m.from === st.me ? t.drYouGuessed : `${who} ${t.drGuessed}`} <b dir="ltr">+{m.pts}</b></p>;
               if (m.kind === 'close') return <p key={m.k} className="dr-m warn">{t.drClose}</p>;
               if (m.kind === 'sys') return <p key={m.k} className="dr-m sys">{sysText(m.text)}</p>;
               return <p key={m.k} className="dr-m" data-priv={m.priv ? 'true' : undefined} dir="auto"><b>{who}</b> {m.text}</p>;
