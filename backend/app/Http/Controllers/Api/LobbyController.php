@@ -203,9 +203,7 @@ class LobbyController extends Controller
             $promptBank = $locale === 'ar' ? self::PROMPTS_AR : self::PROMPTS;
             $answerBank = $locale === 'ar' ? self::ANSWERS_AR : self::ANSWERS;
             if ($locale === 'de') { $promptBank = self::PROMPTS_DE; $answerBank = self::ANSWERS_DE; }
-            $promptIndex = random_int(0, count($promptBank[$game]) - 1);
-            $prompt = $promptBank[$game][$promptIndex];
-            $answer = isset($answerBank[$game]) ? $answerBank[$game][$promptIndex] : null;
+            [$prompt, $answer] = $this->pickPrompt((int) $locked->id, $game, $locale, $promptBank, $answerBank);
             if ($game === 'wordle') $answer = Wordle::pick();
             $turn = $players->first(fn ($player) => (int) $player->id === (int) $locked->host_player_id) ?? $players->first();
             $wheelState = null;
@@ -323,7 +321,7 @@ class LobbyController extends Controller
                     if ($round->game === 'trivia') {
                         foreach (DB::table('party_submissions')->where('round_id', $round->id)->get() as $submission) {
                             $submittedValue = json_decode($submission->payload, true)['value'] ?? '';
-                            if ($this->normalized($submittedValue) === $this->normalized((string) $round->answer)) DB::table('party_players')->where('id', $submission->player_id)->increment('score');
+                            if (\App\Support\Content::matches((string) $submittedValue, (string) $round->answer, \App\Support\Content::aliases('trivia', (string) $round->locale, (string) $round->prompt))) DB::table('party_players')->where('id', $submission->player_id)->increment('score');
                         }
                         $outcome = ['answer' => $round->answer];
                     } else {
@@ -353,14 +351,14 @@ class LobbyController extends Controller
             $promptBank = $locale === 'ar' ? self::PROMPTS_AR : self::PROMPTS;
             $answerBank = $locale === 'ar' ? self::ANSWERS_AR : self::ANSWERS;
             if ($locale === 'de') { $promptBank = self::PROMPTS_DE; $answerBank = self::ANSWERS_DE; }
-            $index = random_int(0, count($promptBank[$game]) - 1);
+            [$nextPrompt, $nextAnswer] = $this->pickPrompt((int) $locked->id, $game, $locale, $promptBank, $answerBank);
             $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
             $previousTurnIndex = $players->search(fn ($person) => (int) $person->id === (int) ($previousRound?->turn_player_id ?? 0));
             $turn = $players->get($previousTurnIndex === false ? 0 : (($previousTurnIndex + 1) % $players->count()));
             if (!$previousRound?->turn_player_id) $turn = $players->first(fn ($person) => (int) $person->id === (int) $locked->host_player_id) ?? $players->first();
             DB::table('party_rounds')->insert([
                 'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
-                'prompt' => $promptBank[$game][$index], 'answer' => $game === 'wordle' ? Wordle::pick() : ($answerBank[$game][$index] ?? null),
+                'prompt' => $nextPrompt, 'answer' => $game === 'wordle' ? Wordle::pick() : $nextAnswer,
                 'status' => 'active', 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
             DB::table('parties')->where('id', $locked->id)->update(['round_number' => $number, 'updated_at' => now()]);
@@ -648,6 +646,22 @@ class LobbyController extends Controller
     {
         $faces = array_map(fn () => random_int(1, 6), range(1, $count));
         return ['faces' => $faces, 'result' => array_sum($faces)];
+    }
+
+    /** Pick a prompt without repeating inside this party until the bank is exhausted. */
+    private function pickPrompt(int $partyId, string $game, string $locale, array $promptBank, array $answerBank): array
+    {
+        $bank = \App\Support\Content::bank($game, $locale);
+        if ($bank === null) {
+            $list = $promptBank[$game] ?? [''];
+            $i = random_int(0, count($list) - 1);
+            return [$list[$i], isset($answerBank[$game]) ? $answerBank[$game][$i] : null];
+        }
+        $used = array_flip(DB::table('party_rounds')->where('party_id', $partyId)->where('game', $game)->pluck('prompt')->all());
+        $pool = array_values(array_filter($bank, fn ($row) => !isset($used[$row[0]])));
+        if (!$pool) $pool = $bank;
+        $row = $pool[random_int(0, count($pool) - 1)];
+        return [$row[0], $game === 'trivia' || $game === 'charades' || $game === 'whoami' ? ($row[1][0] ?? $row[0]) : null];
     }
 
     private function normalized(string $answer): string
