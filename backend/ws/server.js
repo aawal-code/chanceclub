@@ -108,6 +108,11 @@ function nextTurn(room) {
   const pool = bank.filter((w) => !room.used.has(w));
   const src = pool.length >= 3 ? pool : bank;
   const picks = new Set();
+  const tr = WORDS.tiers && WORDS.tiers[room.settings.locale in WORDS ? room.settings.locale : 'en'];
+  if (tr) for (const k of ['easy', 'medium', 'hard']) {
+    const p = tr[k].filter((w) => !room.used.has(w));
+    if (p.length) picks.add(p[rnd(p.length)]);
+  }
   while (picks.size < 3) picks.add(src[rnd(src.length)]);
   room.choices = [...picks];
   room.endsAt = now() + 15000;

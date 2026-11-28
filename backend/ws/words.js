@@ -22,3 +22,28 @@ Fußball,Pokal,Drache,Roboter,Gespenst,Pirat,Zauberer,König,Astronaut,Clown,Mee
 قبعة,حذاء,جورب,قميص,تاج,خاتم,عقد,سيف,درع,علم,بالون,هدية,كتاب,قلم,جيتار,بيانو,طبل,كمان,
 كرة قدم,كأس,تنين,روبوت,شبح,قرصان,ساحر,ملك,رائد فضاء,مهرج,حورية البحر,ندفة ثلج,قلب,جمجمة,عظمة,عين,يد,سن,أنف`.replace(/\n/g, '').split(','),
 };
+
+// Tiered banks: backend/content/draw.<locale>.txt ([medium] / [hard] sections). Legacy lists above count as easy.
+(function loadTiers() {
+  const fs = require('fs'), path = require('path');
+  const dirs = [process.env.CONTENT_DIR, '/var/www/html/content', path.join(__dirname, '..', 'content')].filter(Boolean);
+  const tiers = {};
+  for (const loc of Object.keys(module.exports)) {
+    const easy = module.exports[loc].slice();
+    const t = { easy, medium: [], hard: [] };
+    for (const d of dirs) {
+      const f = path.join(d, `draw.${loc}.txt`);
+      if (!fs.existsSync(f)) continue;
+      let cur = null;
+      for (const line of fs.readFileSync(f, 'utf8').split(/\r?\n/)) {
+        const m = line.match(/^\[(\w+)\]/);
+        if (m) { cur = t[m[1]] ? m[1] : null; continue; }
+        if (cur) for (const w of line.split(',')) { const x = w.trim(); if (x && !t.easy.includes(x) && !t.medium.includes(x) && !t.hard.includes(x)) t[cur].push(x); }
+      }
+      break;
+    }
+    tiers[loc] = t;
+    module.exports[loc] = [...t.easy, ...t.medium, ...t.hard];
+  }
+  Object.defineProperty(module.exports, 'tiers', { value: tiers, enumerable: false });
+})();
