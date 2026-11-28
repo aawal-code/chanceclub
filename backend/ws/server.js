@@ -147,6 +147,8 @@ function tick(room) {
     const gone = !d || !d.ws || d.ws.readyState !== 1;
     if (gone) { if (!room.drawerGoneAt) room.drawerGoneAt = t; else if (t - room.drawerGoneAt > 8000) { sys(room, 'drawer-left'); endTurn(room, 'left'); return; } } else room.drawerGoneAt = 0;
     if (t >= room.endsAt) { endTurn(room, 'time'); return; }
+    const guessers = [...room.players.values()].filter((q) => q.id !== room.drawer && q.ws && q.ws.readyState === 1);
+    if (room.guessed.size > 0 && guessers.length && guessers.every((q) => room.guessed.has(q.id))) { endTurn(room, 'all'); return; }
     if (t >= room.nextHintAt) {
       const chars = [...room.word];
       const hidden = chars.map((c, i) => i).filter((i) => chars[i] !== ' ' && chars[i] !== '-' && !room.revealed.has(i));
@@ -180,8 +182,9 @@ function handleGuess(room, p, text) {
   const raw = String(text || '').slice(0, 80).trim();
   if (!raw) return;
   if (room.phase !== 'drawing') { toAll(room, { t: 'chat', kind: 'msg', from: p.id, text: raw }); return; }
-  const target = norm(room.word);
-  const g = norm(raw);
+  const noAl = (x) => x.split(' ').map((w) => (w.length > 3 && w.startsWith('ال') ? w.slice(2) : w)).join(' ');
+  const target = noAl(norm(room.word));
+  const g = noAl(norm(raw));
   if (p.id === room.drawer) {
     if (g && (g === target || g.includes(target) || (target.length > 3 && target.includes(g) && g.length > 3))) { send(p, { t: 'chat', kind: 'sys', text: 'no-spoil' }); return; }
     toAll(room, { t: 'chat', kind: 'msg', from: p.id, text: raw }); return;
