@@ -30,6 +30,8 @@ export type Round = {
   prompt: string;
   options?: string[] | null;
   status: 'active' | 'complete';
+  ends_at?: number | null;
+  server_now?: number;
   turn_player_id: string | null;
   private_clue: string | null;
   result: any;

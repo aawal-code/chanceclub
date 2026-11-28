@@ -10,6 +10,7 @@ const ImposterGame = React.lazy(() => import('../games/Imposter'));
 const WordBombGame = React.lazy(() => import('../games/WordBomb'));
 const TruthsGame = React.lazy(() => import('../games/Truths'));
 import type { Act } from '../games/kit';
+import { Clock, useServerOffset } from '../games/kit';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 import { Avatar } from '../components/Avatar';
 import { NextBar, PlayersStrip, RequestsBar } from '../components/PartyFlow';
@@ -134,6 +135,7 @@ function GameInner({
               <BracketView t={t} bracket={party.bracket} onPick={party.is_host ? (r, m, side) => onAct({ type: 'pick', value: `${r}:${m}:${side}` }) : undefined} />
             )}
             {game === 'trivia' && <TriviaRound t={t} round={round} onAct={onAct} />}
+            {['wyr', 'likely', 'neverhave'].includes(game) && round.status === 'active' && round.ends_at ? <QuickClock round={round} total={game === 'neverhave' ? 25 : 30} /> : null}
             {game === 'neverhave' && <NeverRound t={t} round={round} party={party} onAct={onAct} />}
             {VOTE_GAMES.includes(game) && <VoteRound t={t} round={round} game={game} onAct={onAct} />}
             {AWARD_GAMES.includes(game) && (
@@ -244,6 +246,11 @@ function TriviaRound({ t, round, onAct }: { t: Strings; round: Round; onAct: (bo
       <p className="caption">{round.submission_count}/{round.submission_status.length} {t.submitted.toLowerCase()}</p>
     </div>
   );
+}
+
+function QuickClock({ round, total }: { round: Round; total: number }) {
+  const offset = useServerOffset(round.server_now || 0);
+  return <Clock endsAt={round.ends_at || 0} total={total} offset={offset} />;
 }
 
 /* ---------------- never have I ever ---------------- */

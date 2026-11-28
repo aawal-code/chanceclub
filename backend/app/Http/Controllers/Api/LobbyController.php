@@ -694,6 +694,8 @@ class LobbyController extends Controller
             'game' => $round->game,
             'prompt' => $displayPrompt,
             'options' => (in_array($round->game, ['wyr', 'neverhave'], true) && $round->answer && str_contains((string) $round->answer, '|')) ? explode('|', (string) $round->answer, 2) : null,
+            'ends_at' => $round->status === 'active' ? $this->voteEndsAt($round) : null,
+            'server_now' => \App\Support\PartyGames::ms(),
             'status' => $round->status,
             'turn_player_id' => $round->turn_player_id ? (string) $round->turn_player_id : null,
             'private_clue' => $privateClue,
@@ -881,10 +883,11 @@ class LobbyController extends Controller
     {
         if ($round->status !== 'active' || !in_array($round->game, ['trivia', 'wyr', 'likely', 'neverhave'], true)) return false;
         $subs = DB::table('party_submissions')->where('round_id', $round->id)->get();
-        if ($subs->isEmpty()) return false;
+        $timedOut = $this->voteEndsAt($round) !== null && \App\Support\PartyGames::ms() >= $this->voteEndsAt($round);
+        if ($subs->isEmpty() && !$timedOut) return false;
         $done = $subs->pluck('player_id')->map(fn ($id) => (int) $id)->all();
         $waiting = $members->filter(fn ($person) => !in_array((int) $person->id, $done, true) && $person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 25);
-        if ($waiting->isNotEmpty()) return false;
+        if ($waiting->isNotEmpty() && !$timedOut) return false;
         if ($round->game === 'trivia') {
             foreach ($subs as $submission) {
                 $given = json_decode($submission->payload, true)['value'] ?? '';
@@ -900,6 +903,16 @@ class LobbyController extends Controller
         }
         DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
         return true;
+    }
+
+    /** Quick-answer rounds close on their own: whoever has not answered by then sits that round out. */
+    private const VOTE_SECONDS = ['wyr' => 30, 'likely' => 30, 'neverhave' => 25];
+
+    private function voteEndsAt(object $round): ?int
+    {
+        $seconds = self::VOTE_SECONDS[$round->game] ?? null;
+        if ($seconds === null || !$round->created_at) return null;
+        return (int) (\Illuminate\Support\Carbon::parse($round->created_at)->getTimestamp() * 1000) + $seconds * 1000;
     }
 
     private function normalized(string $answer): string
