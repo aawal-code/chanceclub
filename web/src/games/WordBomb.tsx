@@ -136,7 +136,7 @@ export default function WordBomb({ t, locale, party, onAct, onAdvance, onFinish,
                 <div key={member.id} className="row gap-10 center">
                   <Avatar avatar={member.avatar} name={member.name} size={24} />
                   <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{member.name}{member.id === party.self_player_id ? ` · ${t.you}` : ''}</span>
-                  <span className="mono" style={{ fontWeight: 800, color: points > 0 ? 'var(--hit)' : 'var(--muted)' }}>+{points}</span>
+                  <span className="mono" style={{ fontWeight: 800, color: points > 0 ? 'var(--hit)' : 'var(--muted)' }}><bdi dir="ltr">+{points}</bdi></span>
                 </div>
               );
             })}

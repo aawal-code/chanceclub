@@ -193,7 +193,7 @@ export default function Truths({ t, locale, party, onAct, onAdvance, onFinish, o
           <div className="row gap-8 wrap" style={{ marginTop: 10 }}>
             {gs.reveal.correct.map((id) => <span key={id} className="gk-used-word">{names.get(id) || '—'} +1</span>)}
             {gs.reveal.fooled.map((id) => <span key={id} className="gk-used-word" data-fooled="true">{names.get(id) || '—'}</span>)}
-            {gs.reveal.points[gs.reveal.subject] ? <span className="gk-used-word">{subjectNameOf(gs.reveal.subject, names)} +{gs.reveal.points[gs.reveal.subject]}</span> : null}
+            {gs.reveal.points[gs.reveal.subject] ? <span className="gk-used-word">{subjectNameOf(gs.reveal.subject, names)} <bdi dir="ltr">+{gs.reveal.points[gs.reveal.subject]}</bdi></span> : null}
           </div>
         </Reveal>
       )}
