@@ -6,8 +6,9 @@ import React, { useState } from 'react';
 import { api, type Party } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Btn, Card, useToast } from '../components/ui';
+import { TOURNAMENT_POOL } from '../games/meta';
 
-const POOL = ['trivia', 'wordle', 'draw', 'categories', 'whoami', 'charades'];
+const POOL = TOURNAMENT_POOL;
 
 export default function TournamentCard({ t, locale, party, onParty }: { t: Strings; locale: Locale; party: Party; onParty: (p: Party, started?: boolean) => void }) {
   const toast = useToast();

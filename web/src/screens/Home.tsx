@@ -96,7 +96,7 @@ export default function Home({
               <span className="badge">{t.solo}</span>
               <span className="glyph"><Glyph name={game.id} /></span>
               <span className="name">{t.gameNames[game.id]}</span>
-              <span className="cat">{t.gameCats[game.id]}</span>
+              <span className="desc">{t.gameDesc[game.id]}</span>
             </button>
           ))}
         </div>
@@ -116,7 +116,7 @@ export default function Home({
               <span className="badge">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
               <span className="glyph"><Glyph name={game.id} /></span>
               <span className="name">{t.gameNames[game.id]}</span>
-              <span className="cat">{t.gameCats[game.id]}</span>
+              <span className="desc">{t.gameDesc[game.id]}</span>
             </button>
           ))}
         </div>

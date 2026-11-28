@@ -34,7 +34,7 @@ export default function SoloBracket({ t, onBack }: { t: Strings; onBack: () => v
           <Btn onClick={generate}>{bracket ? t.bracketReshuffle : t.bracketGenerate}</Btn>
         </div>
       </Card>
-      <p className="caption center-text">{t.gameBlurbs.bracket}</p>
+      <p className="caption center-text">{t.gameDesc.bracket}</p>
     </div>
   );
 }

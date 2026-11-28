@@ -117,43 +117,71 @@ export function Glyph({ name, size = 22 }: GlyphProps) {
     case 'likely':
       return (
         <svg {...common}>
-          <path d="M12 3.8l2.4 5 5.5.8-4 3.9.95 5.5-4.85-2.6-4.85 2.6.95-5.5-4-3.9 5.5-.8z" />
+          <path d="M12 3.8l2.4 5 5.5.8-4 3.9.95 5.5-4.85-2.6-4.85 2.6.95-5.5-4-3.9 5.5-.8z" fill="currentColor" />
         </svg>
       );
     case 'categories':
       return (
         <svg {...common}>
-          <rect x="3.5" y="3.5" width="7" height="7" rx="2" />
-          <rect x="13.5" y="3.5" width="7" height="7" rx="2" />
-          <rect x="3.5" y="13.5" width="7" height="7" rx="2" />
-          <rect x="13.5" y="13.5" width="7" height="7" rx="2" opacity="0.5" />
+          <circle cx="5.5" cy="6.5" r="2" fill="currentColor" stroke="none" />
+          <circle cx="5.5" cy="12" r="2" fill="currentColor" stroke="none" />
+          <circle cx="5.5" cy="17.5" r="2" fill="currentColor" stroke="none" />
+          <path d="M10 6.5h10M10 12h8M10 17.5h10" />
         </svg>
       );
     case 'charades':
       return (
         <svg {...common}>
-          <circle cx="12" cy="7.5" r="3.2" />
-          <path d="M5 20c.6-3.6 3.4-5.6 7-5.6s6.4 2 7 5.6" />
+          <circle cx="12" cy="6.2" r="2.8" fill="currentColor" stroke="none" />
+          <path d="M12 10.5v5" />
+          <path d="M12 12.2L6.4 8.4M12 12.2l5.6-3.8" />
+          <path d="M12 15.5l-3 5M12 15.5l3 5" />
         </svg>
       );
     case 'whoami':
       return (
         <svg {...common}>
-          <path d="M2.8 12s3.4-6 9.2-6 9.2 6 9.2 6-3.4 6-9.2 6-9.2-6-9.2-6z" />
-          <circle cx="12" cy="12" r="2.6" />
+          <path d="M12 3.2a6.6 6.6 0 0 0-3.6 12.1v3.1c0 1 .8 1.8 1.8 1.8h3.6c1 0 1.8-.8 1.8-1.8v-3.1A6.6 6.6 0 0 0 12 3.2z" />
+          <path d="M10.4 8.9a1.7 1.7 0 1 1 2.3 1.6c-.5.2-.7.6-.7 1.1v.3" opacity="0.85" />
+          <circle cx="12" cy="13.8" r="0.75" fill="currentColor" stroke="none" />
         </svg>
       );
     case 'wordle':
       return (
         <svg {...common}>
-          <rect x="3.5" y="3.5" width="5" height="5" rx="1.4" />
+          <rect x="3.5" y="3.5" width="5" height="5" rx="1.4" fill="currentColor" stroke="none" />
           <rect x="9.5" y="3.5" width="5" height="5" rx="1.4" />
-          <rect x="15.5" y="3.5" width="5" height="5" rx="1.4" opacity="0.4" />
-          <rect x="3.5" y="9.5" width="5" height="5" rx="1.4" opacity="0.4" />
-          <rect x="9.5" y="9.5" width="5" height="5" rx="1.4" />
-          <rect x="15.5" y="9.5" width="5" height="5" rx="1.4" opacity="0.4" />
-          <rect x="3.5" y="15.5" width="5" height="5" rx="1.4" opacity="0.4" />
-          <rect x="9.5" y="15.5" width="5" height="5" rx="1.4" opacity="0.4" />
+          <rect x="15.5" y="3.5" width="5" height="5" rx="1.4" opacity="0.35" />
+          <rect x="3.5" y="9.5" width="5" height="5" rx="1.4" opacity="0.35" />
+          <rect x="9.5" y="9.5" width="5" height="5" rx="1.4" fill="currentColor" stroke="none" />
+          <rect x="15.5" y="9.5" width="5" height="5" rx="1.4" opacity="0.35" />
+          <rect x="3.5" y="15.5" width="5" height="5" rx="1.4" opacity="0.35" />
+          <rect x="9.5" y="15.5" width="5" height="5" rx="1.4" opacity="0.35" />
+          <rect x="15.5" y="15.5" width="5" height="5" rx="1.4" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case 'wordbomb':
+      return (
+        <svg {...common}>
+          <circle cx="9.8" cy="15" r="6.2" fill="currentColor" stroke="none" />
+          <path d="M14.2 10.4l3.4-3.4" strokeWidth="2.2" />
+          <path d="M19 4.2l.55 2.05 2.05.55-2.05.55L19 9.4l-.55-2.05L16.4 6.8l2.05-.55z" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case 'imposter':
+      return (
+        <svg {...common}>
+          <path d="M3.2 9.4c0-1.3 1-2.3 2.3-2.4 4.3-.4 8.7-.4 13 0 1.3.1 2.3 1.1 2.3 2.4v2.5c0 1.6-1.2 3-2.8 3.2l-4.2.5c-1.2.1-2.4.1-3.6 0l-4.2-.5C4.4 14.9 3.2 13.5 3.2 11.9z" />
+          <ellipse cx="8.6" cy="11.4" rx="1.7" ry="1.2" fill="currentColor" stroke="none" />
+          <ellipse cx="15.4" cy="11.4" rx="1.7" ry="1.2" fill="currentColor" stroke="none" />
+        </svg>
+      );
+    case 'truths':
+      return (
+        <svg {...common}>
+          <path d="M4 6.5h9M4 17.5h9" />
+          <path d="M4 12h2.6l1.6-2 1.6 4 1.6-2H13" />
+          <path d="M16.6 15.6l4.4 4.4M21 15.6l-4.4 4.4" />
         </svg>
       );
     case 'home':

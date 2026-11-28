@@ -33,8 +33,17 @@ export function gameById(id: string): GameMeta | undefined {
   return GAMES.find((game) => game.id === id);
 }
 
-export const GAME_GROUPS: { key: 'gWords' | 'gFun' | 'gChance'; ids: string[] }[] = [
-  { key: 'gWords', ids: ['wordle', 'draw', 'categories', 'charades', 'whoami'] },
-  { key: 'gFun', ids: ['trivia', 'wyr', 'likely', 'imposter', 'wordbomb', 'truths'] },
-  { key: 'gChance', ids: ['dice', 'coin', 'wheel', 'number', 'yesno', 'bracket'] },
+export type GroupKey = 'gWords' | 'gDraw' | 'gKnow' | 'gParty' | 'gDeciders';
+
+/** Groups say what the player is doing, not what the game is called. Deciders are tools, kept apart. */
+export const GAME_GROUPS: { key: GroupKey; ids: string[] }[] = [
+  { key: 'gWords', ids: ['wordle', 'wordbomb', 'categories'] },
+  { key: 'gDraw', ids: ['draw'] },
+  { key: 'gKnow', ids: ['trivia', 'whoami'] },
+  { key: 'gParty', ids: ['imposter', 'truths', 'charades', 'wyr', 'likely'] },
+  { key: 'gDeciders', ids: ['wheel', 'coin', 'dice', 'number', 'yesno', 'bracket'] },
 ];
+
+/** Games that produce a real placement, so the only ones a tournament can score.
+    Mirrors App\Support\Tournament::GAMES on the server. */
+export const TOURNAMENT_POOL = ['trivia', 'wordle', 'draw', 'categories', 'whoami', 'charades', 'imposter', 'wordbomb', 'truths'];

@@ -3,7 +3,7 @@ import type { Party } from '../api';
 import type { Strings } from '../i18n';
 import { Glyph } from '../components/brand';
 import { Btn, Card } from '../components/ui';
-import { GAMES, type GameMeta } from '../games/meta';
+import { GAMES, GAME_GROUPS, type GameMeta } from '../games/meta';
 
 export default function GameDetail({
   t, gameId, meta, parties, onBack, onSolo, onParty, onPick,
@@ -20,6 +20,12 @@ export default function GameDetail({
   const canSolo = meta.modes.includes('solo');
   const openParties = parties.filter((party) => party.status === 'lobby');
   const others = GAMES.filter((game) => game.id !== gameId).slice(0, 5);
+  const how = t.gameHow[gameId];
+  const isTool = GAME_GROUPS.find((grp) => grp.key === 'gDeciders')?.ids.includes(gameId) ?? false;
+
+  const rows: [string, string][] = how
+    ? [[t.gdWhat, how.what], [t.gdRound, how.round], [t.gdWin, how.win], [t.gdLose, how.lose]]
+    : [];
 
   return (
     <div className="stack gap-20 fade-up detail-wrap">
@@ -36,25 +42,39 @@ export default function GameDetail({
               <h1 className="h1">{t.gameNames[gameId]}</h1>
             </div>
           </div>
-          <p className="lead">{t.gameBlurbs[gameId]}</p>
+          <p className="lead">{t.gameDesc[gameId]}</p>
           <div className="row gap-8 wrap">
             {meta.modes.map((mode) => (
               <span key={mode} className="mode-chip">{mode === 'solo' ? t.solo : t.multiplayer}</span>
             ))}
+            {isTool && <span className="mode-chip" data-plain="true">{t.gDeciders}</span>}
           </div>
           <div className="row gap-10 wrap">
             {canSolo && <Btn size="lg" onClick={onSolo}>{t.playSolo}</Btn>}
             <Btn size="lg" variant={canSolo ? 'ghost' : 'solid'} onClick={onParty}>{t.startParty}</Btn>
           </div>
+
+          {rows.length > 0 && (
+            <Card pad="lg" className="how-card">
+              <h3 className="h3">{t.howItWorks}</h3>
+              <div className="how-list">
+                {rows.map(([label, body]) => (
+                  <div key={label} className="how-row">
+                    <span className="how-k">{label}</span>
+                    <p className="how-v">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
         </div>
 
         <div className="stack gap-14">
           <Card pad="lg" className="stack gap-10">
-            <h3 className="h3">{t.howTitle}</h3>
+            <h3 className="h3">{t.yourParties}</h3>
             <p className="caption">{canSolo ? `${t.soloHint} ${t.partyHint}` : t.partyHint}</p>
             {openParties.length > 0 && (
               <div className="stack gap-6">
-                <span className="caption">{t.yourParties}</span>
                 {openParties.slice(0, 3).map((party) => (
                   <span key={party.code} className="row gap-8 center">
                     <span className="dot" data-on="true" />

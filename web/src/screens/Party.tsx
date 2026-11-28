@@ -149,7 +149,7 @@ export default function PartyScreen({
                   >
                     <span className="glyph"><Glyph name={game} /></span>
                     <span className="name">{t.gameNames[game]}</span>
-                    <span className="cat">{t.gameCats[game]}</span>
+                    <span className="desc">{t.gameDesc[game]}</span>
                   </button>
                 ))}
               </div>

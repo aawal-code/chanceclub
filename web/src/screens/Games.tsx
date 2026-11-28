@@ -1,9 +1,12 @@
 import React from 'react';
 import type { Strings } from '../i18n';
 import { Glyph } from '../components/brand';
-import { soloGames, partyGames, GAME_GROUPS } from '../games/meta';
+import { partyGames, GAME_GROUPS, type GroupKey } from '../games/meta';
 
 export default function Games({ t, onOpen, onParty }: { t: Strings; onOpen: (id: string) => void; onParty: () => void }) {
+  const groups = GAME_GROUPS.filter((grp) => grp.key !== 'gDeciders');
+  const deciders = GAME_GROUPS.find((grp) => grp.key === 'gDeciders');
+
   return (
     <div className="stack gap-20 fade-up">
       <div className="stack gap-6">
@@ -15,46 +18,48 @@ export default function Games({ t, onOpen, onParty }: { t: Strings; onOpen: (id:
       <section className="section">
         <div className="section-title">
           <div className="stack gap-4">
-            <h2 className="h2">{t.soloGames}</h2>
-            <p className="section-sub">{t.soloHint}</p>
-          </div>
-        </div>
-        <div className="game-grid stagger">
-          {soloGames.map((game) => (
-            <button key={`s-${game.id}`} className="game-card" onClick={() => onOpen(game.id)}>
-              <span className="badge">{t.solo}</span>
-              <span className="glyph"><Glyph name={game.id} /></span>
-              <span className="name">{t.gameNames[game.id]}</span>
-              <span className="cat">{t.gameCats[game.id]}</span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="section-title">
-          <div className="stack gap-4">
             <h2 className="h2">{t.partyGames}</h2>
             <p className="section-sub">{t.partyHint}</p>
           </div>
           <button className="nav-link" onClick={onParty}>{t.startParty}<Glyph name="arrow" size={16} /></button>
         </div>
-        {GAME_GROUPS.map((grp) => (
-          <div key={grp.key} className="stack gap-8" style={{ marginBottom: 16 }}>
-            <p className="caption" style={{ fontWeight: 700 }}>{t[grp.key]}</p>
-        <div className="game-grid stagger">
-          {partyGames.filter((g) => grp.ids.includes(g.id)).map((game) => (
-            <button key={`p-${game.id}`} className="game-card" onClick={() => onOpen(game.id)}>
-              <span className="badge">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
-              <span className="glyph"><Glyph name={game.id} /></span>
-              <span className="name">{t.gameNames[game.id]}</span>
-              <span className="cat">{t.gameCats[game.id]}</span>
-            </button>
-          ))}
-        </div>
+        {groups.map((grp) => (
+          <div key={grp.key} className="game-group">
+            <p className="group-label">{t[grp.key as GroupKey]}</p>
+            <div className="game-grid stagger">
+              {partyGames.filter((g) => grp.ids.includes(g.id)).map((game) => (
+                <button key={`p-${game.id}`} className="game-card" onClick={() => onOpen(game.id)}>
+                  <span className="badge">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
+                  <span className="glyph"><Glyph name={game.id} /></span>
+                  <span className="name">{t.gameNames[game.id]}</span>
+                  <span className="desc">{t.gameDesc[game.id]}</span>
+                </button>
+              ))}
+            </div>
           </div>
         ))}
       </section>
+
+      {deciders && (
+        <section className="section deciders">
+          <div className="section-title">
+            <div className="stack gap-4">
+              <h2 className="h2">{t.gDeciders}</h2>
+              <p className="section-sub">{t.gDecidersHint}</p>
+            </div>
+          </div>
+          <div className="game-grid stagger">
+            {partyGames.filter((g) => deciders.ids.includes(g.id)).map((game) => (
+              <button key={`d-${game.id}`} className="game-card" data-tool="true" onClick={() => onOpen(game.id)}>
+                <span className="badge">{game.modes.includes('solo') ? t.both : t.multiplayer}</span>
+                <span className="glyph"><Glyph name={game.id} /></span>
+                <span className="name">{t.gameNames[game.id]}</span>
+                <span className="desc">{t.gameDesc[game.id]}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

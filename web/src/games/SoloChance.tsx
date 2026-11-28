@@ -132,7 +132,7 @@ export default function SoloChance({ t, gameId, onBack }: { t: Strings; gameId: 
         )}
       </Card>
 
-      <p className="caption center-text">{t.gameBlurbs[gameId]}</p>
+      <p className="caption center-text">{t.gameDesc[gameId]}</p>
     </div>
   );
 }
