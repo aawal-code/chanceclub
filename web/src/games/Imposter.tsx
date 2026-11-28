@@ -209,7 +209,7 @@ export default function Imposter({ t, locale, party, onAct, onAdvance, onFinish,
               return (
                 <div key={member.id} className="gk-clue">
                   <span className="grow" style={{ fontWeight: 700 }}>{member.name}{member.id === gs.reveal!.imposterId ? ` · ${t.impImposterTag}` : ''}</span>
-                  <span className="caption">{votes} {t.impVotesWord}</span>
+                  <span className="caption">{votes} {votes === 1 ? t.impVoteOne : t.impVotesWord}</span>
                   {points > 0 && <span className="gk-points">+{points}</span>}
                 </div>
               );

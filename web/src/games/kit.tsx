@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { Party } from '../api';
 import type { Strings } from '../i18n';
 import { Glyph } from '../components/brand';
+import { Avatar } from '../components/Avatar';
 import { Btn, Card } from '../components/ui';
 
 /** Shared furniture for the turn-based party games: header, clock, turn rail, scores, host controls. */
@@ -90,7 +91,7 @@ export function Scores({ t, party }: { t: Strings; party: Party }) {
       {sorted.map((member, index) => (
         <div key={member.id} className="row gap-10 center">
           <span className="caption mono" style={{ width: 16 }}>{index + 1}</span>
-          <span className="avatar-chip" style={{ width: 28, height: 28, borderRadius: 9, fontSize: 11 }}>{member.name.charAt(0).toUpperCase()}</span>
+          <Avatar avatar={member.avatar} name={member.name} size={28} />
           <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{member.name}{member.id === party.self_player_id ? ` · ${t.you}` : ''}</span>
           <span className="mono" style={{ fontWeight: 800 }}>{member.score}</span>
         </div>

@@ -817,3 +817,22 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .gk-points { font-family: var(--mono); font-weight: 800; color: var(--hit); }
 @media (max-width: 420px) { .gk-words { grid-template-columns: 1fr; } .gk-pick { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) { .game-stage { padding-bottom: 92px; } }
+
+/* ---- Profile pictures ------------------------------------------------- */
+.avatar-face, .avatar-img {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  border-radius: 50%; overflow: hidden; line-height: 0;
+}
+.avatar-img { object-fit: cover; background: var(--bg-soft); }
+.avatar-svg { display: block; width: 100%; height: 100%; }
+.avatar-picker { display: grid; grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); gap: 10px; }
+.avatar-pick {
+  padding: 6px; border-radius: 14px; border: 1px solid var(--line);
+  background: var(--bg-soft); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: border-color .15s var(--ease), transform .15s var(--ease);
+}
+.avatar-pick:hover { border-color: var(--ink-soft); }
+.avatar-pick:active { transform: scale(.96); }
+.avatar-pick[data-active="true"] { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.avatar-pick:disabled { opacity: .6; cursor: default; }
+@media (max-width: 520px) { .avatar-picker { grid-template-columns: repeat(5, 1fr); gap: 8px; } }

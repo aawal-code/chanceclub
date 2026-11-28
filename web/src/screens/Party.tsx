@@ -1,5 +1,6 @@
 import { GAME_GROUPS } from '../games/meta';
 import { QR } from '../components/QR';
+import { Avatar } from '../components/Avatar';
 import React, { useEffect, useState } from 'react';
 import type { Party } from '../api';
 import TournamentCard from './TournamentCard';
@@ -65,7 +66,7 @@ export default function PartyScreen({
                 <h1 className="h1">{activeParty.name}</h1>
               </div>
               <span className="seg" style={{ padding: '6px 14px' }}>
-                <b style={{ fontSize: 12, letterSpacing: '.08em' }}>{activeParty.members.length} {t.members.toLowerCase()}</b>
+                <b style={{ fontSize: 12, letterSpacing: '.08em' }}>{activeParty.members.length} {activeParty.members.length === 1 ? t.playerOne : t.members.toLowerCase()}</b>
               </span>
             </div>
 
@@ -93,7 +94,7 @@ export default function PartyScreen({
               <p className="caption">{t.members}</p>
               {activeParty.members.map((member) => (
                 <div key={member.id} className="member">
-                  <span className="avatar-chip">{member.name.charAt(0).toUpperCase()}</span>
+                  <Avatar avatar={member.avatar} name={member.name} size={38} />
                   <div className="grow stack">
                     <span className="name">
                       {member.name}
@@ -186,7 +187,7 @@ export default function PartyScreen({
                   <span className="avatar-chip">{party.name.charAt(0).toUpperCase()}</span>
                   <div className="grow stack">
                     <span className="name">{party.name}</span>
-                    <span className="meta">{party.code} · {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.players.length} {t.members.toLowerCase()}</span>
+                    <span className="meta">{party.code} · {party.status === 'playing' ? t.multiplayer : t.lobby} · {party.players.length} {party.players.length === 1 ? t.playerOne : t.members.toLowerCase()}</span>
                   </div>
                   <Glyph name="arrow" size={18} />
                 </button>

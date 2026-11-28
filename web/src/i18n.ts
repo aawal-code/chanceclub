@@ -113,7 +113,10 @@ const en = {
   impImposterWord: 'Imposter word',
   impWasImposter: '{name} was the imposter',
   impImposterTag: 'imposter',
-  impVotesWord: 'votes',
+  impVotesWord: 'votes', impVoteOne: 'vote',
+  playerOne: 'player',
+  avatarTitle: 'Profile picture', avatarHintAccount: 'Your face shows up in every lobby and game.', avatarHintGuest: 'Saved on this device. Sign in to upload a photo.', avatarUpload: 'Upload a photo', avatarReplace: 'Replace photo', avatarRemove: 'Remove photo', avatarUploadHint: 'Square crop, resized to 128px.', avatarSaved: 'Picture updated', avatarBadFile: 'That picture could not be read.', avatarNeedsAccount: 'Photos need a free account. Pick a preset instead.',
+
   impNeedsThree: 'Imposter needs three players.',
   gkNextHint: 'Start the next round once everyone has seen the reveal.',
   gameNames: {
@@ -240,7 +243,10 @@ const ar: Strings = {
   impCrewWins: 'الفريق كسب', impImposterWins: 'المحتال كسب',
   impGuessedRight: 'اتكشف، بس عرف الكلمة برضه.', impCaughtRight: 'اتكشف بالتصويت. الفريق واخدها.',
   impSurvivedVote: 'التصويت اتقسم. المحتال خرج منها.', impImposterWord: 'كلمة المحتال',
-  impWasImposter: '{name} كان المحتال', impImposterTag: 'المحتال', impVotesWord: 'أصوات',
+  impWasImposter: '{name} كان المحتال', impImposterTag: 'المحتال', impVotesWord: 'أصوات', impVoteOne: 'صوت',
+  playerOne: 'لاعب',
+  avatarTitle: 'الصورة الشخصية', avatarHintAccount: 'صورتك تظهر في كل غرفة ولعبة.', avatarHintGuest: 'محفوظة على هذا الجهاز. سجّل الدخول لرفع صورة.', avatarUpload: 'ارفع صورة', avatarReplace: 'غيّر الصورة', avatarRemove: 'احذف الصورة', avatarUploadHint: 'قص مربع، الحجم 128 بكسل.', avatarSaved: 'تم تحديث الصورة', avatarBadFile: 'الصورة دي مش مقروءة.', avatarNeedsAccount: 'الصور تحتاج حساب مجاني. اختار شكل من الأشكال.',
+
   impNeedsThree: 'لعبة المحتال محتاجة ٣ لاعبين على الأقل.',
   gkNextHint: 'ابدأ الجولة الجاية بعد ما الكل يشوف الكشف.',
   gameNames: {
@@ -364,7 +370,10 @@ const de: Strings = {
   impCrewWins: 'Die Crew gewinnt', impImposterWins: 'Der Bluffer gewinnt',
   impGuessedRight: 'Erwischt, aber das Wort trotzdem erraten.', impCaughtRight: 'Per Abstimmung erwischt. Die Crew holt es.',
   impSurvivedVote: 'Die Abstimmung war uneinig. Der Bluffer kommt durch.', impImposterWord: 'Bluffer-Wort',
-  impWasImposter: '{name} war der Bluffer', impImposterTag: 'Bluffer', impVotesWord: 'Stimmen',
+  impWasImposter: '{name} war der Bluffer', impImposterTag: 'Bluffer', impVotesWord: 'Stimmen', impVoteOne: 'Stimme',
+  playerOne: 'Spieler',
+  avatarTitle: 'Profilbild', avatarHintAccount: 'Dein Gesicht erscheint in jeder Lobby und jedem Spiel.', avatarHintGuest: 'Auf diesem Gerät gespeichert. Melde dich an, um ein Foto hochzuladen.', avatarUpload: 'Foto hochladen', avatarReplace: 'Foto ersetzen', avatarRemove: 'Foto entfernen', avatarUploadHint: 'Quadratischer Ausschnitt, auf 128 px verkleinert.', avatarSaved: 'Bild aktualisiert', avatarBadFile: 'Das Bild konnte nicht gelesen werden.', avatarNeedsAccount: 'Fotos brauchen ein kostenloses Konto. Nimm sonst ein Motiv.',
+
   impNeedsThree: 'Bluffer braucht mindestens drei Spieler.',
   gkNextHint: 'Starte die nächste Runde, wenn alle die Auflösung gesehen haben.',
   gameNames: {

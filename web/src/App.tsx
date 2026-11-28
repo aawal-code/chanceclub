@@ -1,6 +1,6 @@
 import { friendlyError } from './friendly';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, ApiError, clearSession, getGuestName, getSavedUser, getToken, HEALTH_URL, onSessionExpired, onSlowRequest, renewIfStale, setGuestName, setSavedUser, setToken, type Party } from './api';
+import { api, ApiError, clearSession, getGuestName, getSavedUser, getToken, HEALTH_URL, onSessionExpired, onSlowRequest, renewIfStale, setGuestName, setSavedUser, setToken, type Party, getAvatarPreset } from './api';
 import { strings, type Locale, getStrings, DEFAULT_AR_DIALECT } from './i18n';
 import type { ArDialect } from './i18n';
 import { Brand, DieLogo } from './components/brand';
@@ -297,7 +297,7 @@ export default function App() {
     setBusy(true);
     try {
       await ensureIdentity();
-      const result = await api.createParty(name);
+      const result = await api.createParty(name, getAvatarPreset());
       setActiveParty(result.data);
       go({ name: 'party', code: result.data.code });
       refreshParties();
@@ -312,7 +312,7 @@ export default function App() {
     setBusy(true);
     try {
       await ensureIdentity();
-      const result = await api.joinParty(code.trim().toUpperCase());
+      const result = await api.joinParty(code.trim().toUpperCase(), getAvatarPreset());
       setActiveParty(result.data);
       go({ name: 'party', code: result.data.code });
       refreshParties();

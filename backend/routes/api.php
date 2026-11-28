@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AvatarController;
 use App\Http\Controllers\Api\ChanceClubController;
 use App\Http\Controllers\Api\GuestIdentityController;
 use App\Http\Controllers\Api\HistoryController;
@@ -20,6 +21,8 @@ Route::get('/v1/health', function () {
     return response()->json(['up' => true, 'db_ms' => $db]);
 });
 
+Route::get('/v1/avatars/{userId}', [AvatarController::class, 'show'])->where('userId', '[0-9]+');
+
 Route::post('/internal/draw-result', [HistoryController::class, 'drawResult']);
 
 Route::prefix('v1')->group(function () {
@@ -34,6 +37,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['cc.player', 'throttle:cc-player'])->group(function () {
         Route::get('/me', [ChanceClubController::class, 'me']);
         Route::patch('/me', [ChanceClubController::class, 'updateMe']);
+        Route::post('/me/avatar', [AvatarController::class, 'store']);
+        Route::delete('/me/avatar', [AvatarController::class, 'destroy']);
         Route::post('/logout', [ChanceClubController::class, 'logout']);
         Route::get('/teams', [ChanceClubController::class, 'teams']);
         Route::post('/teams', [ChanceClubController::class, 'createTeam']);

@@ -93,7 +93,8 @@ class LobbyController extends Controller
     {
         $data = $request->validate(['name' => ['required', 'string', 'min:1', 'max:80']]);
         $identity = $this->identity($request);
-        $party = DB::transaction(function () use ($data, $identity) {
+        $preset = $this->presetFrom($request);
+        $party = DB::transaction(function () use ($data, $identity, $preset) {
             $code = $this->uniqueCode();
             $partyId = DB::table('parties')->insertGetId([
                 'owner_id' => $identity['kind'] === 'user' ? $identity['id'] : null,
@@ -103,7 +104,7 @@ class LobbyController extends Controller
                 'round_number' => 0,
                 'created_at' => now(), 'updated_at' => now(),
             ]);
-            $playerId = $this->insertPlayer($partyId, $identity, true);
+            $playerId = $this->insertPlayer($partyId, $identity, true, $preset);
             DB::table('parties')->where('id', $partyId)->update(['host_player_id' => $playerId]);
             return DB::table('parties')->find($partyId);
         });
@@ -140,6 +141,7 @@ class LobbyController extends Controller
     public function join(Request $request, string $code): JsonResponse
     {
         $identity = $this->identity($request);
+        $preset = $this->presetFrom($request);
         $party = DB::table('parties')->where('invite_code', strtoupper($code))->first();
         if (!$party || $party->status !== 'lobby') return response()->json(['message' => 'Lobby not found or already started.'], 404);
         $joined = DB::transaction(function () use ($party, $identity) {
@@ -151,7 +153,7 @@ class LobbyController extends Controller
                 return DB::table('parties')->find($locked->id);
             }
             if (DB::table('party_players')->where('party_id', $locked->id)->count() >= 20) throw new HttpException(409, 'This lobby is full.');
-            $this->insertPlayer($locked->id, $identity, false);
+            $this->insertPlayer($locked->id, $identity, false, $preset);
             DB::table('parties')->where('id', $locked->id)->update(['updated_at' => now()]);
             return DB::table('parties')->find($locked->id);
         });
@@ -521,20 +523,51 @@ class LobbyController extends Controller
         if ((int) $party->host_player_id !== (int) $player->id) throw new HttpException(403, 'Only the host can control this lobby.');
     }
 
-    private function insertPlayer(int $partyId, array $identity, bool $ready): int
+    private function insertPlayer(int $partyId, array $identity, bool $ready, ?string $preset = null): int
     {
+        // Snapshot the face at join time so the roster renders without extra lookups.
+        $avatar = $this->identityAvatar($identity);
+        if ($preset) {
+            $avatar['preset'] = $preset;
+            // A guest's choice follows them to the next lobby, not just this one.
+            if ($identity['kind'] === 'guest') {
+                DB::table('guest_identities')->where('id', $identity['id'])->update(['avatar_preset' => $preset]);
+            }
+        }
         return (int) DB::table('party_players')->insertGetId([
             'party_id' => $partyId,
             'user_id' => $identity['kind'] === 'user' ? $identity['id'] : null,
             'guest_id' => $identity['kind'] === 'guest' ? $identity['id'] : null,
             'display_name' => $identity['name'], 'is_ready' => $ready,
+            'avatar_preset' => $avatar['preset'], 'avatar_version' => $avatar['version'],
             'last_seen_at' => now(), 'created_at' => now(), 'updated_at' => now(),
         ]);
+    }
+
+    /** The preset and version a joining player brings with them. */
+    /** The preset the device is showing right now, so a face picked offline still shows up. */
+    private function presetFrom(Request $request): ?string
+    {
+        $preset = $request->input('avatar_preset');
+        if (!is_string($preset)) return null;
+        return in_array($preset, \App\Http\Controllers\Api\AvatarController::PRESETS, true) ? $preset : null;
+    }
+
+    private function identityAvatar(array $identity): array
+    {
+        if ($identity['kind'] === 'user') {
+            $row = DB::table('users')->where('id', $identity['id'])->first(['avatar_preset', 'avatar_version']);
+            return ['preset' => $row->avatar_preset ?? null, 'version' => (int) ($row->avatar_version ?? 0)];
+        }
+        $row = DB::table('guest_identities')->where('id', $identity['id'])->first(['avatar_preset']);
+        return ['preset' => $row->avatar_preset ?? null, 'version' => 0];
     }
 
     private function partyView(object $party, array $identity): array
     {
         $members = DB::table('party_players')->where('party_id', $party->id)->orderBy('id')->get();
+        // One query for every custom picture in the party, so the 0.9s poll stays cheap.
+        $customAvatars = DB::table('user_avatars')->whereIn('user_id', $members->pluck('user_id')->filter()->all())->pluck('user_id')->map(fn ($id) => (int) $id)->all();
         $myPlayer = $members->first(fn ($person) => ($identity['kind'] === 'user' ? (int) $person->user_id : (int) $person->guest_id) === (int) $identity['id']);
         if (!$myPlayer) throw new HttpException(404, 'Party not found.');
         $round = DB::table('party_rounds')->where('party_id', $party->id)->orderByDesc('round_number')->first();
@@ -594,6 +627,12 @@ class LobbyController extends Controller
                 'is_host' => (int) $person->id === (int) $party->host_player_id,
                 'online' => $person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 20,
                 'rtt' => $person->last_rtt_ms === null ? null : (int) $person->last_rtt_ms,
+                'avatar' => \App\Http\Controllers\Api\AvatarController::avatarFrom(
+                    $person->user_id ? in_array((int) $person->user_id, $customAvatars, true) : false,
+                    $person->user_id ? (int) $person->user_id : null,
+                    $person->avatar_preset,
+                    (int) ($person->avatar_version ?? 0)
+                ),
             ])->values()->all(),
             'self_player_id' => $myPlayer ? (string) $myPlayer->id : null,
             'is_host' => (int) $party->host_player_id === (int) $myPlayer->id,

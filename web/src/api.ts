@@ -2,13 +2,19 @@ const BASE = (import.meta.env.VITE_API_URL as string | undefined) || 'https://ch
 export const HEALTH_URL = `${BASE}/up`;
 export const WS_URL = `${BASE.replace(/^http/, 'ws').replace(/\/api\/v1$/, '')}/ws`;
 
+/** Absolute url for a server-relative asset path such as an avatar. */
+export const assetUrl = (path: string) => (/^https?:/i.test(path) ? path : BASE.replace(/\/api\/v1$/, '') + path);
+
 const TOKEN_KEY = 'cc.token';
 const USER_KEY = 'cc.user';
 const GUEST_KEY = 'cc.guest';
 
+export type AvatarInfo = { preset: string; custom: boolean; url: string | null };
+
 export type Member = {
   id: string;
   name: string;
+  avatar?: AvatarInfo;
   ready: boolean;
   score: number;
   is_host: boolean;
@@ -155,8 +161,8 @@ export class ApiError extends Error {
 
 export type Session = {
   identity: { kind: 'user' | 'guest'; id: string; name: string } | null;
-  user: { id: string; name: string; email?: string; preferred_language?: string; theme?: string | null } | null;
-  guest: { id: string; name: string } | null;
+  user: { id: string; name: string; email?: string; preferred_language?: string; theme?: string | null; avatar?: AvatarInfo } | null;
+  guest: { id: string; name: string; avatar?: AvatarInfo } | null;
 };
 
 /** A guest token can expire or be cleared. Mint a fresh guest from the saved name instead of 401-ing. */
@@ -247,6 +253,9 @@ async function requestInner<T>(path: string, method = 'GET', body?: unknown, ret
   return payload as T;
 }
 
+export const getAvatarPreset = () => { try { return localStorage.getItem('cc.avatar'); } catch { return null; } };
+export const setAvatarPreset = (preset: string) => { try { localStorage.setItem('cc.avatar', preset); } catch { /* ignore */ } };
+
 export const api = {
   guest: (name: string) => request<{ token: string; guest: { id: string; name: string } }>('/guest', 'POST', { name }),
   guestMe: () => request<{ guest: { id: string; name: string } }>('/guest/me'),
@@ -256,11 +265,13 @@ export const api = {
     request<{ token: string; refresh_token?: string; user: { id: string; name: string } }>('/login', 'POST', { email, password }),
   me: () => request<Session>('/me'),
   updateMe: (body: Record<string, unknown>) => request<{ user?: any; guest?: any }>('/me', 'PATCH', body),
+  avatarUpload: (data: string) => request<{ avatar: AvatarInfo }>('/me/avatar', 'POST', { data }),
+  avatarRemove: () => request<{ avatar: AvatarInfo }>('/me/avatar', 'DELETE'),
   logout: () => request<{ message: string }>('/logout', 'POST'),
   parties: () => request<{ data: Party[] }>('/parties'),
-  createParty: (name: string) => request<{ data: Party }>('/parties', 'POST', { name }),
+  createParty: (name: string, avatarPreset?: string | null) => request<{ data: Party }>('/parties', 'POST', { name, avatar_preset: avatarPreset || undefined }),
   party: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}`),
-  joinParty: (code: string) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/join`, 'POST'),
+  joinParty: (code: string, avatarPreset?: string | null) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/join`, 'POST', { avatar_preset: avatarPreset || undefined }),
   ready: (code: string, ready: boolean) => request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/ready`, 'POST', { ready }),
   start: (code: string, game: string, locale: string, opts?: { entries?: string[]; eliminate?: boolean; teams?: { name: string; members: string[] }[] }) =>
     request<{ data: Party }>(`/parties/${encodeURIComponent(code)}/start`, 'POST', { game, locale, ...(opts || {}) }),

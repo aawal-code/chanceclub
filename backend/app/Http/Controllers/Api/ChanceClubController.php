@@ -55,6 +55,7 @@ class ChanceClubController extends Controller
             'name' => ['sometimes', 'required', 'string', 'min:2', 'max:80'],
             'preferred_language' => ['sometimes', 'in:en,ar,de'],
             'theme' => ['sometimes', 'in:ink,paper,midnight,sand,neon,brutal,terminal,candy,forest,newsprint,light,dark'],
+            'avatar_preset' => ['sometimes', 'in:'.implode(',', \App\Http\Controllers\Api\AvatarController::PRESETS)],
         ]);
 
         $user = $this->user($request);
@@ -63,13 +64,13 @@ class ChanceClubController extends Controller
             return response()->json(['user' => $this->userView($user->fresh())]);
         }
 
-        // Guests can rename themselves; language and theme live on the device for a guest.
+        // Guests can rename themselves and pick a preset; a custom upload still needs an account.
         $guest = $request->attributes->get('cc.guest');
-        if (isset($data['name']) && $guest) {
-            DB::table('guest_identities')->where('id', $guest->id)->update([
-                'display_name' => trim($data['name']),
-                'updated_at' => now(),
-            ]);
+        if ($guest && (isset($data['name']) || isset($data['avatar_preset']))) {
+            $fields = ['updated_at' => now()];
+            if (isset($data['name'])) $fields['display_name'] = trim($data['name']);
+            if (isset($data['avatar_preset'])) $fields['avatar_preset'] = $data['avatar_preset'];
+            DB::table('guest_identities')->where('id', $guest->id)->update($fields);
             $guest = DB::table('guest_identities')->find($guest->id);
         }
 
@@ -220,7 +221,11 @@ class ChanceClubController extends Controller
 
     private function guestView(?object $guest): ?array
     {
-        return $guest ? ['id' => (string) $guest->id, 'name' => $guest->display_name] : null;
+        return $guest ? [
+            'id' => (string) $guest->id,
+            'name' => $guest->display_name,
+            'avatar' => \App\Http\Controllers\Api\AvatarController::avatarFrom(false, null, $guest->avatar_preset ?? null, 0),
+        ] : null;
     }
 
     private function needsAccount(): JsonResponse
@@ -230,7 +235,7 @@ class ChanceClubController extends Controller
 
     private function userView(User $user): array
     {
-        return ['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'preferred_language' => $user->preferred_language, 'theme' => $user->theme];
+        return ['id' => $user->id, 'name' => $user->name, 'email' => $user->email, 'preferred_language' => $user->preferred_language, 'theme' => $user->theme, 'avatar' => \App\Http\Controllers\Api\AvatarController::avatarView((int) $user->id, $user->avatar_preset, (int) ($user->avatar_version ?? 0))];
     }
 
     private function partyView(object $party): array

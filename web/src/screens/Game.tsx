@@ -9,6 +9,7 @@ const DrawGame = React.lazy(() => import('../games/DrawGame'));
 const ImposterGame = React.lazy(() => import('../games/Imposter'));
 import type { Act } from '../games/kit';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
+import { Avatar } from '../components/Avatar';
 
 const AWARD_GAMES = ['categories', 'whoami', 'charades'];
 const ROLL_GAMES = ['dice', 'coin', 'wheel', 'number', 'yesno'];
@@ -108,7 +109,7 @@ export default function GameScreen({
             {[...party.members].sort((a, b) => b.score - a.score).map((member, index) => (
               <div key={member.id} className="row gap-10 center">
                 <span className="caption mono" style={{ width: 18 }}>{index + 1}</span>
-                <span className="avatar-chip" style={{ width: 30, height: 30, borderRadius: 9, fontSize: 12 }}>{member.name.charAt(0).toUpperCase()}</span>
+                <Avatar avatar={member.avatar} name={member.name} size={30} />
                 <span className="grow" style={{ fontWeight: 700, fontSize: 14 }}>{member.name}{member.id === party.self_player_id ? ` · ${t.you}` : ''}</span>
                 <LagPill rtt={member.rtt} online={member.online} labels={{ none: t.lagNone, slight: t.lagSlight, heavy: t.lagHeavy, checking: t.lagChecking, offline: t.offline }} />
                 <span className="mono" style={{ fontWeight: 800 }}>{member.score}</span>

@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { api, setSavedUser, setSession } from '../api';
+import { api, setSavedUser, setSession, setAvatarPreset, type AvatarInfo } from '../api';
+import { Avatar, AVATAR_PRESETS } from '../components/Avatar';
 import type { Locale, Strings } from '../i18n';
 import { Btn, Card, Field, Seg, useToast } from '../components/ui';
 import type { ThemeName } from '../App';
@@ -28,11 +29,95 @@ export default function Profile({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedName, setSavedName] = useState(false);
+  const [avatar, setAvatar] = useState<AvatarInfo | null>(null);
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
+  const fileRef = React.useRef<HTMLInputElement | null>(null);
 
   const isAccount = identity?.kind === 'user';
   const displayName = identity?.name || guestName || '';
   const trimmedName = name.trim();
   const nameValid = trimmedName.length >= 2;
+
+  React.useEffect(() => {
+    let live = true;
+    api.me().then((r) => {
+      if (!live) return;
+      const info = r.user?.avatar || r.guest?.avatar || null;
+      if (info) { setAvatar(info); setAvatarPreset(info.preset); }
+    }).catch(() => {});
+    return () => { live = false; };
+  }, []);
+
+  const pickPreset = async (preset: string) => {
+    if (avatarBusy) return;
+    setAvatarBusy(true);
+    setAvatarError(null);
+    try {
+      const r = await api.updateMe({ avatar_preset: preset });
+      const info = r.user?.avatar || r.guest?.avatar;
+      if (info) setAvatar(info); else setAvatar({ preset, custom: false, url: null });
+      setAvatarPreset(preset);
+      toast(t.avatarSaved);
+    } catch (problem: any) {
+      setAvatarError(problem?.message || t.error);
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
+
+  /** Shrink to 128x128 in the browser so uploads stay tiny and never time out. */
+  const shrink = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error('read'));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error('decode'));
+      img.onload = () => {
+        const size = 128;
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('canvas'));
+        const side = Math.min(img.width, img.height);
+        ctx.drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, size, size);
+        resolve(canvas.toDataURL('image/webp', 0.9));
+      };
+      img.src = String(reader.result);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  const uploadPhoto = async (file: File) => {
+    if (!isAccount) { setAvatarError(t.avatarNeedsAccount); return; }
+    setAvatarBusy(true);
+    setAvatarError(null);
+    try {
+      const data = await shrink(file);
+      const r = await api.avatarUpload(data);
+      setAvatar(r.avatar);
+      toast(t.avatarSaved);
+    } catch (problem: any) {
+      setAvatarError(problem?.message || t.avatarBadFile);
+    } finally {
+      setAvatarBusy(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
+  const removePhoto = async () => {
+    setAvatarBusy(true);
+    setAvatarError(null);
+    try {
+      const r = await api.avatarRemove();
+      setAvatar(r.avatar);
+    } catch (problem: any) {
+      setAvatarError(problem?.message || t.error);
+    } finally {
+      setAvatarBusy(false);
+    }
+  };
 
   const saveName = async () => {
     setError(null);
@@ -86,9 +171,7 @@ export default function Profile({
 
       <Card pad="lg" className="stack gap-16">
         <div className="row gap-14 center wrap">
-          <span className="avatar-chip" style={{ width: 56, height: 56, borderRadius: 18, fontSize: 22 }}>
-            {(displayName || 'A').charAt(0).toUpperCase()}
-          </span>
+          <Avatar avatar={avatar} name={displayName || 'A'} size={56} />
           <div className="stack gap-4">
             <span className="h2">{displayName || t.guestName}</span>
             <span className="caption">{isAccount ? t.account : t.guestAccount}</span>
@@ -104,6 +187,44 @@ export default function Profile({
           </div>
           <p className="caption">{t.displayNameHint}</p>
         </div>
+      </Card>
+
+      <Card pad="lg" className="stack gap-14">
+        <div className="row between center wrap gap-10">
+          <h3 className="h3">{t.avatarTitle}</h3>
+          <span className="caption">{isAccount ? t.avatarHintAccount : t.avatarHintGuest}</span>
+        </div>
+        <div className="avatar-picker" role="radiogroup" aria-label={t.avatarTitle}>
+          {AVATAR_PRESETS.map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              role="radio"
+              aria-checked={!avatar?.custom && (avatar?.preset || 'ink') === preset}
+              className="avatar-pick"
+              data-active={!avatar?.custom && (avatar?.preset || 'ink') === preset}
+              onClick={() => pickPreset(preset)}
+              disabled={avatarBusy}
+            >
+              <Avatar avatar={{ preset, custom: false, url: null }} size={40} />
+            </button>
+          ))}
+        </div>
+        <div className="row gap-10 wrap center">
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            style={{ display: 'none' }}
+            onChange={(event) => { const f = event.target.files?.[0]; if (f) uploadPhoto(f); }}
+          />
+          <Btn variant="ghost" onClick={() => { if (!isAccount) { setAvatarError(t.avatarNeedsAccount); return; } fileRef.current?.click(); }} disabled={avatarBusy}>
+            {avatar?.custom ? t.avatarReplace : t.avatarUpload}
+          </Btn>
+          {avatar?.custom ? <Btn variant="ghost" onClick={removePhoto} disabled={avatarBusy}>{t.avatarRemove}</Btn> : null}
+          <span className="caption">{t.avatarUploadHint}</span>
+        </div>
+        {avatarError ? <p className="caption" style={{ color: 'var(--danger, #c33)' }}>{avatarError}</p> : null}
       </Card>
 
       <Card pad="lg" className="stack gap-14">
