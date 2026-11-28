@@ -382,3 +382,139 @@ Was fressen Pandas hauptsächlich?|Bambus
 Welches Insekt produziert Seide?|Seidenraupe;Seidenspinner
 Welches Meerestier hat acht Arme?|Oktopus;Krake
 Welcher Fisch ist der größte der Welt?|Walhai
+Was ist das chemische Symbol für Silber?|Ag
+Was ist das chemische Symbol für Kalium?|K
+Was ist das chemische Symbol für Kohlenstoff?|C
+Welches ist das leichteste Element?|Wasserstoff
+Welches Gas kommt in der Sonne am häufigsten vor?|Wasserstoff
+In welchem Aggregatzustand liegt Dampf vor?|Gasförmig;Gas
+Wie heißt die Einheit der elektrischen Stromstärke?|Ampere
+Wie heißt die Einheit der Kraft?|Newton
+Wie nennt man Tiere, die nur Pflanzen fressen?|Pflanzenfresser;Herbivoren
+Wie nennt man Tiere, die nur Fleisch fressen?|Fleischfresser;Karnivoren
+Wie nennt man den Übergang von Wasser zu Dampf?|Verdunstung;Verdampfung
+Auf welcher Schicht der Erde leben wir?|Erdkruste;Kruste
+Welche Naturkatastrophe misst man mit der Richterskala?|Erdbeben
+Wie heißt das heiße flüssige Gestein, das aus einem Vulkan austritt?|Lava
+Welcher Planet ist der Erde in der Größe am ähnlichsten?|Venus
+Wie hieß der erste künstliche Satellit von 1957?|Sputnik
+Wer war der erste Mensch im Weltall?|Juri Gagarin;Gagarin
+Wie heißt das 1990 gestartete Teleskop im Erdorbit?|Hubble;Hubble-Weltraumteleskop
+Welcher Knochen ist der längste im menschlichen Körper?|Oberschenkelknochen;Femur
+Welches Organ filtert das Blut und bildet Urin?|Nieren;Niere
+Mit welchem Organ atmen wir?|Lunge;Lungen
+Welcher Teil des Auges steuert den Lichteinfall?|Pupille;Iris
+Wie viele Sinne zählt man traditionell beim Menschen?|5;fünf
+Welches Vitamin steckt in Orangen?|Vitamin C
+Welches Mineral baut starke Knochen auf und steckt in Milch?|Kalzium;Calcium
+Was ist der härteste Teil des menschlichen Körpers?|Zahnschmelz
+Welche Zivilisation baute Machu Picchu?|Inka;Die Inka
+Welche Zivilisation baute die Stadt Petra?|Nabatäer
+In welchem Land liegt Petra?|Jordanien
+In welchem Land liegt Angkor Wat?|Kambodscha
+In welchem Land liegt der Fuji?|Japan
+In welchem Land liegt die Stadt Marrakesch?|Marokko
+In welchem Land liegt die Stadt Istanbul?|Türkei
+In welchem Land liegt der Kilimandscharo?|Tansania
+In welchem Land liegt der Amazonas-Regenwald größtenteils?|Brasilien
+In welchem Land liegen die Victoriafälle neben Sambia?|Simbabwe
+Welche Wüste bedeckt einen großen Teil Nordafrikas?|Sahara;Die Sahara
+Welche Meerenge trennt Spanien von Marokko?|Straße von Gibraltar;Gibraltar
+Welches Meer liegt zwischen Europa und Afrika?|Mittelmeer
+Was ist die Hauptstadt von Oman?|Maskat
+Was ist die Hauptstadt von Bahrain?|Manama
+Was ist die Hauptstadt des Jemen?|Sanaa
+Was ist die Hauptstadt von Mauretanien?|Nouakchott
+Was ist die Hauptstadt von Äthiopien?|Addis Abeba
+Was ist die Hauptstadt von Ghana?|Accra
+Was ist die Hauptstadt des Senegal?|Dakar
+Was ist die Hauptstadt von Pakistan?|Islamabad
+Was ist die Hauptstadt von Indonesien?|Jakarta
+Was ist die Hauptstadt von Thailand?|Bangkok
+Was ist die Hauptstadt von Vietnam?|Hanoi
+Was ist die Hauptstadt von Polen?|Warschau
+Was ist die Hauptstadt von Norwegen?|Oslo
+Was ist die Hauptstadt von Irland?|Dublin
+Was ist die Hauptstadt von Chile?|Santiago
+Was ist die Hauptstadt von Kolumbien?|Bogotá;Bogota
+Was ist die Hauptstadt von Kuba?|Havanna
+Was ist die Hauptstadt von Neuseeland?|Wellington
+Wer war der erste Kalif nach dem Propheten Muhammad (Friede sei mit ihm)?|Abu Bakr;Abu Bakr as-Siddiq
+Welche Schlacht gewann Saladin 1187 gegen die Kreuzfahrer?|Hattin;Schlacht bei Hattin
+In welchem Jahr fand der Oktoberkrieg statt?|1973
+In welchem Jahr kam Napoleons Expedition nach Ägypten?|1798
+Wer gilt als Begründer des modernen Ägypten im frühen 19. Jahrhundert?|Muhammad Ali;Muhammad Ali Pascha
+Welche ägyptische Stadt gründete Amr ibn al-As im Jahr 641?|Fustat;Al-Fustat
+Welche Moschee in Kairo ist die älteste Afrikas, erbaut von Amr ibn al-As?|Amr-ibn-al-As-Moschee;Amr-Moschee
+Welche ägyptische Universität ist die älteste und zugleich eine Moschee?|Al-Azhar;Al-Azhar-Universität
+Welcher ägyptische Berg ist für das Katharinenkloster an seinem Fuß bekannt?|Berg Sinai;Sinai
+Welcher See ist der größte natürliche See in Ägypten?|Qarunsee;Karun-See
+Welches Meer begrenzt Ägypten im Osten?|Rotes Meer
+Wie heißt das berühmte Opernhaus in Kairo?|Kairoer Oper;Opernhaus
+Wie heißt das traditionelle lange Gewand ägyptischer Männer?|Galabeya;Dschallabija
+Welches ägyptische Getränk wird aus Zuckerrohr gemacht?|Zuckerrohrsaft
+Welches ägyptische Streetfood ist Brot mit Falafel?|Falafel-Sandwich;Ta'ameya
+Welches ägyptische Brot ist rund, flach und wird im Dorfofen gebacken?|Aish baladi;Baladi-Brot
+Welches ägyptische Gericht besteht aus Nudeln, Reis und Kichererbsen mit scharfer Tomatensoße?|Koshari;Kuscharie
+Welches ägyptische Dessert ist ein Milchreis?|Roz bel laban;Milchreis
+Welches ägyptische Gericht wird aus Mulukhiyya gemacht?|Molokhia;Mulukhiyya
+Welches Gebäck ist mit Nüssen und Honig gefüllt und im Nahen Osten beliebt?|Baklava
+Wer malte „Das letzte Abendmahl“?|Leonardo da Vinci;Da Vinci
+Wer malte „Guernica“?|Pablo Picasso;Picasso
+Wer malte „Der Schrei“?|Edvard Munch;Munch
+Wer schuf die Statue „David“ in Florenz?|Michelangelo
+Wer komponierte „Die vier Jahreszeiten“?|Antonio Vivaldi;Vivaldi
+Wer komponierte „Die Zauberflöte“?|Mozart;Wolfgang Amadeus Mozart
+Wer komponierte „Schwanensee“?|Tschaikowski;Pjotr Tschaikowski
+Wer schrieb „Don Quijote“?|Miguel de Cervantes;Cervantes
+Wer schrieb „Die Abenteuer des Tom Sawyer“?|Mark Twain;Twain
+Wer schrieb „1984“?|George Orwell;Orwell
+Wer schrieb „Stolz und Vorurteil“?|Jane Austen;Austen
+Wer schrieb „Mord im Orient-Express“?|Agatha Christie;Christie
+Wer schrieb „Der Alchimist“?|Paulo Coelho;Coelho
+Wer schrieb den ägyptischen Roman „Der Jakubijan-Bau“?|Alaa al-Aswani;Al Aswany
+Welcher ägyptische Autor wird „Doyen der arabischen Literatur“ genannt?|Taha Hussein;Hussein
+Welcher Detektiv wohnt in der Baker Street 221B?|Sherlock Holmes;Holmes
+Wie heißt Batmans Butler?|Alfred;Alfred Pennyworth
+Wie lautet Spider-Mans Vorname?|Peter
+Von welchem Planeten stammt Superman?|Krypton
+Wie heißt der Oger im Film mit dem sprechenden Esel?|Shrek
+In welchem Film sucht ein Clownfisch seinen Sohn?|Findet Nemo
+Welche Prinzessin hat lange magische Haare in einem Turm?|Rapunzel
+Welcher Schneemann liebt warme Umarmungen in „Die Eiskönigin“?|Olaf
+Wie heißt das gelbe Pokémon mit Blitzschweif?|Pikachu
+Welche Firma stellt Windows her?|Microsoft
+Welcher Konzern besitzt YouTube?|Google
+Wofür steht das „P“ in PDF?|Portable
+Welche Taste löscht das Zeichen links vom Cursor?|Rücktaste;Backspace
+Welche Taste hält man für Großbuchstaben gedrückt?|Umschalttaste;Shift
+In welcher Sportart wird der Ryder Cup gespielt?|Golf
+In welcher Sportart gibt es das Pferd mit Pauschen?|Turnen
+Welcher Sport wird „das schöne Spiel“ genannt?|Fußball
+Wie viele Grand-Slam-Turniere gibt es in einer Tennissaison?|4;vier
+Wie oft finden die Olympischen Sommerspiele statt, in Jahren?|4;vier
+Welche Stadt war 2016 Gastgeber der Olympischen Sommerspiele?|Rio de Janeiro;Rio
+Welche Karte zeigt der Schiedsrichter für einen Platzverweis?|Rot;Rote Karte
+Wie viele Spieler stehen bei einem Rugby-Union-Team auf dem Feld?|15;fünfzehn
+Welche Höchstpunktzahl gibt es in einem Frame beim Bowling?|30
+Welches Land hat insgesamt die meisten olympischen Goldmedaillen?|USA;Vereinigte Staaten
+Wie viele Tage braucht die Erde für einen Umlauf um die Sonne?|365
+Wie viele Stunden hat eine Woche?|168
+Wie viele Nullen hat eine Million?|6;sechs
+Was ist 9 zum Quadrat?|81
+Wie viel sind 25 Prozent von 80?|20;zwanzig
+Welche Zahl folgt: 2, 4, 8, 16, ...?|32
+Wie lautet die römische Zahl für 10?|X
+Wie lautet die römische Zahl für 5?|V
+Wie viele Seiten hat ein Fünfeck?|5;fünf
+Welche Form hat vier gleich lange Seiten und vier rechte Winkel?|Quadrat
+Wie nennt man den längsten Tag des Jahres auf der Nordhalbkugel?|Sommersonnenwende
+Wie nennt man ein Schafjunges?|Lamm
+Wie nennt man ein Pferdejunges?|Fohlen
+Wie nennt man ein Kuhjunges?|Kalb
+Welches Tier legt die größten Eier?|Strauß
+Welches Tier hat den längsten Hals?|Giraffe
+Welcher Vogel ist ein Symbol des Friedens?|Taube
+Welcher Vogel ruft nachts?|Eule
+Welches Tier ist für den Dammbau bekannt?|Biber
+Welches Meeressäugetier ist für seine Stoßzähne bekannt?|Walross

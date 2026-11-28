@@ -382,3 +382,139 @@ What do pandas mostly eat?|Bamboo
 Which insect makes silk?|Silkworm;Silk moth
 Which sea animal has eight arms?|Octopus
 Which fish is the largest in the world?|Whale shark
+What is the chemical symbol for silver?|Ag
+What is the chemical symbol for potassium?|K
+What is the chemical symbol for carbon?|C
+Which is the lightest element?|Hydrogen
+What is the most abundant gas in the Sun?|Hydrogen
+What state of matter is steam?|Gas
+What is the unit of electrical current?|Ampere;Amp
+What is the unit of force?|Newton
+What do we call animals that eat only plants?|Herbivores
+What do we call animals that eat only meat?|Carnivores
+What is the process of water turning into vapour called?|Evaporation
+Which layer of Earth do we live on?|Crust;The crust
+Which natural disaster is measured on the Richter scale?|Earthquake
+What is the name of the hot liquid rock that erupts from a volcano?|Lava
+Which planet is nearest to Earth in size?|Venus
+What is the name of the first artificial satellite launched in 1957?|Sputnik
+Who was the first person in space?|Yuri Gagarin;Gagarin
+What is the name of the telescope launched in 1990 that orbits Earth?|Hubble;Hubble Space Telescope
+What is the longest bone in the human body?|Femur;Thigh bone
+Which organ filters blood and makes urine?|Kidneys;Kidney
+Which organ do we use to breathe?|Lungs;Lung
+Which part of the eye controls how much light enters?|Pupil;Iris
+How many senses are traditionally listed for humans?|5;five
+Which vitamin is found in oranges?|Vitamin C
+Which mineral builds strong bones and is in milk?|Calcium
+What is the hardest part of the human body?|Tooth enamel;Enamel
+Which civilization built Machu Picchu?|Inca;Incas
+Which civilization built the city of Petra?|Nabataeans;Nabataean
+In which country is Petra?|Jordan
+In which country is Angkor Wat?|Cambodia
+In which country is Mount Fuji?|Japan
+In which country is the city of Marrakech?|Morocco
+In which country is the city of Istanbul?|Turkey
+In which country is Mount Kilimanjaro?|Tanzania
+In which country is the Amazon rainforest mostly found?|Brazil
+In which country is Victoria Falls partly located along with Zambia?|Zimbabwe
+Which desert covers much of northern Africa?|Sahara;The Sahara
+Which strait separates Spain from Morocco?|Strait of Gibraltar;Gibraltar
+Which sea is between Europe and Africa?|Mediterranean Sea;Mediterranean
+What is the capital of Oman?|Muscat
+What is the capital of Bahrain?|Manama
+What is the capital of Yemen?|Sanaa;Sana'a
+What is the capital of Mauritania?|Nouakchott
+What is the capital of Ethiopia?|Addis Ababa
+What is the capital of Ghana?|Accra
+What is the capital of Senegal?|Dakar
+What is the capital of Pakistan?|Islamabad
+What is the capital of Indonesia?|Jakarta
+What is the capital of Thailand?|Bangkok
+What is the capital of Vietnam?|Hanoi
+What is the capital of Poland?|Warsaw
+What is the capital of Norway?|Oslo
+What is the capital of Ireland?|Dublin
+What is the capital of Chile?|Santiago
+What is the capital of Colombia?|Bogotá;Bogota
+What is the capital of Cuba?|Havana
+What is the capital of New Zealand?|Wellington
+Who was the first Muslim caliph after the Prophet Muhammad (peace be upon him)?|Abu Bakr;Abu Bakr al-Siddiq
+Which battle did Saladin win in 1187 against the Crusaders?|Hattin;Battle of Hattin
+In which year was the October War (Egypt crossing)?|1973
+In which year did the French campaign under Napoleon arrive in Egypt?|1798
+Who founded modern Egypt in the early 19th century as its ruler?|Muhammad Ali;Muhammad Ali Pasha
+Which Egyptian city did Amr ibn al-As found in 641?|Fustat;Al-Fustat
+Which mosque in Cairo is the oldest in Africa, built by Amr ibn al-As?|Mosque of Amr ibn al-As;Amr Mosque
+Which Egyptian university is the oldest and is also a mosque?|Al-Azhar;Al-Azhar University
+Which Egyptian mountain is famous for St. Catherine's Monastery at its foot?|Mount Sinai;Sinai
+Which Egyptian lake is the biggest natural lake inside Egypt?|Lake Qarun;Qarun
+Which sea borders Egypt to the east?|Red Sea
+What is the name of the famous Egyptian opera house in Cairo?|Cairo Opera House;Opera House
+What is the name of the Egyptian traditional long robe worn by men?|Galabeya;Galabiya;Jellabiya
+Which Egyptian drink is made from sugarcane?|Sugarcane juice;Asab
+Which Egyptian street food consists of bread filled with falafel?|Ta'ameya sandwich;Falafel sandwich
+Which Egyptian bread is round, flat and baked in village ovens?|Aish baladi;Baladi bread
+Which Egyptian dish consists of layered pasta, rice and chickpeas with spicy tomato sauce?|Koshari;Kushari
+Which Egyptian dessert is a rice pudding?|Roz bel laban;Rice pudding
+Which Egyptian dish is made of molokhia?|Molokhia
+Which pastry is filled with nuts and honey and is popular in the Middle East?|Baklava
+Who painted "The Last Supper"?|Leonardo da Vinci;Da Vinci
+Who painted "Guernica"?|Pablo Picasso;Picasso
+Who painted "The Scream"?|Edvard Munch;Munch
+Who sculpted "David" in Florence?|Michelangelo
+Who composed "The Four Seasons"?|Antonio Vivaldi;Vivaldi
+Who composed "The Magic Flute"?|Mozart;Wolfgang Amadeus Mozart
+Who composed "Swan Lake"?|Tchaikovsky;Pyotr Tchaikovsky
+Who wrote "Don Quixote"?|Miguel de Cervantes;Cervantes
+Who wrote "The Adventures of Tom Sawyer"?|Mark Twain;Twain
+Who wrote "1984"?|George Orwell;Orwell
+Who wrote "Pride and Prejudice"?|Jane Austen;Austen
+Who wrote "Murder on the Orient Express"?|Agatha Christie;Christie
+Who wrote "The Alchemist"?|Paulo Coelho;Coelho
+Who wrote the Egyptian novel "The Yacoubian Building"?|Alaa Al Aswany;Al Aswany
+Which Egyptian writer is called the "Dean of Arabic Literature"?|Taha Hussein;Hussein
+Which detective lives at 221B Baker Street?|Sherlock Holmes;Holmes
+Who is Batman's butler?|Alfred;Alfred Pennyworth
+What is Spider-Man's real first name?|Peter
+Which planet is Superman from?|Krypton
+What is the name of the ogre in the film with a talking donkey?|Shrek
+Which film features a clownfish searching for his son?|Finding Nemo
+Which princess has long magical hair in a tower?|Rapunzel
+Which snowman loves warm hugs in "Frozen"?|Olaf
+What is the name of the yellow Pokémon with a lightning-bolt tail?|Pikachu
+Which company makes Windows?|Microsoft
+Which company owns YouTube?|Google
+What does "PDF" stand for (first word)?|Portable
+Which key deletes the character to the left of the cursor?|Backspace
+Which key do you hold to type a capital letter?|Shift
+In which sport is the Ryder Cup played?|Golf
+In which sport do you use a pommel horse?|Gymnastics
+Which sport is known as "the beautiful game"?|Football;Soccer
+How many Grand Slam tournaments are in a tennis season?|4;four
+How often are the Summer Olympics held, in years?|4;four
+Which city hosted the 2016 Summer Olympics?|Rio de Janeiro;Rio
+Which colour card does a referee show to send a player off?|Red
+How many players start on a rugby union team?|15;fifteen
+What is the maximum score in a single frame of ten-pin bowling?|30
+Which country has the most Olympic gold medals in total?|United States;USA
+How many days does it take the Earth to orbit the Sun?|365;about 365
+How many hours are in a week?|168
+How many zeros are in one million?|6;six
+What is 9 squared?|81
+What is 25 percent of 80?|20;twenty
+What is the next number: 2, 4, 8, 16, ...?|32
+What is the Roman numeral for 10?|X
+What is the Roman numeral for 5?|V
+How many sides does a pentagon have?|5;five
+What shape has four equal sides and four right angles?|Square
+What is the longest day of the year in the northern hemisphere called?|Summer solstice
+What do we call a baby sheep?|Lamb
+What do we call a baby horse?|Foal
+What do we call a baby cow?|Calf
+Which animal lays the largest eggs?|Ostrich
+Which animal has the longest neck?|Giraffe
+Which bird is a symbol of peace?|Dove
+Which bird hoots at night?|Owl
+Which animal is known for building dams?|Beaver
+Which sea mammal is known for its tusks?|Walrus
