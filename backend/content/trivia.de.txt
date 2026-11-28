@@ -206,3 +206,171 @@ Welche Frucht trägt ihre Samen außen?|Erdbeere
 Wie nennt man gefrorenes Wasser?|Eis
 Welches Geräusch macht eine Katze?|Miau
 Wie nennt man jemanden, der Sterne erforscht?|Astronom
+Was ist das chemische Symbol für Gold?|Au
+Was ist das chemische Symbol für Natrium?|Na
+Was ist das chemische Symbol für Eisen?|Fe
+Welches Gas macht den größten Teil der Erdatmosphäre aus?|Stickstoff
+Welche Kraft hält uns auf dem Boden?|Schwerkraft;Gravitation
+Wie viele Kammern hat das menschliche Herz?|4;vier
+Was ist das größte Organ des menschlichen Körpers?|Haut
+Welche Blutgruppe ist der Universalspender?|0 negativ;Null negativ
+Welcher Teil der Pflanze stellt mit Sonnenlicht Nahrung her?|Blatt;Blätter
+Wie nennt man den Vorgang, mit dem Pflanzen Licht in Energie umwandeln?|Photosynthese
+Wie heißt der nächste Stern zur Erde?|Die Sonne;Sonne
+Welcher Planet unseres Sonnensystems ist der heißeste?|Venus
+Welcher Planet ist auf die Seite gekippt?|Uranus
+Wie heißt unsere Galaxie?|Milchstraße;Die Milchstraße
+Wie viele Planeten hat unser Sonnensystem?|8;acht
+Wie stark ist die Schwerkraft des Mondes im Vergleich zur Erde ungefähr?|Ein Sechstel;1/6
+Wer entdeckte der Legende nach die Schwerkraft durch einen fallenden Apfel?|Isaac Newton;Newton
+Wer entwickelte die Relativitätstheorie?|Albert Einstein;Einstein
+Wer erfand das Telefon?|Alexander Graham Bell;Bell
+Wer entwickelte die Glühbirne zur Marktreife?|Thomas Edison;Edison
+Wer schrieb den ägyptischen Roman „Zwischen den Palästen“?|Nagib Mahfuz;Mahfouz
+Welcher Ägypter erhielt 1988 den Nobelpreis für Literatur?|Nagib Mahfuz;Mahfouz
+Welcher ägyptische Wissenschaftler erhielt 1999 den Chemie-Nobelpreis?|Ahmed Zewail;Zewail
+Wer malte „Sternennacht“?|Vincent van Gogh;Van Gogh
+Wer malte die Decke der Sixtinischen Kapelle?|Michelangelo
+Wer komponierte die „Mondscheinsonate“?|Beethoven;Ludwig van Beethoven
+Welches antike Weltwunder steht noch bei Kairo?|Cheops-Pyramide;Große Pyramide;Pyramiden
+Welcher Fluss ist nach gängiger Messung der längste der Welt?|Nil;Der Nil
+Wie heißt der höchste Berg Afrikas?|Kilimandscharo
+Wie heißt der höchste Berg Ägyptens?|Katharinenberg;Gebel Katherina
+Auf welchem Berg soll Moses die Zehn Gebote empfangen haben?|Berg Sinai;Sinai
+Wie heißt der größte See Afrikas?|Victoriasee;Viktoriasee
+Welcher See ist der größte in Ägypten?|Nasser-See;Nassersee
+Welcher Kanal verbindet das Mittelmeer mit dem Roten Meer?|Sueskanal;Suez
+Welcher Staudamm liegt bei Assuan am Nil?|Assuan-Staudamm;Hochdamm
+Was ist die Hauptstadt von Kenia?|Nairobi
+Was ist die Hauptstadt von Nigeria?|Abuja
+Was ist der Regierungssitz Südafrikas?|Pretoria
+Was ist die Hauptstadt von Mexiko?|Mexiko-Stadt;Mexico City
+Was ist die Hauptstadt von Südkorea?|Seoul
+Was ist die Hauptstadt von Portugal?|Lissabon
+Was ist die Hauptstadt von Schweden?|Stockholm
+Was ist die Hauptstadt der Vereinigten Arabischen Emirate?|Abu Dhabi
+Was ist die Hauptstadt von Libyen?|Tripolis
+Welches Land hat die meisten Einwohner?|Indien
+Welcher ist der größte Kontinent?|Asien
+Welcher ist der kleinste Kontinent?|Australien;Ozeanien
+Welcher Ozean ist der kleinste?|Arktischer Ozean;Nordpolarmeer
+Welches Meer ist besonders salzig und liegt am tiefsten an Land?|Totes Meer
+Welches Land hat die Form eines Stiefels?|Italien
+Welches Land hat ein Ahornblatt in der Flagge?|Kanada
+Welches Land ist berühmt für Tulpen und Windmühlen?|Niederlande;Holland
+In welchem Land leben Kängurus?|Australien
+In welcher Stadt steht der Eiffelturm?|Paris
+In welcher Stadt steht Big Ben?|London
+In welcher Stadt steht das Brandenburger Tor?|Berlin
+In welcher Stadt steht der Burj Khalifa?|Dubai
+In welcher Stadt steht die Kaaba?|Mekka
+In welcher Stadt steht die Prophetenmoschee?|Medina
+In welcher Stadt steht die Al-Azhar-Moschee?|Kairo
+Mit welcher Stadt ist die Legende der Hängenden Gärten verbunden?|Babylon
+Welche ägyptische Stadt liegt an der Nilmündung am Mittelmeer?|Rosetta;Alexandria
+Welche ägyptische Stadt ist das nördliche Tor des Sueskanals?|Port Said
+Welcher Pharao ist als Kindkönig bekannt?|Tutanchamun
+Welche ägyptische Königin war mit Julius Cäsar und Marcus Antonius verbunden?|Kleopatra
+Wie heißt die altägyptische Schrift?|Hieroglyphen
+Welcher Stein half bei der Entzifferung der Hieroglyphen?|Stein von Rosette;Rosetta-Stein
+Worauf schrieben die alten Ägypter mit Schilf als Rohstoff?|Papyrus
+Welcher ägyptische Gott wird mit Falkenkopf dargestellt?|Horus
+Welcher ägyptische Gott ist der Sonnengott?|Ra;Re
+Welcher ägyptische Gott mit Schakalkopf ist mit der Mumifizierung verbunden?|Anubis
+In welchem Jahr fand die ägyptische Revolution gegen die Monarchie statt?|1952
+In welchem Jahr wurde der Sueskanal eröffnet?|1869
+In welchem Jahr sank die Titanic?|1912
+In welchem Jahr endete der Zweite Weltkrieg?|1945
+In welchem Jahr fiel die Berliner Mauer?|1989
+In welchem Jahr landeten Menschen erstmals auf dem Mond?|1969
+In welchem Jahr wurde das World Wide Web öffentlich?|1991
+Welches Reich baute das Kolosseum?|Römisches Reich;Römer
+Wer war der erste Präsident der Vereinigten Staaten?|George Washington;Washington
+Wer war der erste Präsident Ägyptens?|Mohamed Naguib;Nagib
+Welcher alliierte Staatsmann hielt die Rede „Blut, Mühsal, Tränen und Schweiß“?|Winston Churchill;Churchill
+Wer erreichte 1492 für Spanien Amerika?|Christoph Kolumbus;Kolumbus
+Wer war die erste Frau, die einen Nobelpreis gewann?|Marie Curie;Curie
+Welcher Wissenschaftler entdeckte das Penicillin?|Alexander Fleming;Fleming
+Wer behauptete 1543, die Erde kreise um die Sonne?|Kopernikus;Nikolaus Kopernikus
+Wer schrieb das „Buch der Optik“ und gilt als Vater der Optik?|Ibn al-Haitham;Alhazen
+Wer gilt als Vater der Algebra?|Al-Chwarizmi;Chwarizmi
+Welche Sportart wird in Wimbledon gespielt?|Tennis
+Welches Land erfand den Fußball, wie wir ihn kennen?|England
+Wie lang ist ein Marathon in Kilometern (ungefähr)?|42;42 km;42,195
+Wie viele Spieler hat ein Volleyballteam auf dem Feld?|6;sechs
+Wie viele Punkte ist ein Touchdown im American Football wert?|6;sechs
+Welches Land war 2022 Gastgeber der Fußball-WM?|Katar
+Welches Land hat die meisten Männer-Weltmeisterschaften gewonnen?|Brasilien
+Welcher ägyptische Klub trägt den Beinamen „Rote Burg“?|Al Ahly;Ahly
+Welcher ägyptische Klub trägt den Beinamen „Weiße Burg“?|Zamalek
+Wie oft hat Ägypten den Afrika-Cup gewonnen?|7;sieben
+Welcher Argentinier gewann 2022 als Kapitän die WM?|Lionel Messi;Messi
+Welcher portugiesische Fußballer wird CR7 genannt?|Cristiano Ronaldo;Ronaldo
+Welcher Athlet hält den 100-m-Weltrekord von 9,58 Sekunden?|Usain Bolt;Bolt
+Welche Sportart wird mit einem Puck gespielt?|Eishockey
+In welcher Sportart gibt es den Slam Dunk?|Basketball
+In welcher Sportart benutzt man Schläger und Federball?|Badminton
+Welche japanische Kampfkunst bedeutet „leere Hand“?|Karate
+Wie viele Felder hat ein Schachbrett?|64;vierundsechzig
+Welches Instrument hat 88 Tasten?|Klavier
+Wie viele Töne hat eine Oktave?|8;acht
+Welches ist die klassische arabische Laute?|Oud;Ud
+Welche ägyptische Diva wird „Al-Sitt“ genannt?|Umm Kulthum;Oum Kalthoum
+In welchem Film gibt es ein Schiff, Jack und Rose?|Titanic
+Welches Studio machte „Toy Story“?|Pixar
+Wie heißt der Löwe in „Der König der Löwen“?|Simba
+Welche Zaubererschule besucht Harry Potter?|Hogwarts
+Wer ist die Autorin von „Harry Potter“?|J. K. Rowling;Rowling
+Wer schrieb „Der kleine Prinz“?|Antoine de Saint-Exupéry;Saint-Exupéry
+Welche Spielfigur ist ein Klempner mit roter Mütze?|Mario
+Welches Spiel dreht sich ums Bauen mit Blöcken in einer Pixelwelt?|Minecraft
+Wofür steht „www“?|World Wide Web
+Wofür steht das „U“ in USB?|Universal
+Wofür steht das „G“ in GPS?|Global
+Welches soziale Netzwerk wurde durch einen blauen Vogel symbolisiert und heißt jetzt X?|Twitter
+Welche dieser Sprachen wird von rechts nach links geschrieben?|Arabisch
+Was ist die Währung Ägyptens?|Ägyptisches Pfund;Pfund
+Was ist die Währung des Vereinigten Königreichs?|Pfund Sterling;Pfund
+Was ist die Währung Saudi-Arabiens?|Rial;Saudi-Rial
+Was ist die Währung der VAE?|Dirham
+Was ist die Währung der Schweiz?|Schweizer Franken;Franken
+Was ist die Währung Indiens?|Rupie;Indische Rupie
+Was ist die Währung der Türkei?|Lira;Türkische Lira
+Wie viele Seiten hat ein Sechseck?|6;sechs
+Wie viele Seiten hat ein Achteck?|8;acht
+Wie lautet der Wert von Pi auf zwei Nachkommastellen?|3,14;3.14
+Wie viel sind 15 Prozent von 200?|30;dreißig
+Was ist 7 mal 8?|56;sechsundfünfzig
+Was ist 100 geteilt durch 4?|25;fünfundzwanzig
+Welche Primzahl folgt auf 7?|11;elf
+Wie viele Grad hat ein rechter Winkel?|90;neunzig
+Wie viele Grad hat ein Vollkreis?|360
+Wie viele Zentimeter hat ein Meter?|100;hundert
+Wie viele Gramm hat ein Kilogramm?|1000;1.000
+Wie viele Monate hat ein Jahr?|12;zwölf
+Welcher Monat hat 28 oder 29 Tage?|Februar
+Welcher ist der neunte Monat des Jahres?|September
+Welche Farbe hat der Himmel an einem klaren Tag?|Blau
+Was erhält man, wenn man Rot und Weiß mischt?|Rosa
+Was erhält man, wenn man Rot und Blau mischt?|Lila;Violett
+Was ist die Hauptzutat von Guacamole?|Avocado
+Was ist die Hauptzutat von Tahini?|Sesam
+Aus welcher Nuss wird Marzipan gemacht?|Mandel;Mandeln
+Welches Gemüse bringt einen beim Schneiden zum Weinen?|Zwiebel
+Welches Gewürz stammt aus der Krokusblüte und ist sehr teuer?|Safran
+Welches ägyptische Dessert besteht aus Teigfäden mit Nüssen in Sirup?|Kunafa;Konafa
+Welches ägyptische Getränk wird aus Hibiskusblüten gemacht?|Karkade;Hibiskustee
+Welches ägyptische Nationalgericht wird oft aus Saubohnen gemacht?|Ful medames;Ful
+Aus welchem Land stammt Pizza?|Italien
+Aus welchem Land stammt Paella?|Spanien
+Mit welchem Land wird das Croissant berühmterweise verbunden?|Frankreich
+Welcher Vogel ist im Sturzflug am schnellsten?|Wanderfalke;Falke
+Welches ist das größte Landtier?|Afrikanischer Elefant;Elefant
+Welche ist die größte Raubkatze?|Tiger
+Wie viele Herzen hat ein Oktopus?|3;drei
+Welches Tier schläft kopfüber hängend?|Fledermaus
+Welches Tier ist bekannt dafür, die Farbe zu wechseln?|Chamäleon
+Welches Tier trägt sein Junges im Beutel?|Känguru
+Was fressen Pandas hauptsächlich?|Bambus
+Welches Insekt produziert Seide?|Seidenraupe;Seidenspinner
+Welcher Fisch ist der größte der Welt?|Walhai
