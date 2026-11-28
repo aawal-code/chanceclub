@@ -343,7 +343,7 @@ function AwardRound({ t, round, party, onAct }: { t: Strings; round: Round; part
     <div className="stack gap-12">
       {round.private_clue && (
         <div className="card" data-flat="true" style={{ padding: 16 }}>
-          <p className="caption">{t.answer}</p>
+          <p className="caption">{t.onlyYouSee}</p>
           <p className="h2" style={{ marginTop: 6 }}>{round.private_clue}</p>
         </div>
       )}
@@ -359,7 +359,7 @@ function AwardRound({ t, round, party, onAct }: { t: Strings; round: Round; part
                 disabled={scored.has(member.id)}
                 onClick={() => onAct({ type: 'point', target_player_id: Number(member.id) })}
               >
-                {member.name} {scored.has(member.id) ? <Glyph name="check" size={14} /> : <Glyph name="plus" size={14} />}
+                <span style={{ textTransform: "none" }}>{member.name}</span> {scored.has(member.id) ? <Glyph name="check" size={14} /> : <Glyph name="plus" size={14} />}
               </Btn>
             ))}
           </div>
