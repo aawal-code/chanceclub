@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 
 class Tournament
 {
-    public const GAMES = ['trivia', 'wordle', 'draw', 'categories', 'whoami', 'charades'];
+    public const GAMES = ['trivia', 'wordle', 'draw', 'categories', 'whoami', 'charades', 'imposter'];
     public const POINTS = [1 => 10, 2 => 7, 3 => 5, 4 => 4, 5 => 3, 6 => 2];
 
     /** Give placement points for a just-recorded match to the party's active tournament. */

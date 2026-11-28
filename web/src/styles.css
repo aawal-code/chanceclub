@@ -781,3 +781,39 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .rank-row > *:not(.rank-bar) { position: relative; }
 .rank-bar { position: absolute; inset-block: 0; inset-inline-start: 0; background: var(--surface-2); border-radius: 10px; z-index: 0; }
 [dir='rtl'] .bar-grow { transform-origin: right; }
+
+/* ============ turn-based party games (Imposter, Word Bomb, Two Truths) ============ */
+.game-stage { width: 100%; max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+.gk-clock { display: flex; flex-direction: column; gap: 6px; }
+.gk-timer { height: 8px; border-radius: 99px; background: var(--surface-3); overflow: hidden; }
+.gk-timer > i { display: block; height: 100%; background: var(--ink); transition: width .3s linear; }
+.gk-timer[data-tone='warn'] > i { background: #f08c00; }
+.gk-timer[data-tone='danger'] > i { background: #e03131; }
+.gk-rail { display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 6px; scrollbar-width: thin; }
+.gk-chip { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 6px; border-radius: 99px; border: var(--bw) solid var(--line); background: var(--surface-2); font-size: 12.5px; white-space: nowrap; color: var(--ink-soft); }
+.gk-chip[data-turn='true'] { border-color: var(--ink); color: var(--ink); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ink) 14%, transparent); }
+.gk-chip[data-done='true'] { opacity: .62; }
+.gk-dot { width: 24px; height: 24px; border-radius: 8px; display: grid; place-items: center; background: var(--surface-3); font-size: 11px; font-weight: 800; color: var(--ink); flex: none; }
+.gk-dot[data-turn='true'] { background: var(--accent); color: var(--accent-ink); }
+.gk-wordcard { display: flex; flex-direction: column; gap: 4px; padding: 16px 18px; border-radius: var(--r-md); background: var(--surface-2); border: var(--bw) solid var(--line); }
+.gk-wordcard[data-imposter='true'] { border-color: #e03131; box-shadow: inset 0 0 0 1px #e03131; }
+.gk-word { font-size: clamp(24px, 6vw, 34px); font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.gk-clue { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line-soft); font-size: 14px; }
+.gk-clue:last-child { border-bottom: 0; }
+.gk-clue[data-pending='true'] { color: var(--muted); }
+.gk-pick { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.gk-pick-btn { display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 8px 14px; border-radius: var(--r-sm); border: var(--bw) solid var(--line); background: var(--surface-2); color: var(--ink); font-weight: 700; font-size: 14px; cursor: pointer; text-align: start; }
+.gk-pick-btn:hover { border-color: var(--ink); }
+.gk-pick-btn:active { transform: scale(.98); }
+.gk-pick-btn:disabled { opacity: .5; }
+.gk-answer { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border-radius: var(--r-sm); background: var(--surface-2); border: var(--bw) solid var(--line); }
+.gk-reveal { display: flex; flex-direction: column; gap: 12px; padding: 18px; border-radius: var(--r-md); background: var(--surface-2); border: var(--bw) solid var(--line); }
+.gk-reveal[data-tone='win'] { border-color: var(--hit); box-shadow: inset 0 0 0 1px var(--hit); }
+.gk-reveal[data-tone='lose'] { border-color: #e03131; box-shadow: inset 0 0 0 1px #e03131; }
+.gk-reveal-head { font-size: clamp(20px, 4.4vw, 26px); font-weight: 800; letter-spacing: -.02em; margin: 0; }
+.gk-words { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.gk-wordtile { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: var(--r-sm); background: var(--surface); border: var(--bw) solid var(--line); }
+.gk-wordtile[data-imposter='true'] { border-style: dashed; }
+.gk-points { font-family: var(--mono); font-weight: 800; color: var(--hit); }
+@media (max-width: 420px) { .gk-words { grid-template-columns: 1fr; } .gk-pick { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 760px) { .game-stage { padding-bottom: 92px; } }

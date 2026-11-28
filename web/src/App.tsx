@@ -273,6 +273,7 @@ export default function App() {
         if (ticks % 5 === 1) api.heartbeat(code, rtt).catch(() => { /* best effort */ });
         setActiveParty(result.data);
         if (result.data.status === 'lobby' && parseHash().name === 'game') go({ name: 'party', code: result.data.code });
+        if (result.data.status === 'playing' && parseHash().name === 'party') go({ name: 'game' });
       } catch (error) {
         if (cancelled) return;
         if (error instanceof ApiError && (error.status === 404 || error.status === 401)) {
@@ -282,13 +283,14 @@ export default function App() {
       }
     };
     tick();
-    pollRef.current = window.setInterval(tick, 2000);
+    const fast = !!activeParty?.game && ['imposter', 'wordbomb', 'truths'].includes(activeParty.game);
+    pollRef.current = window.setInterval(tick, fast ? 900 : 2000);
     return () => {
       cancelled = true;
       if (pollRef.current) window.clearInterval(pollRef.current);
       pollRef.current = null;
     };
-  }, [activeParty?.code, identity]);
+  }, [activeParty?.code, activeParty?.game, identity]);
 
   /* ---- party actions ---- */
   const createParty = useCallback(async (name: string) => {
@@ -336,14 +338,17 @@ export default function App() {
   }, [ensureIdentity, t.error, toast]);
 
   const act = useCallback(async (body: Record<string, unknown>) => {
-    if (!activeParty) return;
+    if (!activeParty) return { ok: false as const };
     try {
       const result = await api.action(activeParty.code, body);
       setActiveParty(result.data);
+      return { ok: true as const };
     } catch (error: any) {
-      toast(friendlyError(error, t));
+      const message = friendlyError(error, t);
+      toast(message);
+      return { ok: false as const, message, raw: String(error?.message || '') };
     }
-  }, [activeParty, t.error, toast]);
+  }, [activeParty, t, toast]);
 
   const setReady = useCallback(async (ready: boolean) => {
     if (!activeParty) return;

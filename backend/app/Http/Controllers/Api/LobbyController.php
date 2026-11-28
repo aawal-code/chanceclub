@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LobbyController extends Controller
 {
-    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw'];
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw', 'imposter'];
 
     private const PROMPTS = [
         'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],
@@ -119,6 +119,10 @@ class LobbyController extends Controller
         if (!$player->last_seen_at || \App\Support\History::age($player->last_seen_at) >= 8) {
             DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
         }
+        if ($party->status === 'playing') {
+            \App\Support\PartyGames::tick($party, DB::table('party_players')->where('party_id', $party->id)->get());
+            $party = DB::table('parties')->find($party->id) ?? $party;
+        }
         return response()->json(['data' => $this->partyView($party, $identity)]);
     }
 
@@ -206,6 +210,14 @@ class LobbyController extends Controller
             [$prompt, $answer] = $this->pickPrompt((int) $locked->id, $game, $locale, $promptBank, $answerBank);
             if ($game === 'wordle') $answer = Wordle::pick();
             $turn = $players->first(fn ($player) => (int) $player->id === (int) $locked->host_player_id) ?? $players->first();
+            $gameState = null;
+            if (\App\Support\PartyGames::isNew($game)) {
+                $built = \App\Support\PartyGames::start($locked, $players, $game, $locale);
+                $prompt = $built['prompt'];
+                $answer = $built['answer'];
+                $turn = $players->first(fn ($person) => (int) $person->id === (int) $built['turn']) ?? $turn;
+                $gameState = [$game => $built['state']];
+            }
             $wheelState = null;
             if ($game === 'wheel') {
                 $entries = array_values(array_filter(array_map(fn ($entry) => trim((string) $entry), $data['entries'] ?? []), fn ($entry) => $entry !== ''));
@@ -218,7 +230,7 @@ class LobbyController extends Controller
                 'prompt' => $prompt, 'answer' => $answer, 'status' => 'active',
                 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
-            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => $wheelState ? json_encode(['wheel' => $wheelState], JSON_THROW_ON_ERROR) : ($bracketState ? json_encode(['bracket' => $bracketState], JSON_THROW_ON_ERROR) : null), 'updated_at' => now()]);
+            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => $gameState ? json_encode($gameState, JSON_THROW_ON_ERROR) : ($wheelState ? json_encode(['wheel' => $wheelState], JSON_THROW_ON_ERROR) : ($bracketState ? json_encode(['bracket' => $bracketState], JSON_THROW_ON_ERROR) : null)), 'updated_at' => now()]);
             return DB::table('parties')->find($locked->id);
         });
         return response()->json(['data' => $this->partyView($result, $identity)]);
@@ -227,11 +239,14 @@ class LobbyController extends Controller
     public function action(Request $request, string $code): JsonResponse
     {
         $data = $request->validate([
-            'type' => ['required', 'string', 'in:answer,vote,roll,point,guess,pick'],
+            'type' => ['required', 'string', 'in:answer,vote,roll,point,guess,pick,clue,word,submit'],
             'target_player_id' => ['nullable', 'integer', 'min:1'],
-            'value' => ['nullable', 'string', 'max:120'],
+            'value' => ['nullable', 'string', 'max:160'],
             'count' => ['nullable', 'integer', 'in:1,2'],
             'max' => ['nullable', 'integer', 'min:2', 'max:10000'],
+            'choice' => ['nullable', 'integer', 'min:0', 'max:2'],
+            'lines' => ['nullable', 'array', 'max:3'],
+            'lines.*' => ['string', 'max:160'],
         ]);
         $identity = $this->identity($request);
         $party = $this->party($code);
@@ -240,6 +255,12 @@ class LobbyController extends Controller
             $round = DB::table('party_rounds')->where('party_id', $party->id)->orderByDesc('round_number')->lockForUpdate()->first();
             if (!$round || $round->status !== 'active') throw new HttpException(409, 'This round is already resolved.');
             $members = DB::table('party_players')->where('party_id', $party->id)->orderBy('id')->get();
+            if (\App\Support\PartyGames::isNew($round->game)) {
+                $fresh = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
+                \App\Support\PartyGames::act($fresh, $round, $player, $data, $members);
+                DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
+                return DB::table('parties')->find($party->id);
+            }
             if ($data['type'] === 'point') {
                 if (!in_array($round->game, ['categories', 'whoami', 'charades'], true)) throw new HttpException(422, 'Host-awarded points are not available for this game.');
                 if ((int) $party->host_player_id !== (int) $player->id) throw new HttpException(403, 'Only the host can award points.');
@@ -353,15 +374,26 @@ class LobbyController extends Controller
             if ($locale === 'de') { $promptBank = self::PROMPTS_DE; $answerBank = self::ANSWERS_DE; }
             [$nextPrompt, $nextAnswer] = $this->pickPrompt((int) $locked->id, $game, $locale, $promptBank, $answerBank);
             $players = DB::table('party_players')->where('party_id', $locked->id)->orderBy('id')->get();
+            $nextState = null;
             $previousTurnIndex = $players->search(fn ($person) => (int) $person->id === (int) ($previousRound?->turn_player_id ?? 0));
             $turn = $players->get($previousTurnIndex === false ? 0 : (($previousTurnIndex + 1) % $players->count()));
             if (!$previousRound?->turn_player_id) $turn = $players->first(fn ($person) => (int) $person->id === (int) $locked->host_player_id) ?? $players->first();
+            $nextAnswer = $game === 'wordle' ? Wordle::pick() : $nextAnswer;
+            if (\App\Support\PartyGames::isNew($game)) {
+                $built = \App\Support\PartyGames::start($locked, $players, $game, $locale);
+                $nextPrompt = $built['prompt'];
+                $nextAnswer = $built['answer'];
+                $turn = $players->first(fn ($person) => (int) $person->id === (int) $built['turn']) ?? $turn;
+                $nextState = [$game => $built['state']];
+            }
             DB::table('party_rounds')->insert([
                 'party_id' => $locked->id, 'round_number' => $number, 'game' => $game, 'locale' => $locale,
-                'prompt' => $nextPrompt, 'answer' => $game === 'wordle' ? Wordle::pick() : $nextAnswer,
+                'prompt' => $nextPrompt, 'answer' => $nextAnswer,
                 'status' => 'active', 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
-            DB::table('parties')->where('id', $locked->id)->update(['round_number' => $number, 'updated_at' => now()]);
+            DB::table('parties')->where('id', $locked->id)->update($nextState
+                ? ['round_number' => $number, 'state' => json_encode($nextState, JSON_THROW_ON_ERROR), 'updated_at' => now()]
+                : ['round_number' => $number, 'updated_at' => now()]);
             return DB::table('parties')->find($locked->id);
         });
         return response()->json(['data' => $this->partyView($result, $identity)]);
@@ -535,6 +567,10 @@ class LobbyController extends Controller
         if ($party->current_game === 'bracket' && $party->state) {
             $bracketView = json_decode($party->state, true)['bracket'] ?? null;
         }
+        $gameState = null;
+        if ($round && \App\Support\PartyGames::isNew($round->game)) {
+            $gameState = \App\Support\PartyGames::view($party, $round, $myPlayer, $members);
+        }
         $roundView = $round ? [
             'number' => (int) $round->round_number,
             'game' => $round->game,
@@ -564,6 +600,7 @@ class LobbyController extends Controller
             'status' => $party->status, 'game' => $party->current_game,
             'wheel' => $wheel,
             'bracket' => $bracketView,
+            'game_state' => $gameState,
             'tournament' => \App\Support\Tournament::view($party->id),
             'round' => $roundView, 'createdAt' => $party->created_at,
         ];

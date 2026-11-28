@@ -48,6 +48,7 @@ export type Party = {
   games_played?: number;
   my_wins?: number;
   tournament?: Tournament | null;
+  game_state?: Record<string, any> | null;
   createdAt: string;
 };
 

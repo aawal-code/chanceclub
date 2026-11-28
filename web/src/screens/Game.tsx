@@ -6,6 +6,8 @@ import { Btn, Card, Field, useToast, LagPill } from '../components/ui';
 import { Wheel, angleFor } from '../games/Wheel';
 import { BracketView } from '../games/Bracket';
 const DrawGame = React.lazy(() => import('../games/DrawGame'));
+const ImposterGame = React.lazy(() => import('../games/Imposter'));
+import type { Act } from '../games/kit';
 import { Keyboard, WordleBoard, keyStatesFrom } from '../games/Wordle';
 
 const AWARD_GAMES = ['categories', 'whoami', 'charades'];
@@ -18,7 +20,7 @@ export default function GameScreen({
   t: Strings;
   locale: Locale;
   party: Party;
-  onAct: (body: Record<string, unknown>) => void;
+  onAct: Act;
   onAdvance: () => void;
   onFinish: () => void;
   onLeave: () => void;
@@ -29,6 +31,14 @@ export default function GameScreen({
   const game = round?.game || party.game || 'dice';
   const isMyTurn = !!round && round.turn_player_id === party.self_player_id;
   const turnName = round ? party.members.find((member) => member.id === round.turn_player_id)?.name : undefined;
+
+  if (game === 'imposter') {
+    return (
+      <React.Suspense fallback={<p className="caption">{t.loading}</p>}>
+        <ImposterGame t={t} locale={locale} party={party} onAct={onAct} onAdvance={onAdvance} onFinish={onFinish} onLeave={onLeave} onBack={onBack} />
+      </React.Suspense>
+    );
+  }
 
   if (game === 'draw') {
     return (
