@@ -82,6 +82,14 @@ export default function Truths({ t, locale, party, onAct, onAdvance, onFinish, o
       {phase === 'write' && (
         <div className="stack gap-12">
           <Clock endsAt={gs.endsAt} total={WRITE_SECONDS} offset={offset} label={`${gs.submittedCount}/${gs.playerCount} ${t.trSent}`} />
+          <TurnRail
+            party={party}
+            order={gs.order || []}
+            currentId={null}
+            doneIds={new Set(gs.submittedIds || [])}
+            youLabel={t.you}
+            note={t.trSentSoFar}
+          />
           {gs.hasSubmitted ? (
             <div className="gk-answer">
               <span className="caption">{t.trSentWaiting}</span>
