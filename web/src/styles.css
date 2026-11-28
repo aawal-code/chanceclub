@@ -843,3 +843,5 @@ svg { flex-shrink: 0; vertical-align: middle; }
 
 .gk-used { display: flex; flex-wrap: wrap; gap: 6px; }
 .gk-used-word { padding: 4px 10px; border-radius: 999px; background: var(--bg-soft); border: 1px solid var(--line); font-size: 12px; font-weight: 700; }
+
+.gk-error { margin: 0; padding: 10px 12px; border-radius: 12px; background: color-mix(in srgb, var(--miss) 16%, transparent); border: 1px solid var(--miss); color: var(--ink); font-weight: 700; font-size: 13px; }

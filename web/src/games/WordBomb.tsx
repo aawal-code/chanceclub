@@ -72,7 +72,7 @@ export default function WordBomb({ t, locale, party, onAct, onAdvance, onFinish,
       t={t}
       party={party}
       title={title}
-      subtitle={phase === 'play' ? `${gs.used?.length || 0} ${t.wbWordsIn}` : undefined}
+      subtitle={phase === 'play' ? t.wbWordsUsed.replace('{n}', String(gs.used?.length || 0)) : undefined}
       onBack={onBack}
       onLeave={onLeave}
       onFinish={onFinish}
@@ -99,7 +99,7 @@ export default function WordBomb({ t, locale, party, onAct, onAdvance, onFinish,
                 onKeyDown={(event) => { if (event.key === 'Enter') void pass(); }}
               />
               <Btn disabled={!word.trim() || busy} onClick={() => void pass()}>{t.wbPass}</Btn>
-              {error ? <p className="caption" data-tone="danger" style={{ color: 'var(--miss)' }}>{error}</p> : null}
+              {error ? <p className="gk-error" role="alert">{error}</p> : null}
             </div>
           ) : (
             <div className="gk-answer">
@@ -127,7 +127,7 @@ export default function WordBomb({ t, locale, party, onAct, onAdvance, onFinish,
         <Reveal
           tone={gs.boom.holderId === party.self_player_id ? 'lose' : 'win'}
           headline={t.wbBoom}
-          sub={t.wbBoomSub.replace('{name}', names.get(gs.boom.holderId) || '').replace('{passes}', String(gs.boom.passes))}
+          sub={(gs.boom.passes === 1 ? t.wbBoomSubOne : t.wbBoomSub).replace('{name}', names.get(gs.boom.holderId) || '').replace('{passes}', String(gs.boom.passes))}
         >
           <div className="stack gap-8" style={{ marginTop: 10 }}>
             {party.members.map((member) => {

@@ -345,7 +345,8 @@ export default function App() {
       return { ok: true as const };
     } catch (error: any) {
       const message = friendlyError(error, t);
-      toast(message);
+      // The turn-based games print the reason next to the input, so a toast would double it.
+      if (!['imposter', 'wordbomb', 'truths'].includes(activeParty.game || '')) toast(message);
       return { ok: false as const, message, raw: String(error?.message || '') };
     }
   }, [activeParty, t, toast]);
