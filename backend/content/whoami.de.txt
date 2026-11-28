@@ -99,3 +99,287 @@ Ahmed Hegazi
 Kylian Mbappé
 Sergio Ramos
 Olaf
+Kevin De Bruyne
+Erling Haaland
+Vinícius Júnior
+Jude Bellingham
+Luka Modrić
+Robert Lewandowski
+Zlatan Ibrahimović
+Ronaldinho
+Pelé
+Diego Maradona
+Thierry Henry
+David Beckham
+Sadio Mané
+Riyad Mahrez
+Achraf Hakimi
+Yassine Bounou
+Wael Gomaa
+Mohamed Elneny
+Omar Marmoush
+Usain Bolt
+Michael Phelps
+Michael Jordan
+LeBron James
+Stephen Curry
+Kobe Bryant
+Serena Williams
+Roger Federer
+Rafael Nadal
+Novak Djokovic
+Muhammad Ali
+Mike Tyson
+Lewis Hamilton
+Max Verstappen
+Michael Schumacher
+Tiger Woods
+Simone Biles
+Khabib Nurmagomedov
+Conor McGregor
+Ed Sheeran
+Adele
+Rihanna
+Freddie Mercury
+Drake
+Justin Bieber
+Ariana Grande
+Billie Eilish
+Bruno Mars
+Lady Gaga
+Katy Perry
+Dua Lipa
+The Weeknd
+Nancy Ajram
+Kadim Al Sahir
+Wael Kfoury
+Elissa
+Mohamed Mounir
+Mohamed Henedi
+Yasmin Abdulaziz
+Omar Sharif
+Mahmoud Abdel Aziz
+Tom Hanks
+Brad Pitt
+Johnny Depp
+Dwayne Johnson
+Robert Downey Jr.
+Keanu Reeves
+Arnold Schwarzenegger
+Morgan Freeman
+Emma Watson
+Scarlett Johansson
+Angelina Jolie
+Zendaya
+Tom Holland
+Chris Evans
+Nikola Tesla
+Thomas Edison
+Galileo Galilei
+Stephen Hawking
+Vincent van Gogh
+William Shakespeare
+Ludwig van Beethoven
+Wolfgang Amadeus Mozart
+Avicenna
+Alhazen
+Al-Chwarizmi
+Naguib Mahfouz
+Magdy Yacoub
+Tutankhamun
+Nefertiti
+Napoleon Bonaparte
+Alexander der Große
+Julius Cäsar
+Nelson Mandela
+Mahatma Gandhi
+Martin Luther King Jr.
+Abraham Lincoln
+Jeff Bezos
+MrBeast
+PewDiePie
+Captain America
+Thor
+Black Panther
+Wonder Woman
+Joker
+Thanos
+Darth Vader
+Yoda
+Luke Skywalker
+Hermione Granger
+Voldemort
+Gandalf
+Frodo
+Esel aus Shrek
+Mufasa
+Elsa
+Anna aus Die Eiskönigin
+Vaiana
+Aladdin
+Jasmin
+Der Dschinni
+Belle aus Die Schöne und das Biest
+Buzz Lightyear
+Woody
+Dorie
+Lightning McQueen
+WALL-E
+Mike Wazowski
+Tom aus Tom und Jerry
+Jerry aus Tom und Jerry
+Scooby-Doo
+Patrick Star
+Luigi
+Link aus Zelda
+Pac-Man
+Naruto
+Goku
+Luffy
+Doraemon
+Kapitän Tsubasa
+Hercule Poirot
+Alice im Wunderland
+Peter Pan
+Pinocchio
+Der Weihnachtsmann
+Der Grinch
+Dracula
+Frankenstein
+Sindbad der Seefahrer
+Nasreddin Hodscha
+Abu Zeid al-Hilali
+Paul Pogba
+Antoine Griezmann
+Karim Benzema
+Gianluigi Buffon
+Andrés Iniesta
+Xavi Hernández
+Sergio Agüero
+Ahmed Elmohamady
+Mahmoud Kahraba
+Emam Ashour
+Venus Williams
+Carlos Alcaraz
+Yao Ming
+Shaquille O'Neal
+Nadia Comaneci
+Frank Sinatra
+John Lennon
+Paul McCartney
+Bob Marley
+Whitney Houston
+Céline Dion
+Mariah Carey
+Selena Gomez
+Harry Styles
+Post Malone
+Travis Scott
+Cardi B
+Snoop Dogg
+Hamza Namira
+Hussain Al Jassmi
+Majida El Roumi
+Sabah Fakhri
+Asala Nasri
+Ragheb Alama
+Samy Yusuf
+Samir Ghanem
+Fouad El-Mohandes
+Faten Hamama
+Soad Hosny
+Mohamed Saad
+Ahmed El-Sakka
+Samuel L. Jackson
+Denzel Washington
+Jennifer Lawrence
+Meryl Streep
+Sylvester Stallone
+Vin Diesel
+Charlie Sheen
+Hans Zimmer
+Walt Disney
+Steven Spielberg
+Alfred Hitchcock
+Marie Antoinette
+Dschingis Khan
+Winston Churchill
+Königin Elisabeth II.
+Anwar Sadat
+Queen Hatshepsut
+Ibn Battuta
+Christoph Kolumbus
+Neil Armstrong
+Yuri Gagarin
+Charles Darwin
+Alexander Graham Bell
+Die Brüder Wright
+Mark Twain
+Agatha Christie
+J. K. Rowling
+Tawfiq al-Hakim
+Ahmed Shawqi
+Mahmoud Darwish
+Nizar Qabbani
+Bill Nye
+Gordon Ramsay
+Doctor Strange
+Ant-Man
+Deadpool
+Wolverine
+Green Lantern
+Aquaman
+The Flash
+Catwoman
+Harley Quinn
+Optimus Prime
+Die Minions
+Gru
+Kung Fu Panda
+Der gestiefelte Kater
+Rapunzel
+Pocahontas
+Mulan
+Tarzan
+Baloo
+Mowgli
+Dumbo
+Bambi
+Arielle die Meerjungfrau
+Peppa Pig
+Bluey
+Dora the Explorer
+Homer Simpson
+Bart Simpson
+Peter Griffin
+Rick Sanchez
+Garfield
+Snoopy
+Porky Pig
+Road Runner
+Tweety
+Sylvester the Cat
+Popeye
+Tintin
+Asterix
+Heidi
+Die Biene Maja
+Zorro
+Robin Hood
+König Artus
+Herkules
+Medusa
+Zeus
+Poseidon
+Dschinni aus der Wunderlampe
+Minnie Mouse
+Daisy Duck
+Pluto
+Dagobert Duck
+Eeyore
+Piglet
+Kermit der Frosch
+Miss Piggy
+Krümelmonster
+Bibo
+Elmo
