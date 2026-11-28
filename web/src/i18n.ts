@@ -128,13 +128,13 @@ const en = {
     wordle: 'Wordle', dice: 'Dice', coin: 'Coin flip', wheel: 'Wheel', bracket: 'Bracket', number: 'Number', yesno: 'Yes / No',
     trivia: 'Trivia', wyr: 'Would You Rather', likely: 'Most Likely To', categories: 'Categories',
     draw: 'Draw & Guess',
-    charades: 'Charades', whoami: 'Who Am I?', imposter: 'Imposter',
+    charades: 'Charades', whoami: 'Who Am I?', imposter: 'Imposter', wordbomb: 'Word Bomb', truths: 'Two Truths & a Lie',
   } as Record<string, string>,
   gameCats: {
     wordle: 'Words', dice: 'Chance', coin: 'Chance', wheel: 'Chance', bracket: 'Tournament', number: 'Chance', yesno: 'Chance',
     trivia: 'Brainy', wyr: 'Debate', likely: 'Know your crew', categories: 'Quick thinking',
     draw: 'Drawing',
-    charades: 'Act it out', whoami: 'Guessing', imposter: 'Bluffing',
+    charades: 'Act it out', whoami: 'Guessing', imposter: 'Bluffing', wordbomb: 'Words', truths: 'Bluffing',
   } as Record<string, string>,
   gameBlurbs: {
     wordle: 'Six guesses, five letters. The word is checked on the server, so nobody can peek.',
@@ -152,6 +152,8 @@ const en = {
     charades: 'One player acts, everyone else guesses. The host awards the point.',
     whoami: 'Everyone sees your identity except you. Ask, guess, score.',
     imposter: 'Everyone gets the same word except one player. Give clues, then vote out the faker.',
+    wordbomb: 'A category and a burning fuse. Say a word that fits and pass it on before it blows.',
+    truths: 'Three statements, one lie. Guess each other\'s lie, and fool the room with yours.',
   } as Record<string, string>,
 };
 
@@ -263,13 +265,13 @@ const ar: Strings = {
     wordle: 'ووردل', dice: 'النرد', coin: 'العملة', wheel: 'العجلة', bracket: 'الجدول', number: 'الرقم', yesno: 'نعم / لا',
     trivia: 'معلومات', wyr: 'ماذا تفضّل', likely: 'الأكثر احتمالاً', categories: 'الفئات',
     draw: 'ارسم وخمّن',
-    charades: 'تمثيل', whoami: 'من أنا؟', imposter: 'المحتال',
+    charades: 'تمثيل', whoami: 'من أنا؟', imposter: 'المحتال', wordbomb: 'قنبلة الكلمات', truths: 'حقيقتين وكذبة',
   },
   gameCats: {
     wordle: 'كلمات', dice: 'حظ', coin: 'حظ', wheel: 'حظ', bracket: 'بطولة', number: 'حظ', yesno: 'حظ',
     trivia: 'ذكاء', wyr: 'نقاش', likely: 'اعرف شلّتك', categories: 'سرعة بديهة',
     draw: 'رسم',
-    charades: 'مثّلها', whoami: 'تخمين',
+    charades: 'مثّلها', whoami: 'تخمين', wordbomb: 'كلمات', truths: 'خداع',
   },
   gameBlurbs: {
     wordle: 'ست محاولات وخمسة أحرف. الكلمة تتحقق على السيرفر، ما أحد يقدر يغش.',
@@ -395,13 +397,13 @@ const de: Strings = {
     wordle: 'Wordle', dice: 'Würfel', coin: 'Münzwurf', wheel: 'Rad', bracket: 'Turnierbaum', number: 'Zahl', yesno: 'Ja / Nein',
     trivia: 'Quiz', wyr: 'Was würdest du eher', likely: 'Am ehesten', categories: 'Kategorien',
     draw: 'Zeichnen & Raten',
-    charades: 'Scharade', whoami: 'Wer bin ich?', imposter: 'Bluffer',
+    charades: 'Scharade', whoami: 'Wer bin ich?', imposter: 'Bluffer', wordbomb: 'Wortbombe', truths: 'Zwei Wahrheiten & eine Lüge',
   },
   gameCats: {
     wordle: 'Wörter', dice: 'Zufall', coin: 'Zufall', wheel: 'Zufall', bracket: 'Turnier', number: 'Zufall', yesno: 'Zufall',
     trivia: 'Wissen', wyr: 'Debatte', likely: 'Kenne deine Crew', categories: 'Schnelldenken',
     draw: 'Zeichnen',
-    charades: 'Vorspielen', whoami: 'Raten',
+    charades: 'Vorspielen', whoami: 'Raten', wordbomb: 'Wörter', truths: 'Bluffen',
   },
   gameBlurbs: {
     wordle: 'Sechs Versuche, fünf Buchstaben. Das Wort wird auf dem Server geprüft.',
