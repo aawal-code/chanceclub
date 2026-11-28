@@ -278,8 +278,8 @@ class PartyGames
             if ($guess === '') throw new HttpException(422, 'Type your guess.');
             $aliases = Content::aliases('imposter', self::localeOf($state), (string) $state['civilian']);
             $ok = Content::matches($guess, (string) $state['civilian'], $aliases);
-            if ($ok) self::revealImposter($state, true, true);
-            return;
+            if ($ok) { self::revealImposter($state, true, true); return; }
+            throw new HttpException(422, 'wrong');
         }
         throw new HttpException(409, 'The round is over.');
     }
@@ -553,6 +553,7 @@ class PartyGames
             'myVote' => (string) (((array) ($state['votes'] ?? []))[$id] ?? ''),
             'hasVoted' => isset(((array) ($state['votes'] ?? []))[$id]),
             'caught' => $state['caught'] ?? null,
+            'caughtId' => (($state['phase'] ?? '') === 'guess') ? $imposter : '',
             'guessed' => (bool) ($state['guessed'] ?? false),
             'reveal' => $reveal ? [
                 'civilian' => (string) ($outcome['civilian'] ?? $state['civilian']),

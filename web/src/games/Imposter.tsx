@@ -18,6 +18,7 @@ export type ImposterState = {
   myVote: string;
   hasVoted: boolean;
   caught: boolean | null;
+  caughtId?: string;
   guessed: boolean;
   reveal: null | {
     civilian: string;
@@ -61,7 +62,7 @@ export default function Imposter({ t, locale, party, onAct, onAdvance, onFinish,
     setError('');
     const result = await onAct(body);
     setBusy(false);
-    if (result && !result.ok) { setError(result.message || t.error); return; }
+    if (result && !result.ok) { setError(result.raw === 'wrong' ? t.impWrongGuess : result.message || t.error); return; }
     clear?.();
   };
 
@@ -144,7 +145,7 @@ export default function Imposter({ t, locale, party, onAct, onAdvance, onFinish,
             <>
               <p className="caption">{t.impWhoIsIt}</p>
               <div className="gk-pick">
-                {party.members.filter((member) => member.id !== party.self_player_id).map((member) => (
+                {party.members.filter((member) => member.id !== party.self_player_id && (gs.order || []).includes(member.id)).map((member) => (
                   <button key={member.id} className="gk-pick-btn" disabled={busy} onClick={() => void send({ type: 'vote', target_player_id: Number(member.id) })}>
                     <span className="gk-dot">{member.name.charAt(0).toUpperCase()}</span>
                     <span>{member.name}</span>
@@ -176,7 +177,7 @@ export default function Imposter({ t, locale, party, onAct, onAdvance, onFinish,
           ) : (
             <div className="gk-answer">
               <span className="caption">{t.impCaught}</span>
-              <span style={{ fontWeight: 800 }}>{names.get(gs.order?.find((id) => id === (gs.reveal?.imposterId || '')) || '') || ''}</span>
+              <span style={{ fontWeight: 800 }}>{names.get(gs.caughtId || '') || ''}</span>
               <span className="caption">{t.impGuessWaiting}</span>
             </div>
           )}
