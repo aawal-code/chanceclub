@@ -140,9 +140,16 @@ export default function Home({
         </section>
       )}
 
-      <p className="caption" style={{ textAlign: 'center', marginTop: 44, letterSpacing: '.2em' }}>
-        CHANCECLUB · PLAY MORE, SCROLL LESS
-      </p>
+      <footer className="home-footer">
+        <p className="caption home-tagline">CHANCECLUB · PLAY MORE, SCROLL LESS</p>
+        <a className="credit" href="https://aawal-code.github.io/" target="_blank" rel="noopener noreferrer">
+          <span className="credit-dot" aria-hidden="true" />
+          <span className="credit-text">
+            {t.madeBy} <span className="credit-name">aawal</span>
+          </span>
+          <Glyph name="arrow" size={13} />
+        </a>
+      </footer>
     </div>
   );
 }
