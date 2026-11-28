@@ -83,3 +83,126 @@ What is the first month of the Islamic calendar?|Muharram
 Which planet is known for its Great Red Spot?|Jupiter
 What do you call a baby cat?|Kitten
 What do you call a baby dog?|Puppy
+Which planet is known as the Morning Star?|Venus
+What is the largest bone in the human body?|Femur;Thigh bone
+How many teeth does an adult human normally have?|32
+What is the main ingredient of hummus?|Chickpeas
+Which country is the Eiffel Tower in?|France
+Which country is home to the kangaroo?|Australia
+What is the national sport of Japan, known for large wrestlers?|Sumo
+What is the longest river in South America?|Amazon
+Which is the highest mountain in the world?|Everest;Mount Everest
+What is the smallest country in the world?|Vatican City;Vatican
+Which Egyptian mountain is where Moses is said to have received the commandments?|Mount Sinai;Sinai
+What is the highest mountain in Egypt?|Mount Catherine;Catherine
+What is the name of the canal connecting the Mediterranean and the Red Sea in Egypt?|Suez Canal;Suez
+What is the name of the big dam in Aswan?|High Dam;Aswan High Dam
+Which Egyptian city is known as the Pearl of the Mediterranean?|Alexandria
+Which is the largest oasis in Egypt's Western Desert, near Siwa?|Siwa
+What is the name of the famous Egyptian bazaar in Islamic Cairo?|Khan el-Khalili;Khan El Khalili
+What is the name of the Egyptian mosque university founded in 970?|Al-Azhar;Azhar
+What is the name of the great pyramid's builder pharaoh?|Khufu;Cheops
+Who was the famous queen of ancient Egypt who met Julius Caesar?|Cleopatra
+What is the name of the Egyptian god with a falcon head?|Horus
+What is the Egyptian god of the sun?|Ra;Re
+What do the Egyptians call the flatbread they eat every day?|Aish baladi;Aish;Baladi bread
+What is the traditional Egyptian green soup made from jute leaves?|Molokhia
+What is the sweet Egyptian dessert made of milk, rice and nuts called?|Roz bel laban;Rice pudding
+What is the traditional Egyptian dessert of cheese and syrup baked with thin dough?|Konafa;Kunafa
+What is the festival of breaking the fast at the end of Ramadan called?|Eid al-Fitr;Eid
+What month of the year is Christmas in?|December
+How many days are in February in a normal year?|28
+Which day comes after Thursday?|Friday
+How many days are in a week?|7;seven
+What is the opposite of "hot"?|Cold
+What color is a ripe banana?|Yellow
+What colour are the stars on the American flag?|White
+What are the colours of the Egyptian flag?|Red, white and black
+Which bird is on the Egyptian flag?|Eagle;Eagle of Saladin
+How many pyramids are in the Giza plateau's main group?|3;three
+What is the Egyptian pound subdivided into?|Piastres;100 piastres
+Which famous Egyptian lighthouse was one of the Seven Wonders of the Ancient World?|Pharos;Lighthouse of Alexandria
+Which of the Seven Wonders of the Ancient World still stands today?|Great Pyramid;Pyramid of Giza;Pyramid
+How many players are on a basketball team on court?|5;five
+How many points is a free throw worth in basketball?|1;one
+How long is a football match in minutes, without extra time?|90
+What card does a referee show for a serious foul to send a player off?|Red;Red card
+Which country hosted the 2018 FIFA World Cup?|Russia
+Which country hosted the 2022 FIFA World Cup?|Qatar
+Which Egyptian club is nicknamed the Red Castle?|Al Ahly;Ahly
+Which Egyptian club is nicknamed the White Knight?|Zamalek
+How many African Cup of Nations titles has Egypt won, the most of any country?|7;seven
+Which sport is Wimbledon famous for?|Tennis
+What do you call a score of zero in tennis?|Love
+Which martial art comes from Japan and uses a white uniform called a gi?|Judo;Karate
+Which sea creature has eight arms?|Octopus
+Which mammal can fly?|Bat
+Which animal is the fastest on land?|Cheetah
+What is a group of lions called?|Pride
+How many legs does an insect have?|6;six
+Which animal gives us wool?|Sheep
+What does a caterpillar turn into?|Butterfly
+Which part of the plant takes in water from the soil?|Roots;Root
+What process do plants use to make food from sunlight?|Photosynthesis
+What is the chemical symbol for gold?|Au
+What is the chemical symbol for water?|H2O
+Which gas do plants take in from the air?|Carbon dioxide;CO2
+What force keeps us on the ground?|Gravity
+What planet has the shortest year?|Mercury
+What is Earth's natural satellite called?|Moon
+What galaxy do we live in?|Milky Way
+Which direction does the Sun rise from?|East
+Which ocean lies between Africa and Australia?|Indian Ocean;Indian
+Which African country has the largest population?|Nigeria
+What is the capital of South Africa's executive branch?|Pretoria
+What is the capital of Jordan?|Amman
+What is the capital of Lebanon?|Beirut
+What is the capital of Iraq?|Baghdad
+What is the capital of Syria?|Damascus
+What is the capital of Tunisia?|Tunis
+What is the capital of Algeria?|Algiers
+What is the capital of Sudan?|Khartoum
+What is the capital of the UAE?|Abu Dhabi
+What is the capital of Qatar?|Doha
+What is the capital of Kuwait?|Kuwait City;Kuwait
+What is the capital of Russia?|Moscow
+What is the capital of China?|Beijing
+What is the capital of India?|New Delhi
+What is the capital of the USA?|Washington;Washington DC
+What is the capital of Argentina?|Buenos Aires
+What is the capital of Greece?|Athens
+What is the capital of Austria?|Vienna
+What is the capital of Switzerland?|Bern
+What is the capital of Netherlands?|Amsterdam
+What currency is used in the UK?|Pound;Pound sterling
+What currency is used in most of Europe?|Euro
+What currency is used in the USA?|Dollar;US dollar
+Which language has the most native speakers in the world?|Mandarin;Chinese
+In which country was the pizza invented?|Italy
+In which country is sushi from?|Japan
+Which country is famous for the Great Wall?|China
+Which country is the Taj Mahal in?|India
+Which city is the Colosseum in?|Rome
+Which country is Big Ben in?|UK;United Kingdom;England
+Who wrote Romeo and Juliet?|Shakespeare
+Who invented the light bulb, commonly credited?|Thomas Edison;Edison
+Who discovered gravity after seeing an apple fall (the legend)?|Isaac Newton;Newton
+Which company makes the iPhone?|Apple
+Which company created Android?|Google
+What does "www" stand for in a website address?|World Wide Web
+Which social app has a ghost logo?|Snapchat
+Which video platform is known for its red play button logo?|YouTube
+In Minecraft, which green creature explodes near you?|Creeper
+What is the name of Mario's brother?|Luigi
+Which toy is made of interlocking plastic bricks, from Denmark?|Lego
+How many squares does a chessboard have on one side?|8;eight
+Which chess piece can only move diagonally?|Bishop
+How many dots are on a standard die in total?|21
+What is the main ingredient in bread?|Flour
+What fruit is known for keeping the doctor away?|Apple
+Which vegetable makes you cry when you cut it?|Onion
+Which nut is used to make Nutella with chocolate?|Hazelnut
+Which fruit has its seeds on the outside?|Strawberry
+What is the freezing form of water called?|Ice
+What is the sound a cat makes?|Meow
+What do we call a person who studies the stars?|Astronomer

@@ -83,3 +83,126 @@ Was ist der erste Monat des islamischen Kalenders?|Muharram
 Welcher Planet hat den Großen Roten Fleck?|Jupiter
 Wie nennt man ein Katzenbaby?|Kätzchen;Kaetzchen
 Wie nennt man einen jungen Hund?|Welpe
+Welcher Planet heißt Morgenstern?|Venus
+Welcher ist der größte Knochen des Menschen?|Oberschenkelknochen;Femur
+Wie viele Zähne hat ein Erwachsener normalerweise?|32
+Was ist die Hauptzutat von Hummus?|Kichererbsen
+In welchem Land steht der Eiffelturm?|Frankreich
+Welches Land ist die Heimat des Kängurus?|Australien
+Welcher japanische Nationalsport kennt große Ringer?|Sumo
+Welcher ist der längste Fluss Südamerikas?|Amazonas
+Wie heißt der höchste Berg der Welt?|Mount Everest;Everest
+Welches ist das kleinste Land der Welt?|Vatikan;Vatikanstadt
+Auf welchem ägyptischen Berg soll Moses die Gebote erhalten haben?|Sinai;Berg Sinai
+Welcher ist der höchste Berg Ägyptens?|Katharinenberg;Mount Catherine
+Wie heißt der Kanal zwischen Mittelmeer und Rotem Meer in Ägypten?|Sueskanal;Suezkanal;Suez
+Wie heißt der große Staudamm bei Assuan?|Assuan-Staudamm;Hochdamm;Assuan
+Welche ägyptische Stadt heißt Perle des Mittelmeers?|Alexandria;Alexandrien
+Welche ägyptische Oase liegt nahe der libyschen Grenze?|Siwa
+Wie heißt der berühmte Basar in Kairo?|Khan el-Khalili;Khan El Khalili
+Wie heißt die Moschee-Universität in Kairo, gegründet 970?|Al-Azhar;Azhar
+Welcher Pharao baute die Große Pyramide?|Cheops;Khufu
+Welche ägyptische Königin traf Julius Caesar?|Kleopatra;Cleopatra
+Wie heißt der ägyptische Gott mit Falkenkopf?|Horus
+Wie heißt der ägyptische Sonnengott?|Ra;Re
+Wie heißt das tägliche ägyptische Fladenbrot?|Aish baladi;Aish
+Wie heißt die ägyptische grüne Suppe aus Juteblättern?|Molokhia;Mulukhiyya
+Wie heißt der ägyptische Milchreis?|Roz bel laban;Milchreis
+Wie heißt das Dessert aus feinem Teig und Käse mit Sirup?|Kunafa;Konafa;Knafeh
+Wie heißt das Fest zum Ende des Ramadan?|Eid al-Fitr;Id al-Fitr
+In welchem Monat ist Weihnachten?|Dezember
+Wie viele Tage hat der Februar in einem normalen Jahr?|28
+Welcher Tag kommt nach Donnerstag?|Freitag
+Wie viele Tage hat eine Woche?|7;sieben
+Was ist das Gegenteil von heiß?|Kalt
+Welche Farbe hat eine reife Banane?|Gelb
+Welche Farbe haben die Sterne auf der US-Flagge?|Weiß;Weiss
+Welche Farben hat die ägyptische Flagge?|Rot, Weiß und Schwarz
+Welcher Vogel ist auf der ägyptischen Flagge?|Adler
+Wie viele Hauptpyramiden stehen in Gizeh?|3;drei
+In was unterteilt sich das ägyptische Pfund?|Piaster
+Welcher ägyptische Leuchtturm war eines der Sieben Weltwunder?|Pharos;Leuchtturm von Alexandria
+Welches der sieben antiken Weltwunder steht noch?|Große Pyramide;Cheops-Pyramide;Pyramide
+Wie viele Spieler hat ein Basketballteam auf dem Feld?|5;fünf;fuenf
+Wie viele Punkte zählt ein Freiwurf?|1;eins;ein Punkt
+Wie viele Minuten dauert ein Fußballspiel ohne Nachspielzeit?|90
+Welche Karte zeigt der Schiedsrichter zum Platzverweis?|Rot;Rote Karte
+Welches Land war Gastgeber der WM 2018?|Russland
+Welches Land war Gastgeber der WM 2022?|Katar;Qatar
+Welcher ägyptische Klub heißt die Rote Festung?|Al Ahly;Ahly
+Welcher ägyptische Klub heißt der Weiße Ritter?|Zamalek
+Wie viele Afrikameisterschaften hat Ägypten gewonnen?|7;sieben
+Für welchen Sport ist Wimbledon bekannt?|Tennis
+Wie nennt man null Punkte im Tennis?|Love
+Welche japanische Kampfsportart nutzt einen weißen Anzug?|Judo;Karate
+Welches Meerestier hat acht Arme?|Oktopus;Krake
+Welches Säugetier kann fliegen?|Fledermaus
+Welches Tier ist an Land am schnellsten?|Gepard
+Wie nennt man eine Gruppe Löwen?|Rudel
+Wie viele Beine hat ein Insekt?|6;sechs
+Welches Tier liefert Wolle?|Schaf
+Wozu wird eine Raupe?|Schmetterling
+Welcher Pflanzenteil nimmt Wasser aus dem Boden auf?|Wurzeln;Wurzel
+Wie nennt man den Vorgang, mit dem Pflanzen aus Licht Nahrung machen?|Photosynthese
+Wie lautet das chemische Symbol für Gold?|Au
+Wie lautet die chemische Formel für Wasser?|H2O
+Welches Gas nehmen Pflanzen aus der Luft auf?|Kohlendioxid;CO2
+Welche Kraft hält uns am Boden?|Schwerkraft;Gravitation
+Welcher Planet hat das kürzeste Jahr?|Merkur
+Wie heißt der natürliche Satellit der Erde?|Mond
+In welcher Galaxie leben wir?|Milchstraße;Milchstrasse
+Aus welcher Richtung geht die Sonne auf?|Osten
+Welcher Ozean liegt zwischen Afrika und Australien?|Indischer Ozean;Indik
+Welches afrikanische Land hat die meisten Einwohner?|Nigeria
+Wie heißt die Hauptstadt der Regierung Südafrikas?|Pretoria
+Was ist die Hauptstadt von Jordanien?|Amman
+Was ist die Hauptstadt des Libanon?|Beirut
+Was ist die Hauptstadt des Irak?|Bagdad
+Was ist die Hauptstadt von Syrien?|Damaskus
+Was ist die Hauptstadt von Tunesien?|Tunis
+Was ist die Hauptstadt von Algerien?|Algier
+Was ist die Hauptstadt des Sudan?|Khartum
+Was ist die Hauptstadt der VAE?|Abu Dhabi
+Was ist die Hauptstadt von Katar?|Doha
+Was ist die Hauptstadt von Kuwait?|Kuwait-Stadt;Kuwait
+Was ist die Hauptstadt von Russland?|Moskau
+Was ist die Hauptstadt von China?|Peking;Beijing
+Was ist die Hauptstadt von Indien?|Neu-Delhi;Neu Delhi;Delhi
+Was ist die Hauptstadt der USA?|Washington;Washington D.C.
+Was ist die Hauptstadt von Argentinien?|Buenos Aires
+Was ist die Hauptstadt von Griechenland?|Athen
+Was ist die Hauptstadt von Österreich?|Wien
+Was ist die Hauptstadt der Schweiz?|Bern
+Was ist die Hauptstadt der Niederlande?|Amsterdam
+Welche Währung gilt im Vereinigten Königreich?|Pfund;Pfund Sterling
+Welche Währung gilt in großen Teilen Europas?|Euro
+Welche Währung gilt in den USA?|Dollar;US-Dollar
+Welche Sprache hat die meisten Muttersprachler?|Chinesisch;Mandarin
+In welchem Land wurde die Pizza erfunden?|Italien
+Aus welchem Land stammt Sushi?|Japan
+Welches Land hat die Chinesische Mauer?|China
+In welchem Land steht das Taj Mahal?|Indien
+In welcher Stadt steht das Kolosseum?|Rom
+In welchem Land steht Big Ben?|Großbritannien;England;UK
+Wer schrieb Romeo und Julia?|Shakespeare
+Wem wird die Erfindung der Glühbirne zugeschrieben?|Edison;Thomas Edison
+Wer entdeckte laut Legende die Schwerkraft beim Fallen eines Apfels?|Newton;Isaac Newton
+Welche Firma stellt das iPhone her?|Apple
+Welche Firma entwickelte Android?|Google
+Wofür steht www in einer Internetadresse?|World Wide Web
+Welche App hat ein Geist als Logo?|Snapchat
+Welche Videoplattform hat einen roten Play-Button als Logo?|YouTube
+Welches grüne Wesen in Minecraft explodiert neben dir?|Creeper
+Wie heißt Marios Bruder?|Luigi
+Welches dänische Spielzeug besteht aus Steckbausteinen?|Lego
+Wie viele Felder hat eine Schachbrettseite?|8;acht
+Welche Schachfigur zieht nur diagonal?|Läufer;Laeufer
+Wie viele Augen hat ein Würfel insgesamt?|21
+Was ist die Hauptzutat von Brot?|Mehl
+Welche Frucht hält angeblich den Arzt fern?|Apfel
+Welches Gemüse bringt dich beim Schneiden zum Weinen?|Zwiebel
+Welche Nuss steckt neben Schokolade in Nutella?|Haselnuss
+Welche Frucht trägt ihre Samen außen?|Erdbeere
+Wie nennt man gefrorenes Wasser?|Eis
+Welches Geräusch macht eine Katze?|Miau
+Wie nennt man jemanden, der Sterne erforscht?|Astronom
