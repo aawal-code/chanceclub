@@ -58,3 +58,187 @@ Karaoke|Concert
 Market|Mall
 Noodle|Soup
 Pilot|Captain
+Hamburger|Sandwich
+Apple|Pear
+Orange|Tangerine
+Strawberry|Raspberry
+Watermelon|Melon
+Potato|Sweet potato
+Carrot|Radish
+Tomato|Red pepper
+Bread|Toast
+Cheese|Butter
+Rice|Couscous
+Soup|Stew
+Salad|Coleslaw
+Sushi|Rice roll
+Steak|Burger patty
+Chicken|Turkey
+Shark|Dolphin
+Wolf|Fox
+Horse|Donkey
+Dog|Wolf cub
+Rabbit|Hare
+Frog|Toad
+Crocodile|Lizard
+Eagle|Hawk
+Penguin|Puffin
+Bee|Wasp
+Butterfly|Moth
+Ant|Termite
+Whale|Seal
+Octopus|Squid
+Camel|Llama
+Tennis|Badminton
+Swimming|Diving
+Running|Jogging
+Boxing|Wrestling
+Skiing|Snowboarding
+Chess|Draughts
+Violin|Cello
+Drum|Tambourine
+Trumpet|Trombone
+Car|Taxi
+Train|Metro
+Plane|Helicopter
+Ship|Ferry
+Motorbike|Quad bike
+School|University
+Hospital|Clinic
+Restaurant|Cafe
+Hotel|Hostel
+Airport|Train station
+Supermarket|Corner shop
+Bank|Post office
+Museum|Gallery
+Zoo|Aquarium
+Desert|Dunes
+Forest|Jungle
+River|Stream
+Island|Peninsula
+Laptop|Desktop computer
+Television|Projector
+Headphones|Earbuds
+Watch|Smartband
+Fridge|Freezer
+Oven|Microwave
+Kettle|Teapot
+Spoon|Ladle
+Fork|Spork
+Knife|Scissors
+Plate|Bowl
+Cup|Mug
+Bed|Hammock
+Table|Desk
+Lamp|Candle
+Shirt|Blouse
+Jeans|Trousers
+Jacket|Coat
+Sneakers|Boots
+Hat|Cap
+Scarf|Shawl
+Glasses|Sunglasses
+Ring|Bracelet
+Backpack|Handbag
+Umbrella|Raincoat
+Police officer|Security guard
+Firefighter|Paramedic
+Singer|Rapper
+Actor|Comedian
+Painter|Sculptor
+Soldier|Guard
+King|Prince
+Dragon|Dinosaur
+Ghost|Skeleton
+Rain|Drizzle
+Thunder|Lightning
+Rainbow|Aurora
+Sun|Moon
+Star|Planet
+Earth|Mars
+Birthday party|Graduation party
+Picnic|Barbecue
+Camping|Hiking
+Fishing|Hunting
+Painting|Drawing
+Dancing|Aerobics
+Photography|Filmmaking
+Reading|Audiobooks
+Gaming|Streaming
+Magic show|Circus
+Concert|Festival
+Passport|ID card
+Ticket|Voucher
+Key|Padlock
+Notebook|Diary
+Pen|Marker
+Eraser|Correction tape
+Calculator|Abacus
+Map|Compass
+Flag|Banner
+Balloon|Bubble
+Gift|Card
+Mosque|Church
+Pyramid|Sphinx
+Nile|Red Sea
+Cairo|Alexandria
+Paris|Rome
+London|Dublin
+Berlin|Vienna
+Tokyo|Seoul
+New York|Chicago
+Dubai|Doha
+Eiffel Tower|Big Ben
+Great Wall|Colosseum
+Statue of Liberty|Christ the Redeemer
+Football match|Cricket match
+Olympics|World Cup
+Gold medal|Trophy
+Referee|Linesman
+Goalkeeper|Defender
+Penalty|Free kick
+Math|Physics
+Chemistry|Biology
+History|Geography
+Exam|Quiz
+Homework|Project
+Email|Text message
+Selfie|Screenshot
+Password|PIN code
+Wi-Fi|Bluetooth
+Battery|Charger
+Spider|Scorpion
+Snake|Eel
+Parrot|Owl
+Cow|Buffalo
+Sheep|Goat
+Elephant|Rhino
+Giraffe|Zebra
+Monkey|Gorilla
+Bear|Panda
+Mango|Papaya
+Banana|Plantain
+Grapes|Raisins
+Dates|Figs
+Peanut|Almond
+Milk|Yogurt
+Water|Sparkling water
+Cake|Muffin
+Cookie|Biscuit
+Candy|Chewing gum
+Popcorn|Chips
+Soap|Shampoo
+Towel|Bathrobe
+Perfume|Deodorant
+Hairdryer|Straightener
+Broom|Mop
+Washing machine|Dishwasher
+Ladder|Stairs
+Hammer|Screwdriver
+Rope|Chain
+Bridge|Tunnel
+Tent|Cabin
+Lighthouse|Windmill
+Skyscraper|Tower
+Farm|Orchard
+Garden|Park
