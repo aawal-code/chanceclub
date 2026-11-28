@@ -124,6 +124,8 @@ class LobbyController extends Controller
             \App\Support\PartyGames::tick($party, DB::table('party_players')->where('party_id', $party->id)->get());
             $party = DB::table('parties')->find($party->id) ?? $party;
         }
+        $this->maintain((int) $party->id);
+        $party = DB::table('parties')->find($party->id) ?? $party;
         return response()->json(['data' => $this->partyView($party, $identity)]);
     }
 
@@ -143,7 +145,13 @@ class LobbyController extends Controller
         $identity = $this->identity($request);
         $preset = $this->presetFrom($request);
         $party = DB::table('parties')->where('invite_code', strtoupper($code))->first();
-        if (!$party || $party->status !== 'lobby') return response()->json(['message' => 'Lobby not found or already started.'], 404);
+        if (!$party) return response()->json(['message' => 'Lobby not found or already started.'], 404);
+        if ($party->status !== 'lobby') {
+            // A game is running. Someone already in it just returns; anyone else asks the host.
+            if ($this->player((int) $party->id, $identity)) return response()->json(['data' => $this->partyView($party, $identity), 'message' => 'Back in.']);
+            $pending = \App\Support\PartyFlow::request($party, $identity, null, $this->presetFrom($request));
+            return response()->json(['requested' => true, 'request' => $pending], 202);
+        }
         $joined = DB::transaction(function () use ($party, $identity, $preset) {
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if (!$locked || $locked->status !== 'lobby') throw new HttpException(409, 'This lobby has already started.');
@@ -232,7 +240,7 @@ class LobbyController extends Controller
                 'prompt' => $prompt, 'answer' => $answer, 'status' => 'active',
                 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
-            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'current_game' => $game, 'round_number' => $number, 'state' => $gameState ? json_encode($gameState, JSON_THROW_ON_ERROR) : ($wheelState ? json_encode(['wheel' => $wheelState], JSON_THROW_ON_ERROR) : ($bracketState ? json_encode(['bracket' => $bracketState], JSON_THROW_ON_ERROR) : null)), 'updated_at' => now()]);
+            DB::table('parties')->where('id', $locked->id)->update(['status' => 'playing', 'auto_next_at' => null, 'current_game' => $game, 'round_number' => $number, 'state' => $gameState ? json_encode($gameState, JSON_THROW_ON_ERROR) : ($wheelState ? json_encode(['wheel' => $wheelState], JSON_THROW_ON_ERROR) : ($bracketState ? json_encode(['bracket' => $bracketState], JSON_THROW_ON_ERROR) : null)), 'updated_at' => now()]);
             return DB::table('parties')->find($locked->id);
         });
         return response()->json(['data' => $this->partyView($result, $identity)]);
@@ -339,19 +347,7 @@ class LobbyController extends Controller
                 if ($data['type'] === 'answer' && $round->game !== 'trivia') throw new HttpException(422, 'Answer submissions are only available for trivia.');
                 if (DB::table('party_submissions')->where('round_id', $round->id)->where('player_id', $player->id)->exists()) throw new HttpException(409, 'You already submitted for this round.');
                 DB::table('party_submissions')->insert(['round_id' => $round->id, 'player_id' => $player->id, 'payload' => json_encode(['value' => $value], JSON_THROW_ON_ERROR), 'created_at' => now(), 'updated_at' => now()]);
-                $submitted = DB::table('party_submissions')->where('round_id', $round->id)->whereIn('player_id', $members->pluck('id'))->count();
-                if ($submitted >= $members->count()) {
-                    if ($round->game === 'trivia') {
-                        foreach (DB::table('party_submissions')->where('round_id', $round->id)->get() as $submission) {
-                            $submittedValue = json_decode($submission->payload, true)['value'] ?? '';
-                            if (\App\Support\Content::matches((string) $submittedValue, (string) $round->answer, \App\Support\Content::aliases('trivia', (string) $round->locale, (string) $round->prompt))) DB::table('party_players')->where('id', $submission->player_id)->increment('score');
-                        }
-                        $outcome = ['answer' => $round->answer];
-                    } else {
-                        $outcome = ['tally' => $this->tally($round->id)];
-                    }
-                    DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
-                }
+                $this->settleSubmissions($round, $members, (int) $party->id);
             }
             DB::table('party_players')->where('id', $player->id)->update(['last_seen_at' => now(), 'updated_at' => now()]);
             return DB::table('parties')->find($party->id);
@@ -364,7 +360,15 @@ class LobbyController extends Controller
         $identity = $this->identity($request);
         $party = $this->party($code);
         $this->requireHost($party, $identity);
-        $result = DB::transaction(function () use ($party, $identity) {
+        $result = $this->advanceParty((int) $party->id);
+        return response()->json(['data' => $this->partyView($result, $identity)]);
+    }
+
+    /** Start the next round of the running game. Shared by the host's Next button and the countdown. */
+    public function advanceParty(int $partyId): object
+    {
+        $party = (object) ['id' => $partyId];
+        $result = DB::transaction(function () use ($party) {
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if ($locked->status !== 'playing' || !$locked->current_game) throw new HttpException(409, 'There is no active game.');
             $number = (int) $locked->round_number + 1;
@@ -380,6 +384,15 @@ class LobbyController extends Controller
             $previousTurnIndex = $players->search(fn ($person) => (int) $person->id === (int) ($previousRound?->turn_player_id ?? 0));
             $turn = $players->get($previousTurnIndex === false ? 0 : (($previousTurnIndex + 1) % $players->count()));
             if (!$previousRound?->turn_player_id) $turn = $players->first(fn ($person) => (int) $person->id === (int) $locked->host_player_id) ?? $players->first();
+            // Turns skip anyone who has dropped out, so a dead phone never holds the dice.
+            $isHere = fn ($person) => $person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 25;
+            if ($turn && !$isHere($turn)) {
+                $from = $players->search(fn ($person) => (int) $person->id === (int) $turn->id);
+                for ($step = 1; $step <= $players->count(); $step++) {
+                    $candidate = $players->get((($from === false ? 0 : $from) + $step) % $players->count());
+                    if ($isHere($candidate)) { $turn = $candidate; break; }
+                }
+            }
             $nextAnswer = $game === 'wordle' ? Wordle::pick() : $nextAnswer;
             if (\App\Support\PartyGames::isNew($game)) {
                 $built = \App\Support\PartyGames::start($locked, $players, $game, $locale);
@@ -394,11 +407,11 @@ class LobbyController extends Controller
                 'status' => 'active', 'turn_player_id' => $turn->id, 'created_at' => now(), 'updated_at' => now(),
             ]);
             DB::table('parties')->where('id', $locked->id)->update($nextState
-                ? ['round_number' => $number, 'state' => json_encode($nextState, JSON_THROW_ON_ERROR), 'updated_at' => now()]
-                : ['round_number' => $number, 'updated_at' => now()]);
+                ? ['round_number' => $number, 'state' => json_encode($nextState, JSON_THROW_ON_ERROR), 'auto_next_at' => null, 'updated_at' => now()]
+                : ['round_number' => $number, 'auto_next_at' => null, 'updated_at' => now()]);
             return DB::table('parties')->find($locked->id);
         });
-        return response()->json(['data' => $this->partyView($result, $identity)]);
+        return $result;
     }
 
     public function tournamentCreate(Request $request, string $code): JsonResponse
@@ -487,13 +500,72 @@ class LobbyController extends Controller
             $locked = DB::table('parties')->where('id', $party->id)->lockForUpdate()->first();
             if ($locked->status === 'playing') {
                 if ($locked->current_game !== 'draw') \App\Support\History::recordParty($locked);
-                DB::table('party_players')->where('party_id', $locked->id)->update(['score' => 0, 'is_ready' => false, 'updated_at' => now()]);
-                DB::table('party_players')->where('id', $locked->host_player_id)->update(['is_ready' => true]);
-                DB::table('parties')->where('id', $locked->id)->update(['status' => 'lobby', 'current_game' => null, 'state' => null, 'updated_at' => now()]);
+                // Play again with the same people: whoever is still here stays ready, so nobody taps ready twice.
+                $players = DB::table('party_players')->where('party_id', $locked->id)->get();
+                foreach ($players as $person) {
+                    $here = (int) $person->id === (int) $locked->host_player_id || ($person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 25);
+                    DB::table('party_players')->where('id', $person->id)->update(['score' => 0, 'is_ready' => $here, 'updated_at' => now()]);
+                }
+                DB::table('parties')->where('id', $locked->id)->update(['status' => 'lobby', 'current_game' => null, 'state' => null, 'auto_next_at' => null, 'updated_at' => now()]);
             }
             return DB::table('parties')->find($locked->id);
         });
         return response()->json(['data' => $this->partyView($result, $identity)]);
+    }
+
+    private const AUTO_NEXT = ['trivia' => 10, 'wyr' => 8, 'likely' => 8, 'wordle' => 10, 'imposter' => 16, 'wordbomb' => 10, 'truths' => 16];
+
+    /**
+     * Keeps a party moving without anyone's hand on it. Runs on every poll but only writes when needed:
+     * hands the host role to someone who is here when the host has vanished, finishes a round that is
+     * only waiting on dropped players, and runs the countdown into the next round.
+     */
+    private function maintain(int $partyId): void
+    {
+        $party = DB::table('parties')->find($partyId);
+        if (!$party) return;
+        $hostRow = $party->host_player_id ? DB::table('party_players')->find($party->host_player_id) : null;
+        $hostGone = !$hostRow || \App\Support\History::age($hostRow->last_seen_at) >= 30;
+        $round = $party->status === 'playing' ? DB::table('party_rounds')->where('party_id', $partyId)->orderByDesc('round_number')->first() : null;
+        $needsSettle = $round && $round->status === 'active' && in_array($round->game, ['trivia', 'wyr', 'likely'], true);
+        $needsAuto = $round && $round->status === 'complete' && isset(self::AUTO_NEXT[$round->game]);
+        $stale = $party->auto_next_at !== null && !$needsAuto;
+        if (!$hostGone && !$needsSettle && !$needsAuto && !$stale) return;
+        $advance = false;
+        DB::transaction(function () use ($partyId, &$advance) {
+            $locked = DB::table('parties')->where('id', $partyId)->lockForUpdate()->first();
+            if (!$locked) return;
+            $players = DB::table('party_players')->where('party_id', $partyId)->orderBy('id')->get();
+            $isHere = fn ($person) => $person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 25;
+            $host = $players->first(fn ($person) => (int) $person->id === (int) $locked->host_player_id);
+            if (!$host || \App\Support\History::age($host->last_seen_at) >= 30) {
+                $next = $players->first(fn ($person) => $isHere($person) && (int) $person->id !== (int) $locked->host_player_id);
+                if ($next) {
+                    DB::table('parties')->where('id', $partyId)->update(['host_player_id' => $next->id, 'updated_at' => now()]);
+                    DB::table('party_players')->where('id', $next->id)->update(['is_ready' => true]);
+                }
+            }
+            if ($locked->status !== 'playing') return;
+            $round = DB::table('party_rounds')->where('party_id', $partyId)->orderByDesc('round_number')->lockForUpdate()->first();
+            if (!$round) return;
+            if ($round->status === 'active') {
+                if (in_array($round->game, ['trivia', 'wyr', 'likely'], true)) $this->settleSubmissions($round, $players, $partyId);
+                return;
+            }
+            if (!isset(self::AUTO_NEXT[$round->game])) {
+                if ($locked->auto_next_at !== null) DB::table('parties')->where('id', $partyId)->update(['auto_next_at' => null]);
+                return;
+            }
+            $now = \App\Support\PartyGames::ms();
+            if ($locked->auto_next_at === null) {
+                DB::table('parties')->where('id', $partyId)->update(['auto_next_at' => $now + self::AUTO_NEXT[$round->game] * 1000]);
+            } elseif ($now >= (int) $locked->auto_next_at) {
+                $advance = true;
+            }
+        });
+        if ($advance) {
+            try { $this->advanceParty($partyId); } catch (HttpException $e) { /* the host got there first */ }
+        }
     }
 
     private function identity(Request $request): array
@@ -606,10 +678,22 @@ class LobbyController extends Controller
         if ($round && \App\Support\PartyGames::isNew($round->game)) {
             $gameState = \App\Support\PartyGames::view($party, $round, $myPlayer, $members);
         }
+        $isHostView = (int) $party->host_player_id === (int) $myPlayer->id;
+        $nextInMs = ($party->status === 'playing' && $party->auto_next_at !== null) ? max(0, (int) $party->auto_next_at - \App\Support\PartyGames::ms()) : null;
+        $requests = [];
+        $customCounts = (object) [];
+        if ($isHostView) {
+            $seatNames = $members->pluck('display_name', 'id');
+            foreach (DB::table('party_requests')->where('party_id', $party->id)->where('status', 'pending')->orderBy('id')->get() as $req) {
+                $requests[] = ['id' => (string) $req->id, 'name' => $req->display_name, 'claim_player_id' => $req->claim_player_id ? (string) $req->claim_player_id : null, 'claim_name' => $req->claim_player_id ? ($seatNames[$req->claim_player_id] ?? null) : null];
+            }
+            $customCounts = (object) DB::table('party_prompts')->where('party_id', $party->id)->groupBy('game')->selectRaw('game, count(*) as n')->pluck('n', 'game')->map(fn ($n) => (int) $n)->all();
+        }
         $roundView = $round ? [
             'number' => (int) $round->round_number,
             'game' => $round->game,
             'prompt' => $displayPrompt,
+            'options' => ($round->game === 'wyr' && $round->answer && str_contains((string) $round->answer, '|')) ? explode('|', (string) $round->answer, 2) : null,
             'status' => $round->status,
             'turn_player_id' => $round->turn_player_id ? (string) $round->turn_player_id : null,
             'private_clue' => $privateClue,
@@ -628,6 +712,7 @@ class LobbyController extends Controller
                 'ready' => (bool) $person->is_ready, 'score' => (int) $person->score,
                 'is_host' => (int) $person->id === (int) $party->host_player_id,
                 'online' => $person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 20,
+                'sitting_out' => !($person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 25),
                 'rtt' => $person->last_rtt_ms === null ? null : (int) $person->last_rtt_ms,
                 'avatar' => \App\Http\Controllers\Api\AvatarController::avatarFrom(
                     $person->user_id ? in_array((int) $person->user_id, $customAvatars, true) : false,
@@ -643,6 +728,10 @@ class LobbyController extends Controller
             'bracket' => $bracketView,
             'game_state' => $gameState,
             'tournament' => \App\Support\Tournament::view($party->id),
+            'next_in_ms' => $nextInMs,
+            'content_mode' => $party->content_mode ?: 'builtin',
+            'requests' => $requests,
+            'custom_counts' => $customCounts,
             'round' => $roundView, 'createdAt' => $party->created_at,
         ];
     }
@@ -737,16 +826,65 @@ class LobbyController extends Controller
     private function pickPrompt(int $partyId, string $game, string $locale, array $promptBank, array $answerBank): array
     {
         $bank = \App\Support\Content::bank($game, $locale);
+        if ($game === 'wyr' && $bank !== null) {
+            // The file holds "A|B"; the round shows "A or B?" and keeps the two sides for the buttons.
+            $joiner = ['en' => ' or ', 'ar' => ' أم ', 'de' => ' oder '][$locale] ?? ' or ';
+            $mark = $locale === 'ar' ? '؟' : '?';
+            $bank = array_map(fn ($row) => [rtrim($row[0], '?؟').$joiner.rtrim($row[1][0] ?? '', '?؟').$mark, [$row[0], $row[1][0] ?? '']], $bank);
+            $used = array_flip(DB::table('party_rounds')->where('party_id', $partyId)->where('game', 'wyr')->pluck('prompt')->all());
+            $custom = [];
+            if ((string) DB::table('parties')->where('id', $partyId)->value('content_mode') !== 'builtin') {
+                foreach (\App\Support\Content::custom($partyId, 'wyr') as [$a, $b]) $custom[] = [rtrim($a, '?؟').$joiner.rtrim($b[0] ?? '', '?؟').$mark, [$a, $b[0] ?? '']];
+            }
+            $row = $this->chooseRow($partyId, $bank, $custom, $used);
+            return [$row[0], implode('|', $row[1])];
+        }
         if ($bank === null) {
             $list = $promptBank[$game] ?? [''];
             $i = random_int(0, count($list) - 1);
             return [$list[$i], isset($answerBank[$game]) ? $answerBank[$game][$i] : null];
         }
         $used = array_flip(DB::table('party_rounds')->where('party_id', $partyId)->where('game', $game)->pluck('prompt')->all());
-        $pool = array_values(array_filter($bank, fn ($row) => !isset($used[$row[0]])));
-        if (!$pool) $pool = $bank;
-        $row = $pool[random_int(0, count($pool) - 1)];
+        $row = \App\Support\Content::choose($partyId, $game, $bank, $used);
         return [$row[0], $game === 'trivia' || $game === 'charades' || $game === 'whoami' ? ($row[1][0] ?? $row[0]) : null];
+    }
+
+    /** Same choice as Content::choose, for rows already shaped by the caller. */
+    private function chooseRow(int $partyId, array $bank, array $custom, array $used): array
+    {
+        $mode = (string) (DB::table('parties')->where('id', $partyId)->value('content_mode') ?: 'builtin');
+        $fresh = fn (array $rows) => array_values(array_filter($rows, fn ($row) => !isset($used[$row[0]])));
+        $mine = $fresh($custom);
+        $built = $fresh($bank);
+        if ($mode === 'only' && $custom) $pool = $mine ?: $custom;
+        elseif ($mode === 'mix' && $mine && (!$built || random_int(1, 100) <= 40)) $pool = $mine;
+        else $pool = $built ?: $bank;
+        return $pool[random_int(0, count($pool) - 1)];
+    }
+
+    /**
+     * Finish a submission round (trivia, would you rather, most likely) once every player who is
+     * actually here has answered. A player who dropped out no longer holds the room up.
+     */
+    public function settleSubmissions(object $round, $members, int $partyId): bool
+    {
+        if ($round->status !== 'active' || !in_array($round->game, ['trivia', 'wyr', 'likely'], true)) return false;
+        $subs = DB::table('party_submissions')->where('round_id', $round->id)->get();
+        if ($subs->isEmpty()) return false;
+        $done = $subs->pluck('player_id')->map(fn ($id) => (int) $id)->all();
+        $waiting = $members->filter(fn ($person) => !in_array((int) $person->id, $done, true) && $person->last_seen_at && \App\Support\History::age($person->last_seen_at) < 25);
+        if ($waiting->isNotEmpty()) return false;
+        if ($round->game === 'trivia') {
+            foreach ($subs as $submission) {
+                $given = json_decode($submission->payload, true)['value'] ?? '';
+                if (\App\Support\Content::matches((string) $given, (string) $round->answer, \App\Support\Content::aliases('trivia', (string) $round->locale, (string) $round->prompt, $partyId))) DB::table('party_players')->where('id', $submission->player_id)->increment('score');
+            }
+            $outcome = ['answer' => $round->answer];
+        } else {
+            $outcome = ['tally' => $this->tally($round->id)];
+        }
+        DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
+        return true;
     }
 
     private function normalized(string $answer): string

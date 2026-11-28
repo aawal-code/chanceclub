@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\ChanceClubController;
 use App\Http\Controllers\Api\GuestIdentityController;
 use App\Http\Controllers\Api\HistoryController;
 use App\Http\Controllers\Api\LobbyController;
+use App\Http\Controllers\Api\PartyFlowController;
 use App\Http\Controllers\Api\WordleController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,15 @@ Route::prefix('v1')->group(function () {
         Route::post('/parties/{code}/tournament', [LobbyController::class, 'tournamentCreate']);
         Route::post('/parties/{code}/tournament/{action}', [LobbyController::class, 'tournamentAction'])->whereIn('action', ['next', 'shuffle', 'reorder', 'cancel']);
         Route::post('/parties/{code}/leave', [LobbyController::class, 'leave']);
+        Route::get('/parties/{code}/seats', [PartyFlowController::class, 'seats']);
+        Route::post('/parties/{code}/claim', [PartyFlowController::class, 'claim']);
+        Route::get('/parties/{code}/request', [PartyFlowController::class, 'myRequest']);
+        Route::post('/parties/{code}/requests/{id}/{action}', [PartyFlowController::class, 'decide'])->whereNumber('id')->whereIn('action', ['approve', 'deny']);
+        Route::post('/parties/{code}/host', [PartyFlowController::class, 'makeHost']);
+        Route::get('/parties/{code}/prompts', [PartyFlowController::class, 'prompts']);
+        Route::post('/parties/{code}/prompts', [PartyFlowController::class, 'addPrompts']);
+        Route::delete('/parties/{code}/prompts/{id}', [PartyFlowController::class, 'removePrompt'])->whereNumber('id');
+        Route::post('/parties/{code}/prompt-mode', [PartyFlowController::class, 'promptMode']);
         Route::post('/parties/{code}/finish', [LobbyController::class, 'finish']);
         Route::post('/wordle/solo', [WordleController::class, 'start']);
         Route::get('/wordle/solo/{id}', [WordleController::class, 'show']);

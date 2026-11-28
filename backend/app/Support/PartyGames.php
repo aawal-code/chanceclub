@@ -65,9 +65,7 @@ class PartyGames
         $bank = Content::bank('imposter', $locale) ?? Content::bank('imposter', 'en');
         if (!$bank) throw new HttpException(503, 'The word bank is missing.');
         $used = array_flip(DB::table('party_rounds')->where('party_id', $partyId)->where('game', 'imposter')->pluck('answer')->filter()->all());
-        $pool = array_values(array_filter($bank, fn ($row) => !isset($used[$row[0]])));
-        if (!$pool) $pool = $bank;
-        $row = $pool[random_int(0, count($pool) - 1)];
+        $row = Content::choose($partyId, 'imposter', $bank, $used);
         shuffle($ids);
         $imposterId = $ids[random_int(0, count($ids) - 1)];
         $state = [

@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\DB;
+
 /** File-backed prompt banks (backend/content/{game}.{locale}.txt, one "prompt|answer;alt;alt" per line). */
 class Content
 {
@@ -30,10 +32,47 @@ class Content
         return self::$cache[$key] = $out ?: null;
     }
 
-    public static function aliases(string $game, string $locale, string $prompt): array
+    public static function aliases(string $game, string $locale, string $prompt, ?int $partyId = null): array
     {
         foreach (self::bank($game, $locale) ?? [] as [$p, $a]) if ($p === $prompt) return $a;
+        if ($partyId) {
+            foreach (self::custom($partyId, $game) as [$p, $a]) if ($p === $prompt) return array_slice($a, 1);
+        }
         return [];
+    }
+
+    /** Games a host can write their own prompts for, and the line format each one takes. */
+    public const CUSTOM_GAMES = ['trivia', 'categories', 'whoami', 'charades', 'wyr', 'likely', 'imposter'];
+
+    /** @return array<int, array{0:string,1:string[]}> the host's own prompts for one game, same shape as bank(). */
+    public static function custom(int $partyId, string $game): array
+    {
+        $out = [];
+        foreach (DB::table('party_prompts')->where('party_id', $partyId)->where('game', $game)->orderBy('id')->get() as $row) {
+            $answers = $row->answer === null || $row->answer === '' ? [] : array_values(array_filter(array_map('trim', explode(';', $row->answer)), fn ($a) => $a !== ''));
+            $out[] = [$row->prompt, $answers];
+        }
+        return $out;
+    }
+
+    /**
+     * Choose one row for the next round: the built-in bank, the host's own prompts, or a mix,
+     * never repeating inside the party until the pool runs out.
+     * @param array<int, array{0:string,1:string[]}> $bank
+     * @param array<string,int> $used prompts already played, as keys
+     */
+    public static function choose(int $partyId, string $game, array $bank, array $used): array
+    {
+        $mode = (string) (DB::table('parties')->where('id', $partyId)->value('content_mode') ?: 'builtin');
+        $custom = ($mode === 'builtin' || !in_array($game, self::CUSTOM_GAMES, true)) ? [] : self::custom($partyId, $game);
+        $fresh = fn (array $rows) => array_values(array_filter($rows, fn ($row) => !isset($used[$row[0]])));
+        $mine = $fresh($custom);
+        $built = $fresh($bank);
+        if ($mode === 'only' && $custom) $pool = $mine ?: $custom;
+        elseif ($mode === 'mix' && $mine && (!$built || random_int(1, 100) <= 40)) $pool = $mine;
+        else $pool = $built ?: ($bank ?: $custom);
+        if (!$pool) return ['', []];
+        return $pool[random_int(0, count($pool) - 1)];
     }
 
     public static function norm(string $s): string

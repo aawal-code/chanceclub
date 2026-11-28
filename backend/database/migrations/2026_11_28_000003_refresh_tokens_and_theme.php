@@ -15,8 +15,10 @@ return new class extends Migration {
         // Existing sessions get a refresh window so nobody is signed out by this deploy.
         DB::table('api_tokens')->whereNull('refresh_hash')->update(['expires_at' => now()->addDays(2)]);
         // Theme: null means "never chosen", so a new device never overwrites a real choice with its default.
-        DB::statement('ALTER TABLE users ALTER COLUMN theme DROP NOT NULL');
-        DB::statement('ALTER TABLE users ALTER COLUMN theme DROP DEFAULT');
+        if (DB::connection()->getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE users ALTER COLUMN theme DROP NOT NULL');
+            DB::statement('ALTER TABLE users ALTER COLUMN theme DROP DEFAULT');
+        }
         DB::table('users')->where('theme', 'light')->update(['theme' => null]);
     }
 
