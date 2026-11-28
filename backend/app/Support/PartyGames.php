@@ -112,8 +112,11 @@ class PartyGames
     private static function startTruths(array $ids, string $locale = 'en'): array
     {
         shuffle($ids);
+        $topics = Content::bank('truths', $locale) ?? Content::bank('truths', 'en') ?? [];
+        $topic = $topics ? $topics[random_int(0, count($topics) - 1)][0] : '';
         $state = [
             'phase' => 'write',
+            'topic' => $topic,
             'order' => $ids,
             'statements' => (object) [],
             'lies' => (object) [],
@@ -123,7 +126,7 @@ class PartyGames
             'locale' => $locale,
             'endsAt' => self::ms() + self::WRITE_MS,
         ];
-        return ['prompt' => self::title('truths', 'en'), 'answer' => null, 'turn' => null, 'state' => $state];
+        return ['prompt' => self::title('truths', $locale), 'answer' => null, 'turn' => null, 'state' => $state];
     }
 
     /* ------------------------------------------------------------------ state io */
@@ -363,6 +366,7 @@ class PartyGames
     private static function actBomb(object $party, array &$state, object $player, array $data, $members, array $online): void
     {
         $me = (string) $player->id;
+        if (($state['phase'] ?? '') !== 'play') throw new HttpException(409, 'The round is over.');
         if ((string) $state['holderId'] !== $me) throw new HttpException(403, 'The bomb is not in your hands.');
         $word = trim((string) ($data['value'] ?? ''));
         if ($word === '') throw new HttpException(422, 'Type a word.');
@@ -443,6 +447,7 @@ class PartyGames
             $subject = (string) ($state['subject'] ?? '');
             if ($subject === '') throw new HttpException(409, 'Nobody is up for a vote.');
             if ($me === $subject) throw new HttpException(403, 'Wait for the others to vote on yours.');
+            if (!in_array($me, array_map('strval', $state['order']), true)) throw new HttpException(403, 'You are not in this round.');
             $votes = (array) $state['votes'];
             $mine = (array) ($votes[$subject] ?? []);
             if (isset($mine[$me])) throw new HttpException(409, 'You already voted on this one.');
@@ -597,6 +602,7 @@ class PartyGames
         $submitted = [];
         foreach ($statements as $pid => $lines) $submitted[] = (string) $pid;
         return [
+            'topic' => (string) ($state['topic'] ?? ''),
             'myStatements' => array_values($statements[$id] ?? []),
             'myLie' => isset($lies[$id]) ? (int) $lies[$id] : null,
             'hasSubmitted' => isset($statements[$id]),

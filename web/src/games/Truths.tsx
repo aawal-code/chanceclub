@@ -10,6 +10,7 @@ export type TruthsState = {
   endsAt: number;
   serverNow: number;
   order: string[];
+  topic?: string;
   myStatements: string[];
   myLie: number | null;
   hasSubmitted: boolean;
@@ -96,13 +97,19 @@ export default function Truths({ t, locale, party, onAct, onAdvance, onFinish, o
               <div className="gk-used">
                 {(gs.myStatements || []).map((line, index) => (
                   <span key={index} className="gk-used-word" data-lie={index === gs.myLie ? 'true' : undefined}>
-                    {index + 1}. {line}{index === gs.myLie ? ' · lie' : ''}
+                    {index + 1}. {line}{index === gs.myLie ? ` · ${t.trLieOn}` : ''}
                   </span>
                 ))}
               </div>
             </div>
           ) : (
             <>
+              {gs.topic ? (
+                <div className="tr-topic">
+                  <span className="caption">{t.trTopic}</span>
+                  <strong>{gs.topic}</strong>
+                </div>
+              ) : null}
               <p className="caption">{t.trPrompt}</p>
               <div className="stack gap-10">
                 {[0, 1, 2].map((index) => (

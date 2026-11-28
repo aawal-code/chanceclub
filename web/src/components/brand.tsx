@@ -176,6 +176,13 @@ export function Glyph({ name, size = 22 }: GlyphProps) {
           <ellipse cx="15.4" cy="11.4" rx="1.7" ry="1.2" fill="currentColor" stroke="none" />
         </svg>
       );
+    case 'neverhave':
+      return (
+        <svg {...common}>
+          <path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V10M10 10V5a1.5 1.5 0 0 1 3 0v5M13 10V6a1.5 1.5 0 0 1 3 0v6.5" />
+          <path d="M7 11a1.5 1.5 0 0 0-3 0v3.5A6 6 0 0 0 10 20h2a5 5 0 0 0 5-5v-2.5" />
+        </svg>
+      );
     case 'truths':
       return (
         <svg {...common}>

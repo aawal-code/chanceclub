@@ -24,6 +24,7 @@ export const GAMES: GameMeta[] = [
   { id: 'imposter', modes: ['party'] },
   { id: 'wordbomb', modes: ['party'] },
   { id: 'truths', modes: ['party'] },
+  { id: 'neverhave', modes: ['party'] },
 ];
 
 export const soloGames = GAMES.filter((game) => game.modes.includes('solo'));
@@ -40,7 +41,7 @@ export const GAME_GROUPS: { key: GroupKey; ids: string[] }[] = [
   { key: 'gWords', ids: ['wordle', 'wordbomb', 'categories'] },
   { key: 'gDraw', ids: ['draw'] },
   { key: 'gKnow', ids: ['trivia', 'whoami'] },
-  { key: 'gParty', ids: ['imposter', 'truths', 'charades', 'wyr', 'likely'] },
+  { key: 'gParty', ids: ['imposter', 'truths', 'neverhave', 'charades', 'wyr', 'likely'] },
   { key: 'gDeciders', ids: ['wheel', 'coin', 'dice', 'number', 'yesno', 'bracket'] },
 ];
 

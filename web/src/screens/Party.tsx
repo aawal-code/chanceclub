@@ -11,7 +11,7 @@ import type { SetupState } from '../games/Bracket';
 import { Btn, Card, CopyButton, Field, Seg, useToast, LagPill } from '../components/ui';
 import { OwnPrompts, RequestsBar, WaitingRoom } from '../components/PartyFlow';
 
-const GAMES = ['wordle', 'draw', 'bracket', 'trivia', 'charades', 'whoami', 'imposter', 'wordbomb', 'truths', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
+const GAMES = ['wordle', 'draw', 'bracket', 'trivia', 'charades', 'whoami', 'imposter', 'wordbomb', 'truths', 'neverhave', 'wyr', 'likely', 'categories', 'dice', 'coin', 'wheel', 'number', 'yesno'];
 
 export default function PartyScreen({
   t, locale, identity, guestName, setGuestName, parties, activeParty, busy, initialCode,

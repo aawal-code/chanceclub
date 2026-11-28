@@ -153,7 +153,8 @@ const en = {
   impImposterTag: 'imposter',
   impVotesWord: 'votes', impVoteOne: 'vote',
   playerOne: 'player',
-  trTitle: 'Two truths and a lie', trVoteTitle: 'Spot the lie', trRevealTitle: 'The reveal', trPrompt: 'Three statements about you. Two true, one made up. Nobody sees which is which until the vote.', trPh1: 'I once...', trPh2: 'My favourite...', trPh3: 'I have never...', trLieOff: 'Lie?', trLieOn: 'Lie', trSend: 'Send my three', trSent: 'sent', trSentSoFar: 'Who has sent theirs', trSentWaiting: 'Sent. Waiting for the others.', trWhichLie: 'Which one is the lie?', trVoted: 'voted', trYouPicked: 'You picked number {n}', trYourTurnWait: 'Your three are up. Sit tight.', trTheLieWas: 'Number {n} was the lie', trSubjectWas: 'The three belonged to {name}', trLie: 'the lie', trSpotted: 'spotted', trFooled: 'fooled', trAllDone: 'Every round done',
+  trTitle: 'Two truths and a lie', trVoteTitle: 'Spot the lie', trRevealTitle: 'The reveal', trPrompt: 'Three statements about you. Two true, one made up. Nobody sees which is which until the vote.', trPh1: 'I once...', trPh2: 'My favourite...', trPh3: 'I have never...', trLieOff: 'Lie?', trLieOn: 'Lie', trSend: 'Send my three', trSent: 'sent', trSentSoFar: 'Who has sent theirs', trSentWaiting: 'Sent. Waiting for the others.', trWhichLie: 'Which one is the lie?', trVoted: 'voted', trYouPicked: 'You picked number {n}', trYourTurnWait: 'Your three are up. Sit tight.', trTheLieWas: 'Number {n} was the lie', trSubjectWas: 'The three belonged to {name}', trLie: 'the lie', trSpotted: 'spotted', trFooled: 'fooled', trAllDone: 'Every round done', trTopic: 'Topic idea',
+  nhHave: 'I have', nhNever: 'Never', nhAsk: 'Be honest. Nobody can see until everyone has answered.', nhNobody: 'Nobody',
 
   wbTitle: 'Word Bomb', wbBoomTitle: 'Boom', wbCategory: 'Category', wbFuse: 'Fuse', wbYouHold: 'You have the bomb. Type a word and pass it.', wbHolding: '{name} is holding the bomb', wbYourWord: 'Your word', wbWordPh: 'One word that fits', wbPass: 'Pass the bomb', wbWait: 'Waiting for the pass', wbLastPass: 'Last word: {word}', wbUsed: 'Words already used', wbNoneYet: 'No words yet. Go.', wbWordsUsed: '{n} words used', wbBoomSubOne: '{name} was holding it after one pass.', wbDupe: 'Someone already said that. Try another.', wbWrong: 'That does not fit the category.', wbBoom: 'Boom!', wbBoomSub: '{name} was holding it after {passes} passes.',
 
@@ -166,13 +167,13 @@ const en = {
     wordle: 'Wordle', dice: 'Dice', coin: 'Coin flip', wheel: 'Wheel', bracket: 'Bracket', number: 'Number', yesno: 'Yes / No',
     trivia: 'Trivia', wyr: 'Would You Rather', likely: 'Most Likely To', categories: 'Categories',
     draw: 'Draw & Guess',
-    charades: 'Charades', whoami: 'Who Am I?', imposter: 'Imposter', wordbomb: 'Word Bomb', truths: 'Two Truths & a Lie',
+    charades: 'Charades', whoami: 'Who Am I?', imposter: 'Imposter', wordbomb: 'Word Bomb', truths: 'Two Truths & a Lie', neverhave: 'Never Have I Ever',
   } as Record<string, string>,
   gameCats: {
     wordle: 'Words', wordbomb: 'Words', categories: 'Words',
     draw: 'Drawing',
     trivia: 'Knowledge', whoami: 'Knowledge',
-    charades: 'Party', imposter: 'Party', truths: 'Party', wyr: 'Party', likely: 'Party',
+    charades: 'Party', imposter: 'Party', truths: 'Party', neverhave: 'Party', wyr: 'Party', likely: 'Party',
     dice: 'Decider', coin: 'Decider', wheel: 'Decider', number: 'Decider', yesno: 'Decider', bracket: 'Decider',
   } as Record<string, string>,
   gdWhat: 'What it is', gdRound: 'How a round goes', gdWin: 'How you win', gdLose: 'How you lose',
@@ -188,6 +189,7 @@ const en = {
     imposter: 'Everyone gets the same word except one. Find the faker.',
     truths: 'Three statements about a player. Two are true, one is a lie.',
     wyr: 'Two options, one vote each. The room decides.',
+    neverhave: 'Read the line. Tap I have or Never. See who did it.',
     likely: 'Point at whoever the prompt fits best.',
     dice: 'Roll the dice and settle it.',
     coin: 'Heads or tails in one tap.',
@@ -256,6 +258,12 @@ const en = {
       round: 'Read both sides, vote, and wait for the room. The tally appears once everyone has voted.',
       win: 'The side with more votes takes the round.',
       lose: 'Nobody loses points here. The tally is the whole result.',
+    },
+    neverhave: {
+      what: 'A confession game. A line appears: Never have I ever... and everyone answers for themselves.',
+      round: 'Read the line, tap I have or Never on your own phone, and wait for the room. The answers show once everyone has tapped.',
+      win: 'Nobody wins or loses. The point is finding out who did it.',
+      lose: 'Nothing to lose. Be honest.',
     },
     likely: {
       what: 'A getting-to-know-you game. A prompt goes up and everyone picks the player it fits.',
@@ -431,7 +439,8 @@ const ar: Strings = {
   impSurvivedVote: 'التصويت اتقسم. المحتال خرج منها.', impImposterWord: 'كلمة المحتال',
   impWasImposter: '{name} كان المحتال', impImposterTag: 'المحتال', impVotesWord: 'أصوات', impVoteOne: 'صوت',
   playerOne: 'لاعب',
-  trTitle: 'حقيقتين وكذبة', trVoteTitle: 'اعرف الكذبة', trRevealTitle: 'الكشف', trPrompt: 'تلات جمل عنك. اتنين صح وواحدة مكذوبة. محدش يعرف مين المكذوبة قبل التصويت.', trPh1: 'أنا مرة...', trPh2: 'أكتر حاجة بحبها...', trPh3: 'عمري ما...', trLieOff: 'كذبة؟', trLieOn: 'كذبة', trSend: 'ابعت التلاتة', trSent: 'بعتو', trSentSoFar: 'مين بعت', trSentWaiting: 'اتبعتو. مستنيين الباقي.', trWhichLie: 'مين فيهم الكذبة؟', trVoted: 'صوّتو', trYouPicked: 'اخترت رقم {n}', trYourTurnWait: 'تلاتتك معروضة. استنى.', trTheLieWas: 'رقم {n} كانت الكذبة', trSubjectWas: 'التلاتة بتاعة {name}', trLie: 'الكذبة', trSpotted: 'عرفوها', trFooled: 'اتنصب عليهم', trAllDone: 'خلصت كل الجولات',
+  trTitle: 'حقيقتين وكذبة', trVoteTitle: 'اعرف الكذبة', trRevealTitle: 'الكشف', trPrompt: 'تلات جمل عنك. اتنين صح وواحدة مكذوبة. محدش يعرف مين المكذوبة قبل التصويت.', trPh1: 'أنا مرة...', trPh2: 'أكتر حاجة بحبها...', trPh3: 'عمري ما...', trLieOff: 'كذبة؟', trLieOn: 'كذبة', trSend: 'ابعت التلاتة', trSent: 'بعتو', trSentSoFar: 'مين بعت', trSentWaiting: 'اتبعتو. مستنيين الباقي.', trWhichLie: 'مين فيهم الكذبة؟', trVoted: 'صوّتو', trYouPicked: 'اخترت رقم {n}', trYourTurnWait: 'تلاتتك معروضة. استنى.', trTheLieWas: 'رقم {n} كانت الكذبة', trSubjectWas: 'التلاتة بتاعة {name}', trLie: 'الكذبة', trSpotted: 'عرفوها', trFooled: 'اتنصب عليهم', trAllDone: 'خلصت كل الجولات', trTopic: 'فكرة للموضوع',
+  nhHave: 'عملتها', nhNever: 'عمري ما', nhAsk: 'كون صريح. محدش هيشوف حاجة لحد ما الكل يجاوب.', nhNobody: 'ولا واحد',
 
   wbTitle: 'قنبلة الكلمات', wbBoomTitle: 'بووم', wbCategory: 'الفئة', wbFuse: 'الفتيل', wbYouHold: 'القنبلة معاك. اكتب كلمة ومرّرها.', wbHolding: 'القنبلة مع {name}', wbYourWord: 'كلمتك', wbWordPh: 'كلمة واحدة تناسب الفئة', wbPass: 'مرّر القنبلة', wbWait: 'مستنيين التمرير', wbLastPass: 'آخر كلمة: {word}', wbUsed: 'الكلمات المستخدمة', wbNoneYet: 'مفيش كلمات لسه. يلا.', wbWordsUsed: '{n} كلمة', wbBoomSubOne: 'القنبلة كانت مع {name} بعد تمريرة واحدة.', wbDupe: 'حد قال الكلمة دي قبل كده. جرّب غيرها.', wbWrong: 'الكلمة دي مش من الفئة.', wbBoom: 'بووم!', wbBoomSub: 'القنبلة كانت مع {name} بعد {passes} تمريرة.',
 
@@ -707,7 +716,8 @@ const de: Strings = {
   impSurvivedVote: 'Die Abstimmung war uneinig. Der Bluffer kommt durch.', impImposterWord: 'Bluffer-Wort',
   impWasImposter: '{name} war der Bluffer', impImposterTag: 'Bluffer', impVotesWord: 'Stimmen', impVoteOne: 'Stimme',
   playerOne: 'Spieler',
-  trTitle: 'Zwei Wahrheiten und eine Lüge', trVoteTitle: 'Finde die Lüge', trRevealTitle: 'Die Auflösung', trPrompt: 'Drei Aussagen über dich. Zwei stimmen, eine ist erfunden. Niemand sieht vorher, welche.', trPh1: 'Ich habe mal...', trPh2: 'Mein Lieblings...', trPh3: 'Ich habe noch nie...', trLieOff: 'Lüge?', trLieOn: 'Lüge', trSend: 'Meine drei senden', trSent: 'gesendet', trSentSoFar: 'Wer schon gesendet hat', trSentWaiting: 'Gesendet. Warte auf die anderen.', trWhichLie: 'Welche ist die Lüge?', trVoted: 'haben gewählt', trYouPicked: 'Du hast Nummer {n} gewählt', trYourTurnWait: 'Deine drei sind dran. Warte kurz.', trTheLieWas: 'Nummer {n} war die Lüge', trSubjectWas: 'Die drei gehörten {name}', trLie: 'die Lüge', trSpotted: 'erkannt', trFooled: 'getäuscht', trAllDone: 'Alle Runden durch',
+  trTitle: 'Zwei Wahrheiten und eine Lüge', trVoteTitle: 'Finde die Lüge', trRevealTitle: 'Die Auflösung', trPrompt: 'Drei Aussagen über dich. Zwei stimmen, eine ist erfunden. Niemand sieht vorher, welche.', trPh1: 'Ich habe mal...', trPh2: 'Mein Lieblings...', trPh3: 'Ich habe noch nie...', trLieOff: 'Lüge?', trLieOn: 'Lüge', trSend: 'Meine drei senden', trSent: 'gesendet', trSentSoFar: 'Wer schon gesendet hat', trSentWaiting: 'Gesendet. Warte auf die anderen.', trWhichLie: 'Welche ist die Lüge?', trVoted: 'haben gewählt', trYouPicked: 'Du hast Nummer {n} gewählt', trYourTurnWait: 'Deine drei sind dran. Warte kurz.', trTheLieWas: 'Nummer {n} war die Lüge', trSubjectWas: 'Die drei gehörten {name}', trLie: 'die Lüge', trSpotted: 'erkannt', trFooled: 'getäuscht', trAllDone: 'Alle Runden durch', trTopic: 'Themenidee',
+  nhHave: 'Habe ich', nhNever: 'Noch nie', nhAsk: 'Sei ehrlich. Erst wenn alle geantwortet haben, wird aufgedeckt.', nhNobody: 'Niemand',
 
   wbTitle: 'Wortbombe', wbBoomTitle: 'Bumm', wbCategory: 'Kategorie', wbFuse: 'Zündschnur', wbYouHold: 'Du hast die Bombe. Tippe ein Wort und gib sie weiter.', wbHolding: '{name} hat die Bombe', wbYourWord: 'Dein Wort', wbWordPh: 'Ein Wort, das passt', wbPass: 'Bombe weitergeben', wbWait: 'Warte auf die Weitergabe', wbLastPass: 'Letztes Wort: {word}', wbUsed: 'Schon gesagte Wörter', wbNoneYet: 'Noch keine Wörter. Los.', wbWordsUsed: '{n} Wörter', wbBoomSubOne: '{name} hielt sie nach einer Weitergabe.', wbDupe: 'Das hat schon jemand gesagt. Nimm ein anderes.', wbWrong: 'Das passt nicht zur Kategorie.', wbBoom: 'Bumm!', wbBoomSub: '{name} hielt sie nach {passes} Weitergaben.',
 
@@ -720,7 +730,7 @@ const de: Strings = {
     wordle: 'Wordle', dice: 'Würfel', coin: 'Münzwurf', wheel: 'Rad', bracket: 'Turnierbaum', number: 'Zahl', yesno: 'Ja / Nein',
     trivia: 'Quiz', wyr: 'Was würdest du eher', likely: 'Am ehesten', categories: 'Kategorien',
     draw: 'Zeichnen & Raten',
-    charades: 'Scharade', whoami: 'Wer bin ich?', imposter: 'Bluffer', wordbomb: 'Wortbombe', truths: 'Zwei Wahrheiten & eine Lüge',
+    charades: 'Scharade', whoami: 'Wer bin ich?', imposter: 'Bluffer', wordbomb: 'Wortbombe', truths: 'Zwei Wahrheiten & eine Lüge', neverhave: 'Ich hab noch nie',
   },
   gameCats: {
     wordle: 'Wörter', wordbomb: 'Wörter', categories: 'Wörter',
@@ -742,6 +752,7 @@ const de: Strings = {
     imposter: 'Alle bekommen dasselbe Wort, außer einer Person. Finde den Bluffer.',
     truths: 'Drei Aussagen über eine Person. Zwei stimmen, eine ist gelogen.',
     wyr: 'Zwei Optionen, eine Stimme pro Person. Der Raum entscheidet.',
+    neverhave: 'Lies den Satz. Tippe Habe ich oder Noch nie. Sieh, wer es getan hat.',
     likely: 'Zeig auf die Person, auf die es am besten passt.',
     dice: 'Würfeln und die Sache klären.',
     coin: 'Kopf oder Zahl mit einem Tipp.',
@@ -810,6 +821,12 @@ const de: Strings = {
       round: 'Beide Seiten lesen, abstimmen und auf den Raum warten. Die Auszählung kommt, sobald alle gevotet haben.',
       win: 'Die Seite mit mehr Stimmen holt die Runde.',
       lose: 'Hier verliert niemand Punkte. Die Auszählung ist das ganze Ergebnis.',
+    },
+    neverhave: {
+      what: 'Ein Geständnisspiel. Es erscheint ein Satz: Ich habe noch nie... und alle antworten für sich.',
+      round: 'Lies den Satz, tippe auf dem eigenen Handy auf Habe ich oder Noch nie und warte auf die anderen. Die Antworten erscheinen, sobald alle getippt haben.',
+      win: 'Niemand gewinnt oder verliert. Es geht darum, herauszufinden, wer es getan hat.',
+      lose: 'Es gibt nichts zu verlieren. Sei ehrlich.',
     },
     likely: {
       what: 'Ein Kennenlernspiel. Eine Vorgabe erscheint und alle wählen die Person, auf die sie am besten passt.',
@@ -923,7 +940,7 @@ const arEG: Partial<Strings> = {
     wordle: 'كلمات', wordbomb: 'كلمات', categories: 'كلمات',
     draw: 'رسم',
     trivia: 'معلومات', whoami: 'معلومات',
-    charades: 'جلسة', imposter: 'جلسة', truths: 'جلسة', wyr: 'جلسة', likely: 'جلسة',
+    charades: 'جلسة', imposter: 'جلسة', truths: 'جلسة', neverhave: 'جلسة', wyr: 'جلسة', likely: 'جلسة',
     dice: 'أداة قرار', coin: 'أداة قرار', wheel: 'أداة قرار', number: 'أداة قرار', yesno: 'أداة قرار', bracket: 'أداة قرار',
   },
   gameDesc: {
@@ -937,6 +954,7 @@ const arEG: Partial<Strings> = {
     imposter: 'الكل بياخد نفس الكلمة إلا واحد. اكتشف المحتال.',
     truths: '٣ جمل عن لاعب. اتنين صح وواحدة كدب.',
     wyr: 'اختيارين وصوت لكل واحد. الغرفة هي اللي تحدد.',
+    neverhave: 'اقرا الجملة. دوس عملتها أو عمري ما. وشوف مين عملها.',
     likely: 'أشِر على اللي العبارة تنطبق عليه أكتر.',
     dice: 'ارمي النرد وخلاص.',
     coin: 'وجه ولا كتابة بضغطة.',
@@ -1006,6 +1024,12 @@ const arEG: Partial<Strings> = {
       win: 'الجانب اللي أخد أصوات أكتر ياخد الجولة.',
       lose: 'محدش بيخسر نقط هنا. النتيجة نفسها هي كل حاجة.',
     },
+    neverhave: {
+      what: 'لعبة اعترافات. بتظهر جملة: عمري ما... وكل واحد بيجاوب عن نفسه.',
+      round: 'اقرا الجملة، دوس عملتها أو عمري ما من موبايلك، واستنى الباقي. الإجابات بتظهر لما الكل يدوس.',
+      win: 'محدش بيكسب ولا بيخسر. المتعة إنك تعرف مين عملها.',
+      lose: 'مفيش حاجة تخسرها. كون صريح.',
+    },
     likely: {
       what: 'لعبة تعرّف. عبارة بتظهر والكل بيختار اللاعب اللي تناسبه أكتر.',
       round: 'اقرأ العبارة، صوّت للاعب واحد، واتفرج على الأصوات وهي بتتجمع.',
@@ -1049,7 +1073,7 @@ const arEG: Partial<Strings> = {
       lose: 'الناحية التانية خرجت. مفيش نقط ولا بطولة.',
     },
   } as Record<string, GameHow>,
-  gameNames: { ...ar.gameNames, wyr: 'تفضّل إيه', likely: 'مين الأكتر احتمالاً' },
+  gameNames: { ...ar.gameNames, wyr: 'تفضّل إيه', likely: 'مين الأكتر احتمالاً', neverhave: 'عمري ما' },
 };
 
 export const arDialects: Record<ArDialect, { label: string; strings: Partial<Strings> }> = {
@@ -1061,6 +1085,6 @@ export const DEFAULT_AR_DIALECT: ArDialect = 'eg';
 export function getStrings(locale: Locale, dialect: ArDialect = DEFAULT_AR_DIALECT): Strings {
   if (locale !== 'ar') return strings[locale];
   // Arabic is Egyptian only: the base `ar` block is a fallback, the layers below win.
-  return { ...ar, ...arEG, ...arEgypt, gameNames: { ...ar.gameNames, ...(arEG.gameNames as object), whoami: 'أنا مين؟', likely: 'مين الأكتر احتمال' } } as Strings;
+  return { ...ar, ...arEG, ...arEgypt, gameNames: { ...ar.gameNames, ...(arEG.gameNames as object), whoami: 'أنا مين؟', likely: 'مين الأكتر احتمال', neverhave: 'عمري ما' } } as Strings;
 }
 

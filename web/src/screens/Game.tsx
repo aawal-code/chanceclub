@@ -118,7 +118,7 @@ function GameInner({
                 </span>
                 <span className="caption">{t.gameNames[game] || game}</span>
               </span>
-              {round.turn_player_id && (
+              {round.turn_player_id && !['wyr', 'likely', 'neverhave', 'trivia', 'categories', 'wordle'].includes(game) && (
                 <span className="turn-chip">
                   {isMyTurn ? <b>{t.yourTurn}</b> : <>{t.waitingTurn} · <b>{turnName}</b></>}
                 </span>
@@ -134,6 +134,7 @@ function GameInner({
               <BracketView t={t} bracket={party.bracket} onPick={party.is_host ? (r, m, side) => onAct({ type: 'pick', value: `${r}:${m}:${side}` }) : undefined} />
             )}
             {game === 'trivia' && <TriviaRound t={t} round={round} onAct={onAct} />}
+            {game === 'neverhave' && <NeverRound t={t} round={round} party={party} onAct={onAct} />}
             {VOTE_GAMES.includes(game) && <VoteRound t={t} round={round} game={game} onAct={onAct} />}
             {AWARD_GAMES.includes(game) && (
               <AwardRound t={t} round={round} party={party} onAct={onAct} />
@@ -240,6 +241,41 @@ function TriviaRound({ t, round, onAct }: { t: Strings; round: Round; onAct: (bo
     <div className="stack gap-12">
       <Field label={t.yourAnswer} value={value} onChange={setValue} placeholder="…" maxLength={120} onKeyDown={(e) => { if (e.key === 'Enter' && value.trim()) onAct({ type: 'answer', value: value.trim() }); }} />
       <Btn disabled={!value.trim()} onClick={() => onAct({ type: 'answer', value: value.trim() })}>{t.submit}</Btn>
+      <p className="caption">{round.submission_count}/{round.submission_status.length} {t.submitted.toLowerCase()}</p>
+    </div>
+  );
+}
+
+/* ---------------- never have I ever ---------------- */
+function NeverRound({ t, round, party, onAct }: { t: Strings; round: Round; party: Party; onAct: (body: Record<string, unknown>) => void }) {
+  const options = round.options && round.options.length === 2 ? round.options : [t.nhHave, t.nhNever];
+  const complete = round.status === 'complete';
+  if (complete) {
+    const have = new Set<string>(((round.result as { have?: string[] } | null)?.have) || []);
+    const answered = new Set((round.submission_status || []).filter((row) => row.submitted).map((row) => row.player_id));
+    const who = party.members.filter((member) => have.has(member.id));
+    const never = party.members.filter((member) => answered.has(member.id) && !have.has(member.id));
+    return (
+      <div className="stack gap-12">
+        <div className="nh-result" data-kind="have">
+          <b>{options[0]} · {who.length}</b>
+          <span>{who.length ? who.map((member) => member.name).join(', ') : t.nhNobody}</span>
+        </div>
+        <div className="nh-result" data-kind="never">
+          <b>{options[1]} · {never.length}</b>
+          <span>{never.length ? never.map((member) => member.name).join(', ') : t.nhNobody}</span>
+        </div>
+      </div>
+    );
+  }
+  if (round.submitted) return <p className="caption">{t.submitted} · {t.waitingOthers} ({round.submission_count}/{round.submission_status.length})</p>;
+  return (
+    <div className="stack gap-10">
+      <p className="caption">{t.nhAsk}</p>
+      <div className="nh-buttons">
+        <button type="button" className="nh-btn" data-kind="have" onClick={() => onAct({ type: 'vote', value: options[0] })}>{options[0]}</button>
+        <button type="button" className="nh-btn" data-kind="never" onClick={() => onAct({ type: 'vote', value: options[1] })}>{options[1]}</button>
+      </div>
       <p className="caption">{round.submission_count}/{round.submission_status.length} {t.submitted.toLowerCase()}</p>
     </div>
   );

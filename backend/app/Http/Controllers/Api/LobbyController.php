@@ -13,7 +13,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LobbyController extends Controller
 {
-    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw', 'imposter', 'wordbomb', 'truths'];
+    private const GAMES = ['categories', 'whoami', 'trivia', 'charades', 'wyr', 'likely', 'yesno', 'dice', 'coin', 'wheel', 'number', 'wordle', 'bracket', 'draw', 'imposter', 'wordbomb', 'truths', 'neverhave'];
 
     private const PROMPTS = [
         'categories' => ['Things you find at the beach', 'Fruits and vegetables', 'Movie characters', 'Countries and cities', 'Things that are red', 'Sports and hobbies'],
@@ -340,10 +340,10 @@ class LobbyController extends Controller
                     }
                 }
             } else {
-                if (!in_array($round->game, ['trivia', 'wyr', 'likely'], true)) throw new HttpException(422, 'This game does not accept private submissions.');
+                if (!in_array($round->game, ['trivia', 'wyr', 'likely', 'neverhave'], true)) throw new HttpException(422, 'This game does not accept private submissions.');
                 $value = trim($data['value'] ?? '');
                 if ($value === '') throw ValidationException::withMessages(['value' => 'A response is required.']);
-                if ($data['type'] === 'vote' && !in_array($round->game, ['wyr', 'likely'], true)) throw new HttpException(422, 'Voting is not available in this game.');
+                if ($data['type'] === 'vote' && !in_array($round->game, ['wyr', 'likely', 'neverhave'], true)) throw new HttpException(422, 'Voting is not available in this game.');
                 if ($data['type'] === 'answer' && $round->game !== 'trivia') throw new HttpException(422, 'Answer submissions are only available for trivia.');
                 if (DB::table('party_submissions')->where('round_id', $round->id)->where('player_id', $player->id)->exists()) throw new HttpException(409, 'You already submitted for this round.');
                 DB::table('party_submissions')->insert(['round_id' => $round->id, 'player_id' => $player->id, 'payload' => json_encode(['value' => $value], JSON_THROW_ON_ERROR), 'created_at' => now(), 'updated_at' => now()]);
@@ -513,7 +513,7 @@ class LobbyController extends Controller
         return response()->json(['data' => $this->partyView($result, $identity)]);
     }
 
-    private const AUTO_NEXT = ['trivia' => 10, 'wyr' => 8, 'likely' => 8, 'wordle' => 10, 'imposter' => 16, 'wordbomb' => 10, 'truths' => 16];
+    private const AUTO_NEXT = ['trivia' => 10, 'wyr' => 8, 'likely' => 8, 'wordle' => 10, 'imposter' => 16, 'wordbomb' => 10, 'truths' => 16, 'neverhave' => 9];
 
     /**
      * Keeps a party moving without anyone's hand on it. Runs on every poll but only writes when needed:
@@ -527,7 +527,7 @@ class LobbyController extends Controller
         $hostRow = $party->host_player_id ? DB::table('party_players')->find($party->host_player_id) : null;
         $hostGone = !$hostRow || \App\Support\History::age($hostRow->last_seen_at) >= 30;
         $round = $party->status === 'playing' ? DB::table('party_rounds')->where('party_id', $partyId)->orderByDesc('round_number')->first() : null;
-        $needsSettle = $round && $round->status === 'active' && in_array($round->game, ['trivia', 'wyr', 'likely'], true);
+        $needsSettle = $round && $round->status === 'active' && in_array($round->game, ['trivia', 'wyr', 'likely', 'neverhave'], true);
         $needsAuto = $round && $round->status === 'complete' && isset(self::AUTO_NEXT[$round->game]);
         $stale = $party->auto_next_at !== null && !$needsAuto;
         if (!$hostGone && !$needsSettle && !$needsAuto && !$stale) return;
@@ -549,7 +549,7 @@ class LobbyController extends Controller
             $round = DB::table('party_rounds')->where('party_id', $partyId)->orderByDesc('round_number')->lockForUpdate()->first();
             if (!$round) return;
             if ($round->status === 'active') {
-                if (in_array($round->game, ['trivia', 'wyr', 'likely'], true)) $this->settleSubmissions($round, $players, $partyId);
+                if (in_array($round->game, ['trivia', 'wyr', 'likely', 'neverhave'], true)) $this->settleSubmissions($round, $players, $partyId);
                 return;
             }
             if (!isset(self::AUTO_NEXT[$round->game])) {
@@ -693,7 +693,7 @@ class LobbyController extends Controller
             'number' => (int) $round->round_number,
             'game' => $round->game,
             'prompt' => $displayPrompt,
-            'options' => ($round->game === 'wyr' && $round->answer && str_contains((string) $round->answer, '|')) ? explode('|', (string) $round->answer, 2) : null,
+            'options' => (in_array($round->game, ['wyr', 'neverhave'], true) && $round->answer && str_contains((string) $round->answer, '|')) ? explode('|', (string) $round->answer, 2) : null,
             'status' => $round->status,
             'turn_player_id' => $round->turn_player_id ? (string) $round->turn_player_id : null,
             'private_clue' => $privateClue,
@@ -839,6 +839,16 @@ class LobbyController extends Controller
             $row = $this->chooseRow($partyId, $bank, $custom, $used);
             return [$row[0], implode('|', $row[1])];
         }
+        if ($game === 'neverhave' && $bank !== null) {
+            $prefix = ['en' => 'Never have I ever ', 'ar' => 'عمري ما ', 'de' => 'Ich habe noch nie '][$locale] ?? 'Never have I ever ';
+            $labels = ['en' => ['I have', 'Never'], 'ar' => ['عملتها', 'عمري ما'], 'de' => ['Habe ich', 'Noch nie']][$locale] ?? ['I have', 'Never'];
+            $used = array_flip(DB::table('party_rounds')->where('party_id', $partyId)->where('game', 'neverhave')->pluck('prompt')->all());
+            $rows = array_map(fn ($row) => [$prefix.$row[0].($locale === 'de' ? '.' : '.'), []], $bank);
+            $fresh = array_values(array_filter($rows, fn ($row) => !isset($used[$row[0]])));
+            $pool = $fresh ?: $rows;
+            $row = $pool[random_int(0, count($pool) - 1)];
+            return [$row[0], implode('|', $labels)];
+        }
         if ($bank === null) {
             $list = $promptBank[$game] ?? [''];
             $i = random_int(0, count($list) - 1);
@@ -868,7 +878,7 @@ class LobbyController extends Controller
      */
     public function settleSubmissions(object $round, $members, int $partyId): bool
     {
-        if ($round->status !== 'active' || !in_array($round->game, ['trivia', 'wyr', 'likely'], true)) return false;
+        if ($round->status !== 'active' || !in_array($round->game, ['trivia', 'wyr', 'likely', 'neverhave'], true)) return false;
         $subs = DB::table('party_submissions')->where('round_id', $round->id)->get();
         if ($subs->isEmpty()) return false;
         $done = $subs->pluck('player_id')->map(fn ($id) => (int) $id)->all();
@@ -882,6 +892,10 @@ class LobbyController extends Controller
             $outcome = ['answer' => $round->answer];
         } else {
             $outcome = ['tally' => $this->tally($round->id)];
+            if ($round->game === 'neverhave') {
+                $have = explode('|', (string) $round->answer)[0];
+                $outcome['have'] = $subs->filter(fn ($submission) => (json_decode($submission->payload, true)['value'] ?? '') === $have)->pluck('player_id')->map(fn ($id) => (string) $id)->values()->all();
+            }
         }
         DB::table('party_rounds')->where('id', $round->id)->update(['outcome' => json_encode($outcome, JSON_THROW_ON_ERROR), 'status' => 'complete', 'updated_at' => now()]);
         return true;

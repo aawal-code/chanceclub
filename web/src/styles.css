@@ -915,3 +915,13 @@ svg { flex-shrink: 0; vertical-align: middle; }
 .own-item { font-size: 14px; padding: 4px 0; border-bottom: 1px solid var(--line); }
 .own-item .grow { overflow-wrap: anywhere; min-width: 0; }
 .member .sit-out { color: var(--muted); font-style: italic; }
+
+/* ============ never have I ever, topic hint ============ */
+.tr-topic { display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; background: var(--surface-3); border: 1px solid var(--line); }
+.tr-topic strong { font-size: 15px; }
+.nh-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.nh-btn { min-height: 64px; border-radius: 16px; border: 1px solid var(--line); background: var(--surface-3); color: inherit; font: inherit; font-weight: 800; font-size: 17px; cursor: pointer; }
+.nh-btn[data-kind="have"] { border-color: var(--accent, #7c5cff); }
+.nh-btn:active { transform: scale(0.97); }
+.nh-result { display: grid; gap: 4px; padding: 12px 14px; border-radius: 14px; background: var(--surface-3); border: 1px solid var(--line); }
+.nh-result span { font-size: 14px; opacity: 0.85; }
