@@ -180,7 +180,8 @@ function WordleParty({ t, party, round, onAct }: { t: Strings; party: Party; rou
   const toast = useToast();
   const attempts = round.wordle?.attempts || [];
   const solved = round.wordle?.solved;
-  const complete = round.status === 'complete';
+  const outOfGuesses = attempts.length >= (round.wordle?.max || 6) || !!solved;
+  const complete = round.status === 'complete' || outOfGuesses;
   const [current, setCurrent] = useState('');
   const [shake, setShake] = useState(false);
 
@@ -222,7 +223,7 @@ function WordleParty({ t, party, round, onAct }: { t: Strings; party: Party; rou
         {solved && <span className="caption" style={{ color: 'var(--hit)' }}>{t.solved}</span>}
       </div>
       {!complete && <Keyboard onKey={onKey} keyStates={keyStatesFrom(attempts)} />}
-      {complete && <p className="caption">{t.roundComplete}</p>}
+      {complete && <p className="caption">{round.status === 'complete' ? t.roundComplete : solved ? t.waitingOthers : t.noGuessesLeft}</p>}
     </div>
   );
 }

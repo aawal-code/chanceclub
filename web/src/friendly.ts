@@ -9,6 +9,7 @@ export function friendlyError(e: any, t: Strings): string {
   if (status === 404) return t.errRoom;
   if (status === 403) return t.errHost;
   if (status === 429) return t.errSlow;
+  if (status === 409 && /no guesses/i.test(msg)) return t.noGuessesLeft;
   if (status === 409 && /started/i.test(msg)) return t.errStarted;
   if (status === 409 && /full/i.test(msg)) return t.errFull;
   if (status === 409 && /ready/i.test(msg)) return t.everyoneReady;

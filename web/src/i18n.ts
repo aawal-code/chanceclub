@@ -82,7 +82,7 @@ const en = {
   passwordHint: 'At least 8 characters.', displayNameHint: 'This is the name other players see.',
   wordle: 'Wordle', wordleSolo: 'Endless word game', newWord: 'New word', guess: 'Guess',
   enter: 'Enter', delete: 'Delete', solved: 'Solved!', outOfGuesses: 'Out of guesses', wordWas: 'The word was',
-  notAWord: 'Not in the dictionary', alreadyGuessed: 'Already tried that word',
+  noGuessesLeft: 'No guesses left', notAWord: 'Not in the dictionary', alreadyGuessed: 'Already tried that word',
   solo: 'Solo', multiplayer: 'Party', comingSoon: 'Party only',
   yourTurn: 'Your turn', waitingTurn: 'Waiting for their turn',
   roundComplete: 'Round complete', scores: 'Scores', playNext: 'Next round',
@@ -390,7 +390,7 @@ const ar: Strings = {
   passwordHint: '٨ أحرف على الأقل.', displayNameHint: 'هذا الاسم اللي يشوفه اللاعبون.',
   wordle: 'ووردل', wordleSolo: 'لعبة كلمات لا تنتهي', newWord: 'كلمة جديدة', guess: 'خمّن',
   enter: 'إدخال', delete: 'حذف', solved: 'حلّيتها!', outOfGuesses: 'انتهت المحاولات', wordWas: 'الكلمة كانت',
-  notAWord: 'ليست في القاموس', alreadyGuessed: 'جرّبتها من قبل',
+  noGuessesLeft: 'خلصت محاولاتك', notAWord: 'ليست في القاموس', alreadyGuessed: 'جرّبتها من قبل',
   solo: 'فردي', multiplayer: 'جماعي', comingSoon: 'للجلسات فقط',
   yourTurn: 'دورك', waitingTurn: 'بانتظار دورهم',
   roundComplete: 'انتهت الجولة', scores: 'النقاط', playNext: 'الجولة التالية',
@@ -667,7 +667,7 @@ const de: Strings = {
   passwordHint: 'Mindestens 8 Zeichen.', displayNameHint: 'Diesen Namen sehen die anderen Spieler.',
   wordle: 'Wordle', wordleSolo: 'Endloses Wortspiel', newWord: 'Neues Wort', guess: 'Raten',
   enter: 'Eingeben', delete: 'Löschen', solved: 'Gelöst!', outOfGuesses: 'Keine Versuche mehr', wordWas: 'Das Wort war',
-  notAWord: 'Nicht im Wörterbuch', alreadyGuessed: 'Schon versucht',
+  noGuessesLeft: 'Keine Versuche mehr', notAWord: 'Nicht im Wörterbuch', alreadyGuessed: 'Schon versucht',
   solo: 'Solo', multiplayer: 'Runde', comingSoon: 'Nur in der Runde',
   yourTurn: 'Du bist dran', waitingTurn: 'Wartet auf den Zug',
   roundComplete: 'Runde beendet', scores: 'Punkte', playNext: 'Nächste Runde',
@@ -880,6 +880,7 @@ export type ArDialect = 'eg' | 'msa';
 /* Arabic dialect registry. `ar` above is Modern Standard Arabic and is the base every dialect falls back to.
    A new dialect (for example Syrian) is a copy of the Egyptian block below with its own overrides plus one registry entry. */
 const arEG: Partial<Strings> = {
+  noGuessesLeft: 'خلصت محاولاتك',
   waiting: 'مستني المضيف', notReady: 'مش جاهز', offline: 'مش متصل',
   needTwo: 'محتاجين لاعبين اتنين على الأقل', everyoneReady: 'لازم الكل يبقى جاهز',
   chooseGame: 'اختار لعبة', createParty: 'اعمل جلسة', code: 'كود الدعوة', invite: 'كود الدعوة', copyLink: 'انسخ لينك الدعوة', copied: 'اتنسخ',
