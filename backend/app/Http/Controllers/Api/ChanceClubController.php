@@ -191,8 +191,29 @@ class ChanceClubController extends Controller
     private function issueToken(User $user, int $status = 200): JsonResponse
     {
         $plain = Str::random(80);
-        DB::table('api_tokens')->insert(['user_id' => $user->id, 'token_hash' => hash('sha256', $plain), 'expires_at' => now()->addDays(30), 'created_at' => now(), 'updated_at' => now()]);
-        return response()->json(['token' => $plain, 'user' => $this->userView($user)], $status);
+        $refresh = Str::random(80);
+        DB::table('api_tokens')->insert([
+            'user_id' => $user->id, 'token_hash' => hash('sha256', $plain), 'expires_at' => now()->addDays(2),
+            'refresh_hash' => hash('sha256', $refresh), 'refresh_expires_at' => now()->addDays(365),
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        return response()->json(['token' => $plain, 'refresh_token' => $refresh, 'expires_in' => 2 * 86400, 'user' => $this->userView($user)], $status);
+    }
+
+    /** Exchange a long-lived refresh token for a fresh access token. The refresh token slides forward on use. */
+    public function refresh(Request $request): JsonResponse
+    {
+        $data = $request->validate(['refresh_token' => ['required', 'string', 'min:32', 'max:200']]);
+        $row = DB::table('api_tokens')->where('refresh_hash', hash('sha256', $data['refresh_token']))->where('refresh_expires_at', '>', now())->first();
+        if (!$row) return response()->json(['message' => 'Session expired. Please sign in again.'], 401);
+        $user = User::find($row->user_id);
+        if (!$user) return response()->json(['message' => 'Session expired. Please sign in again.'], 401);
+        $plain = Str::random(80);
+        DB::table('api_tokens')->where('id', $row->id)->update([
+            'token_hash' => hash('sha256', $plain), 'expires_at' => now()->addDays(2),
+            'refresh_expires_at' => now()->addDays(365), 'updated_at' => now(),
+        ]);
+        return response()->json(['token' => $plain, 'refresh_token' => $data['refresh_token'], 'expires_in' => 2 * 86400, 'user' => $this->userView($user)]);
     }
 
     private function user(Request $request): ?User { return $request->attributes->get('cc.user'); }

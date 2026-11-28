@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { api, setSavedUser, setToken } from '../api';
+import { api, setSavedUser, setSession } from '../api';
 import type { Locale, Strings } from '../i18n';
 import { Btn, Card, Field, Seg, useToast } from '../components/ui';
 import type { ThemeName } from '../App';
@@ -63,7 +63,7 @@ export default function Profile({
       const result = mode === 'signup'
         ? await api.register(trimmedName, email.trim(), password)
         : await api.login(email.trim(), password);
-      setToken(result.token);
+      setSession(result);
       setSavedUser({ name: result.user.name });
       setIdentity({ kind: 'user', name: result.user.name });
       setName(result.user.name);

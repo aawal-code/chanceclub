@@ -1,6 +1,6 @@
 import { friendlyError } from './friendly';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { api, ApiError, getGuestName, getSavedUser, getToken, HEALTH_URL, onSlowRequest, setGuestName, setSavedUser, setToken, type Party } from './api';
+import { api, ApiError, clearSession, getGuestName, getSavedUser, getToken, HEALTH_URL, onSessionExpired, onSlowRequest, renewIfStale, setGuestName, setSavedUser, setToken, type Party } from './api';
 import { strings, type Locale, getStrings, DEFAULT_AR_DIALECT } from './i18n';
 import type { ArDialect } from './i18n';
 import { Brand, DieLogo } from './components/brand';
@@ -112,11 +112,39 @@ export default function App() {
   }, [theme, locale]);
 
   /* ---- keep account preferences in step with the device (accounts only) ---- */
+  /* The account owns the theme: on sign-in adopt the saved one (a new device inherits it); if the account has
+     never chosen, the device's current theme becomes the account's, so a guest-to-account upgrade keeps it. */
+  const [themeSynced, setThemeSynced] = useState(false);
   useEffect(() => {
-    if (identity?.kind !== 'user') return;
-    const id = window.setTimeout(() => { api.updateMe({ preferred_language: locale, theme }).catch(() => { /* best effort */ }); }, 800);
+    if (identity?.kind !== 'user') { setThemeSynced(false); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const session = await api.me();
+        const saved = session.user?.theme;
+        if (!cancelled && saved && (THEME_ORDER as string[]).includes(saved)) setTheme(saved as ThemeName);
+        if (!cancelled && session.user?.preferred_language && !localStorage.getItem(LOCALE_KEY)) setLocale(normalizeLocale(session.user.preferred_language));
+      } catch { /* offline: keep the device theme, sync later */ }
+      if (!cancelled) setThemeSynced(true);
+    })();
+    return () => { cancelled = true; };
+  }, [identity?.kind]);
+  useEffect(() => {
+    if (!themeSynced || identity?.kind !== 'user') return;
+    const id = window.setTimeout(() => { api.updateMe({ preferred_language: locale, theme }).catch(() => { /* best effort */ }); }, 600);
     return () => window.clearTimeout(id);
-  }, [identity?.kind, locale, theme]);
+  }, [themeSynced, identity?.kind, locale, theme]);
+
+  /* ---- sessions: renew quietly; only a genuine rejection sends the person to sign in ---- */
+  useEffect(() => {
+    const off = onSessionExpired(() => { setIdentity(null); setActiveParty(null); toast(t.sessionExpired); go({ name: 'profile' }); });
+    const tick = () => { void renewIfStale(); };
+    const timer = window.setInterval(tick, 30 * 60 * 1000);
+    const vis = () => { if (document.visibilityState === 'visible') tick(); };
+    document.addEventListener('visibilitychange', vis);
+    window.addEventListener('online', tick);
+    return () => { off(); window.clearInterval(timer); document.removeEventListener('visibilitychange', vis); window.removeEventListener('online', tick); };
+  }, [t.sessionExpired]);
 
   /* ---- hash routing ---- */
   useEffect(() => {
@@ -163,16 +191,20 @@ export default function App() {
         go({ name: 'party', code: legacyJoin.toUpperCase() });
         window.history.replaceState({}, '', `${window.location.pathname}#/party/${legacyJoin.toUpperCase()}`);
       }
+      await renewIfStale();
       const token = getToken();
       if (token) {
         try {
           const session = await api.me();
-          if (session.user) setIdentity({ kind: 'user', name: session.user.name });
+          if (session.user) { setIdentity({ kind: 'user', name: session.user.name }); setSavedUser({ name: session.user.name }); }
           else if (session.guest) setIdentity({ kind: 'guest', name: session.guest.name });
-        } catch {
-          // A stale token must never dead-end a guest: they stay a visitor and get a fresh
-          // guest session the moment they create or join a lobby.
-          setIdentity(null);
+        } catch (problem) {
+          // A failed network call must never sign anyone out: keep the remembered identity.
+          // Only a genuine rejection (handled in api.ts) clears the session.
+          const saved = getSavedUser();
+          if (getToken() && saved) setIdentity({ kind: 'user', name: saved.name });
+          else if (getToken() && getGuestName()) setIdentity({ kind: 'guest', name: getGuestName() });
+          else setIdentity(null);
         }
       }
       // A reload or a deep link must not drop the lobby you are in.
@@ -373,8 +405,7 @@ export default function App() {
 
   const signOut = useCallback(async () => {
     try { await api.logout(); } catch { /* guest sessions may refuse while in a lobby */ }
-    setToken(null);
-    setSavedUser(null);
+    clearSession();
     setIdentity(null);
     setActiveParty(null);
     go({ name: 'home' });

@@ -74,6 +74,63 @@ export function setToken(token: string | null) {
     else localStorage.removeItem(TOKEN_KEY);
   } catch { /* ignore */ }
 }
+const REFRESH_KEY = 'cc.refresh';
+const RENEWED_KEY = 'cc.renewed';
+export function getRefreshToken(): string | null {
+  try { return localStorage.getItem(REFRESH_KEY); } catch { return null; }
+}
+/** Store a full signed-in session: short-lived access token plus the long-lived refresh token. */
+export function setSession(result: { token: string; refresh_token?: string }) {
+  setToken(result.token);
+  try {
+    if (result.refresh_token) localStorage.setItem(REFRESH_KEY, result.refresh_token);
+    localStorage.setItem(RENEWED_KEY, String(Date.now()));
+  } catch { /* ignore */ }
+  try { void navigator.storage?.persist?.(); } catch { /* ignore */ }
+}
+export function clearSession() {
+  setToken(null);
+  try { localStorage.removeItem(REFRESH_KEY); localStorage.removeItem(RENEWED_KEY); localStorage.removeItem(USER_KEY); } catch { /* ignore */ }
+}
+const expiredListeners = new Set<() => void>();
+export function onSessionExpired(fn: () => void): () => void { expiredListeners.add(fn); return () => { expiredListeners.delete(fn); }; }
+
+let refreshInFlight: Promise<'ok' | 'rejected' | 'network'> | null = null;
+/** Renew the access token. Only a real rejection (401/422) ends the session; network trouble never does. */
+export function renewSession(): Promise<'ok' | 'rejected' | 'network'> {
+  const refresh = getRefreshToken();
+  if (!refresh) return Promise.resolve('rejected');
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = (async () => {
+    try {
+      const response = await fetch(`${BASE}/auth/refresh`, {
+        method: 'POST',
+        headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refresh_token: refresh }),
+      });
+      if (response.ok) {
+        const payload = await response.json();
+        if (payload?.token) { setSession({ token: payload.token, refresh_token: payload.refresh_token || refresh }); return 'ok' as const; }
+        return 'network' as const;
+      }
+      if (response.status === 401 || response.status === 422) return 'rejected' as const;
+      return 'network' as const;
+    } catch { return 'network' as const; }
+    finally { window.setTimeout(() => { refreshInFlight = null; }, 0); }
+  })();
+  return refreshInFlight;
+}
+/** Quiet background renewal: refresh when the last renewal is older than 12 hours. */
+export async function renewIfStale(force = false): Promise<'ok' | 'rejected' | 'network' | 'skipped'> {
+  if (!getRefreshToken()) return 'skipped';
+  let last = 0;
+  try { last = Number(localStorage.getItem(RENEWED_KEY) || 0); } catch { /* ignore */ }
+  if (!force && Date.now() - last < 12 * 3600 * 1000) return 'skipped';
+  const r = await renewSession();
+  if (r === 'rejected') { clearSession(); expiredListeners.forEach((fn) => fn()); }
+  return r;
+}
+
 export function getSavedUser(): { name: string } | null {
   try { const raw = localStorage.getItem(USER_KEY); return raw ? JSON.parse(raw) : null; } catch { return null; }
 }
@@ -97,7 +154,7 @@ export class ApiError extends Error {
 
 export type Session = {
   identity: { kind: 'user' | 'guest'; id: string; name: string } | null;
-  user: { id: string; name: string; email?: string; preferred_language?: string; theme?: string } | null;
+  user: { id: string; name: string; email?: string; preferred_language?: string; theme?: string | null } | null;
   guest: { id: string; name: string } | null;
 };
 
@@ -176,7 +233,13 @@ async function requestInner<T>(path: string, method = 'GET', body?: unknown, ret
       `Request failed (${response.status})`;
     const authRoute = path === '/guest' || path === '/login' || path === '/register';
     if (response.status === 401 && retry && !authRoute) {
-      if (await healGuest()) return request<T>(path, method, body, false);
+      if (getRefreshToken() || getSavedUser()) {
+        // A signed-in account: renew quietly. Only a genuine rejection signs the person out.
+        const renewed = getRefreshToken() ? await renewSession() : 'rejected';
+        if (renewed === 'ok') return request<T>(path, method, body, false);
+        if (renewed === 'rejected') { clearSession(); expiredListeners.forEach((fn) => fn()); }
+        else throw new ApiError('Network error. Check your connection and try again.', 0);
+      } else if (await healGuest()) return request<T>(path, method, body, false);
     }
     throw new ApiError(String(message), response.status);
   }
@@ -187,9 +250,9 @@ export const api = {
   guest: (name: string) => request<{ token: string; guest: { id: string; name: string } }>('/guest', 'POST', { name }),
   guestMe: () => request<{ guest: { id: string; name: string } }>('/guest/me'),
   register: (name: string, email: string, password: string) =>
-    request<{ token: string; user: { id: string; name: string } }>('/register', 'POST', { name, email, password }),
+    request<{ token: string; refresh_token?: string; user: { id: string; name: string } }>('/register', 'POST', { name, email, password }),
   login: (email: string, password: string) =>
-    request<{ token: string; user: { id: string; name: string } }>('/login', 'POST', { email, password }),
+    request<{ token: string; refresh_token?: string; user: { id: string; name: string } }>('/login', 'POST', { email, password }),
   me: () => request<Session>('/me'),
   updateMe: (body: Record<string, unknown>) => request<{ user?: any; guest?: any }>('/me', 'PATCH', body),
   logout: () => request<{ message: string }>('/logout', 'POST'),
