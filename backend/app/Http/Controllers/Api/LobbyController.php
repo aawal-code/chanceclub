@@ -650,8 +650,8 @@ class LobbyController extends Controller
         $roundScores = $round ? DB::table('party_round_scores')->where('round_id', $round->id)->pluck('player_id')->map(fn ($id) => (string) $id)->all() : [];
         $outcome = $round?->outcome ? json_decode($round->outcome, true) : null;
         $displayPrompt = $round?->prompt;
-        if ($round?->game === 'whoami') $displayPrompt = $round->locale === 'ar' ? 'أنا مين؟' : 'Who am I?';
-        if ($round?->game === 'charades') $displayPrompt = $round->locale === 'ar' ? 'مثّلها من غير كلام!' : 'Act it out!';
+        if ($round?->game === 'whoami') $displayPrompt = ['ar' => 'أنا مين؟', 'de' => 'Wer bin ich?'][$round->locale] ?? 'Who am I?';
+        if ($round?->game === 'charades') $displayPrompt = ['ar' => 'مثّلها من غير كلام!', 'de' => 'Spiel es ohne Worte vor!'][$round->locale] ?? 'Act it out!';
         $privateClue = null;
         if ($round?->game === 'charades' && (int) $round->turn_player_id === (int) $myPlayer->id) $privateClue = $round->answer;
         if ($round?->game === 'whoami' && (int) $round->turn_player_id !== (int) $myPlayer->id) $privateClue = $round->answer;
@@ -830,11 +830,12 @@ class LobbyController extends Controller
             // The file holds "A|B"; the round shows "A or B?" and keeps the two sides for the buttons.
             $joiner = ['en' => ' or ', 'ar' => ' ولا ', 'de' => ' oder '][$locale] ?? ' or ';
             $mark = $locale === 'ar' ? '؟' : '?';
-            $bank = array_map(fn ($row) => [rtrim($row[0], '?؟').$joiner.rtrim($row[1][0] ?? '', '?؟').$mark, [$row[0], $row[1][0] ?? '']], $bank);
+            $low = fn (string $t) => $locale === 'ar' ? $t : mb_strtolower(mb_substr($t, 0, 1)).mb_substr($t, 1);
+            $bank = array_map(fn ($row) => [rtrim($row[0], '?؟').$joiner.$low(rtrim($row[1][0] ?? '', '?؟')).$mark, [$row[0], $row[1][0] ?? '']], $bank);
             $used = array_flip(DB::table('party_rounds')->where('party_id', $partyId)->where('game', 'wyr')->pluck('prompt')->all());
             $custom = [];
             if ((string) DB::table('parties')->where('id', $partyId)->value('content_mode') !== 'builtin') {
-                foreach (\App\Support\Content::custom($partyId, 'wyr') as [$a, $b]) $custom[] = [rtrim($a, '?؟').$joiner.rtrim($b[0] ?? '', '?؟').$mark, [$a, $b[0] ?? '']];
+                foreach (\App\Support\Content::custom($partyId, 'wyr') as [$a, $b]) $custom[] = [rtrim($a, '?؟').$joiner.$low(rtrim($b[0] ?? '', '?؟')).$mark, [$a, $b[0] ?? '']];
             }
             $row = $this->chooseRow($partyId, $bank, $custom, $used);
             return [$row[0], implode('|', $row[1])];
