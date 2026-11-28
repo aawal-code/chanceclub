@@ -91,15 +91,18 @@ export default function Profile({
 
   const uploadPhoto = async (file: File) => {
     if (!isAccount) { setAvatarError(t.avatarNeedsAccount); return; }
+    if (!/^image\/(png|jpeg|webp)$/i.test(file.type)) { setAvatarError(t.avatarBadFile); return; }
+    if (file.size > 12 * 1024 * 1024) { setAvatarError(t.avatarTooBig); return; }
     setAvatarBusy(true);
     setAvatarError(null);
     try {
       const data = await shrink(file);
+      if (!data) throw new Error('resize');
       const r = await api.avatarUpload(data);
       setAvatar(r.avatar);
       toast(t.avatarSaved);
     } catch (problem: any) {
-      setAvatarError(problem?.message || t.avatarBadFile);
+      setAvatarError(problem?.message || t.avatarUploadFailed);
     } finally {
       setAvatarBusy(false);
       if (fileRef.current) fileRef.current.value = '';
@@ -219,7 +222,7 @@ export default function Profile({
             onChange={(event) => { const f = event.target.files?.[0]; if (f) uploadPhoto(f); }}
           />
           <Btn variant="ghost" onClick={() => { if (!isAccount) { setAvatarError(t.avatarNeedsAccount); return; } fileRef.current?.click(); }} disabled={avatarBusy}>
-            {avatar?.custom ? t.avatarReplace : t.avatarUpload}
+            {avatarBusy ? t.avatarUploading : avatar?.custom ? t.avatarReplace : t.avatarUpload}
           </Btn>
           {avatar?.custom ? <Btn variant="ghost" onClick={removePhoto} disabled={avatarBusy}>{t.avatarRemove}</Btn> : null}
           <span className="caption">{t.avatarUploadHint}</span>

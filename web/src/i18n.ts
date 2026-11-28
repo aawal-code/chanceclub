@@ -115,6 +115,7 @@ const en = {
   impImposterTag: 'imposter',
   impVotesWord: 'votes', impVoteOne: 'vote',
   playerOne: 'player',
+  avatarUploading: 'Uploading…', avatarUploadFailed: 'The upload did not go through. Try again.', avatarTooBig: 'That photo is too big. Pick one under 12 MB.',
   avatarTitle: 'Profile picture', avatarHintAccount: 'Your face shows up in every lobby and game.', avatarHintGuest: 'Saved on this device. Sign in to upload a photo.', avatarUpload: 'Upload a photo', avatarReplace: 'Replace photo', avatarRemove: 'Remove photo', avatarUploadHint: 'Square crop, resized to 128px.', avatarSaved: 'Picture updated', avatarBadFile: 'That picture could not be read.', avatarNeedsAccount: 'Photos need a free account. Pick a preset instead.',
 
   impNeedsThree: 'Imposter needs three players.',
@@ -245,6 +246,7 @@ const ar: Strings = {
   impSurvivedVote: 'التصويت اتقسم. المحتال خرج منها.', impImposterWord: 'كلمة المحتال',
   impWasImposter: '{name} كان المحتال', impImposterTag: 'المحتال', impVotesWord: 'أصوات', impVoteOne: 'صوت',
   playerOne: 'لاعب',
+  avatarUploading: 'بيترفع…', avatarUploadFailed: 'الرفع مكملش. جرّب تاني.', avatarTooBig: 'الصورة كبيرة أوي. اختار واحدة أقل من 12 ميجا.',
   avatarTitle: 'الصورة الشخصية', avatarHintAccount: 'صورتك تظهر في كل غرفة ولعبة.', avatarHintGuest: 'محفوظة على هذا الجهاز. سجّل الدخول لرفع صورة.', avatarUpload: 'ارفع صورة', avatarReplace: 'غيّر الصورة', avatarRemove: 'احذف الصورة', avatarUploadHint: 'قص مربع، الحجم 128 بكسل.', avatarSaved: 'تم تحديث الصورة', avatarBadFile: 'الصورة دي مش مقروءة.', avatarNeedsAccount: 'الصور تحتاج حساب مجاني. اختار شكل من الأشكال.',
 
   impNeedsThree: 'لعبة المحتال محتاجة ٣ لاعبين على الأقل.',
@@ -372,6 +374,7 @@ const de: Strings = {
   impSurvivedVote: 'Die Abstimmung war uneinig. Der Bluffer kommt durch.', impImposterWord: 'Bluffer-Wort',
   impWasImposter: '{name} war der Bluffer', impImposterTag: 'Bluffer', impVotesWord: 'Stimmen', impVoteOne: 'Stimme',
   playerOne: 'Spieler',
+  avatarUploading: 'Wird hochgeladen…', avatarUploadFailed: 'Der Upload hat nicht geklappt. Versuch es noch einmal.', avatarTooBig: 'Das Foto ist zu groß. Nimm eines unter 12 MB.',
   avatarTitle: 'Profilbild', avatarHintAccount: 'Dein Gesicht erscheint in jeder Lobby und jedem Spiel.', avatarHintGuest: 'Auf diesem Gerät gespeichert. Melde dich an, um ein Foto hochzuladen.', avatarUpload: 'Foto hochladen', avatarReplace: 'Foto ersetzen', avatarRemove: 'Foto entfernen', avatarUploadHint: 'Quadratischer Ausschnitt, auf 128 px verkleinert.', avatarSaved: 'Bild aktualisiert', avatarBadFile: 'Das Bild konnte nicht gelesen werden.', avatarNeedsAccount: 'Fotos brauchen ein kostenloses Konto. Nimm sonst ein Motiv.',
 
   impNeedsThree: 'Bluffer braucht mindestens drei Spieler.',

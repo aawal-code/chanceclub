@@ -3,7 +3,7 @@ export const HEALTH_URL = `${BASE}/up`;
 export const WS_URL = `${BASE.replace(/^http/, 'ws').replace(/\/api\/v1$/, '')}/ws`;
 
 /** Absolute url for a server-relative asset path such as an avatar. */
-export const assetUrl = (path: string) => (/^https?:/i.test(path) ? path : BASE.replace(/\/api\/v1$/, '') + path);
+export const assetUrl = (path: string) => (/^https?:/i.test(path) ? path : BASE + path);
 
 const TOKEN_KEY = 'cc.token';
 const USER_KEY = 'cc.user';

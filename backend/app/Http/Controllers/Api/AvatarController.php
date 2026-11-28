@@ -31,9 +31,10 @@ class AvatarController extends Controller
         if (!$row) {
             return new HttpResponse('', 404, ['Cache-Control' => 'public, max-age=60']);
         }
-        $bytes = $row->bytes;
-        if (is_resource($bytes)) $bytes = stream_get_contents($bytes);
-        if (is_string($bytes) && str_starts_with($bytes, '\\x')) $bytes = hex2bin(str_replace('\\x', '', $bytes));
+        $bytes = base64_decode((string) $row->data, true);
+        if ($bytes === false || $bytes === '') {
+            return new HttpResponse('', 404, ['Cache-Control' => 'public, max-age=60']);
+        }
 
         return new HttpResponse($bytes, 200, [
             'Content-Type' => $row->mime,
@@ -72,7 +73,7 @@ class AvatarController extends Controller
         DB::transaction(function () use ($user, $mime, $bytes) {
             DB::table('user_avatars')->updateOrInsert(
                 ['user_id' => $user->id],
-                ['mime' => $mime, 'bytes' => $bytes, 'byte_size' => strlen($bytes), 'updated_at' => now(), 'created_at' => now()]
+                ['mime' => $mime, 'data' => base64_encode($bytes), 'byte_size' => strlen($bytes), 'updated_at' => now(), 'created_at' => now()]
             );
             DB::table('users')->where('id', $user->id)->increment('avatar_version');
         });
@@ -113,7 +114,7 @@ class AvatarController extends Controller
         return [
             'preset' => $preset ?: 'ink',
             'custom' => $custom,
-            'url' => $custom ? '/v1/avatars/'.$userId.'?v='.$version : null,
+            'url' => $custom ? '/avatars/'.$userId.'?v='.$version : null,
         ];
     }
 }
